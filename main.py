@@ -19,4 +19,4 @@ nt = Network("800px", "1800px", select_menu=True, directed=True)
 nt.from_nx(G)
 
 nt.show_buttons(filter_=[])
-nt.show("nx.html", notebook=False)
+nt.show("output.html", notebook=False)
