@@ -17,7 +17,7 @@ eBurger is a way to quickly visualize and interact with solidity smart contracts
 
 You get two types of results from this:
 - A visual Call Flow Graph under `output.html`
-- `ast_roots` variable containes pythonified representation of the AST - Bon Apetit 🍔 !
+- `ast_roots` variable contains pythonified representation of the AST - Bon Apetit 🍔 !
 
 ## How it looks like
 Here's an example of the interactive graph
