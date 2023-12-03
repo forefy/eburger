@@ -1,0 +1,10 @@
+.venv/
+.pytest*
+contract_asts/*
+.DS_Store
+**/.DS_Store
+*.egg-info
+*__pycache__
+lib/
+*.html
+dist/
