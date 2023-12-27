@@ -1,6 +1,7 @@
 .venv/
 .pytest*
 contract_asts/*
+contract_graphs/*
 .DS_Store
 **/.DS_Store
 *.egg-info
@@ -8,3 +9,4 @@ contract_asts/*
 lib/
 *.html
 dist/
+.vscode

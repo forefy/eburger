@@ -1,36 +1,50 @@
+from datetime import datetime
 import json
+import os
+from pathlib import Path
 import re
 import shlex
 import subprocess
+import uuid
 from eburger.serializer import parse_solidity_ast
 import networkx as nx
 from pyvis.network import Network
 import argparse
 
+from eburger.yaml_parser import process_files_concurrently
+
 parser = argparse.ArgumentParser(description="help")
-parser.add_argument("-sf", dest="solidity_file", type=str, help="path to Solidty file")
 parser.add_argument(
-    "-sr",
+    "-file", dest="solidity_file", type=str, help="path to Solidty file"
+)
+parser.add_argument(
+    "-folder", dest="solidity_folder", type=str, help="path to Solidty folder"
+)
+parser.add_argument(
+    "-r",
     dest="solc_remappings",
     type=str,
     nargs="+",
     help="Solidity compiler remappings",
 )
 parser.add_argument(
-    "-jf", dest="json_file", type=str, help="path to Solidty AST JSON file"
+    "-ast", dest="ast_json_file", type=str, help="path to Solidty AST JSON file"
+)
+parser.add_argument(
+    "-n",
+    dest="project_name",
+    type=str,
+    help="name of the project, if not supplied, name is automatically picked",
 )
 args = parser.parse_args()
 
 
-def draw_graph(ast_json):
-    G = nx.MultiDiGraph()
-    ast_roots, G = parse_solidity_ast(ast_json, G)
-
+def draw_graph(file_name):
     nt = Network("800px", "1800px", select_menu=True, directed=True)
     nt.from_nx(G)
 
     nt.show_buttons(filter_=[])
-    nt.show("output.html", notebook=False)
+    nt.show(f"contract_graphs/{file_name}.html", notebook=False)
 
 
 def run_command(command):
@@ -49,19 +63,38 @@ def run_command(command):
     return results
 
 
-def construct_solc_cmdline():
+def get_all_solidity_files(folder_path):
+    solidity_files = []
+    for root, dirs, files in os.walk(folder_path):
+        for file in files:
+            if file.endswith(".sol"):
+                solidity_files.append(os.path.join(folder_path, file))
+    return solidity_files
+
+
+def construct_solc_cmdline(compilation_source_path: str) -> str:
     solc_cmdline = "solc"
     if args.solc_remappings:
         solc_cmdline += " "
         solc_cmdline += " ".join(args.solc_remappings)
-    solc_cmdline += f" --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes {args.solidity_file}"
+    if args.solidity_folder:
+        solidity_files = get_all_solidity_files(args.solidity_folder)
+        compilation_source_path = " ".join(solidity_files)
+    solc_cmdline += f" --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes {compilation_source_path}"
     return solc_cmdline
 
 
-if args.solidity_file:
-    # get contract version
-    with open(args.solidity_file, "r") as f:
-        solc_required_version = None
+def find_and_read_sol_file(folder_path):
+    # Search for .sol files recursively in the given folder
+    for root, dirs, files in os.walk(folder_path):
+        for file in files:
+            if file.endswith(".sol"):
+                sol_file_path = os.path.join(root, file)
+                return sol_file_path
+
+
+def get_solidity_version_from_file(solidity_file: str) -> str:
+    with open(solidity_file, "r") as f:
         for line in f:
             if line.startswith("pragma solidity"):
                 solc_required_version = (
@@ -70,42 +103,77 @@ if args.solidity_file:
                     .replace(";", "")
                 )
                 break
-        if not solc_required_version:
-            print("Couldn't extract solidity version from file")
-            exit(0)
-        print(f"Trying to switch solc to version {solc_required_version}")
+    if not solc_required_version:
+        print("Couldn't extract solidity version from file")
+        exit(0)
+    return solc_required_version
+
+
+if args.solidity_file or args.solidity_folder:
+    sample_file_path = None
+    compilation_source_path = None
+    if args.solidity_file:
+        sample_file_path = args.solidity_file
+        compilation_source_path = args.solidity_file
+    elif args.solidity_folder:
+        compilation_source_path = args.solidity_folder
+        extracted_sample_file_path = find_and_read_sol_file(args.solidity_folder)
+        if extracted_sample_file_path is not None:
+            sample_file_path = extracted_sample_file_path
+
+    # get contract version
+    solc_required_version = get_solidity_version_from_file(sample_file_path)
+    print(f"Trying to switch solc to version {solc_required_version}")
+    solc_use_res = run_command(f"solc-select use {solc_required_version}")
+    print("------")
+    if not solc_use_res:
+        print("Error switching solc version, trying to install")
+        solc_install_res = run_command(f"solc-select install {solc_required_version}")
         solc_use_res = run_command(f"solc-select use {solc_required_version}")
-        print("------")
         if not solc_use_res:
-            print("Error switching solc version, trying to install")
-            solc_install_res = run_command(
-                f"solc-select install {solc_required_version}"
-            )
-            solc_use_res = run_command(f"solc-select use {solc_required_version}")
-            if not solc_use_res:
-                print("Failed to install required solc version")
-                exit(0)
-        solc_versions_res = run_command(f"solc-select versions")
-        print(f"Successfully switched solc version")
-        print("Trying to compile contract")
-        from pathlib import Path
+            print("Failed to install required solc version")
+            exit(0)
+    solc_versions_res = run_command(f"solc-select versions")
+    print(f"Successfully switched solc version")
+    print("Trying to compile contract")
 
-        ast_workspace = Path.cwd() / "contract_asts"
-        filename_match = re.search(r"/([^/]+)\.sol$", args.solidity_file)
+    ast_workspace = Path.cwd() / "contract_asts"
+    if args.project_name:
+        filename = args.project_name
+    else:
+        filename_match = re.search(r"/([^/]+)\.sol$", sample_file_path)
         filename = filename_match.group(1) if filename_match else None
-        output_filename = ast_workspace / f"{filename}.json"
-        solc_remappings = " ".join(args.solc_remappings)
-        solc_cmdline = construct_solc_cmdline()
-        print(solc_cmdline)
-        solc_compile_res = run_command(solc_cmdline)
-        solc_compile_res_parsed = json.loads("".join(solc_compile_res))
-        with open(output_filename, "w") as outfile:
-            json.dump(solc_compile_res_parsed, outfile, indent=4)
-        with open(output_filename, "r") as f:
-            ast_json = json.load(f)
-            draw_graph(ast_json)
-
-elif args.json_file:
-    with open(args.json_file, "r") as f:
+    filename = f"{filename}_{datetime.now().strftime('%m%y')}"
+    output_filename = ast_workspace / f"{filename}.json"
+    solc_remappings = " ".join(args.solc_remappings)
+    solc_cmdline = construct_solc_cmdline(compilation_source_path)
+    if solc_cmdline is None:
+        print("Error constructing solc command line")
+        exit(0)
+    print(solc_cmdline)
+    solc_compile_res = run_command(solc_cmdline)
+    solc_compile_res_parsed = json.loads("".join(solc_compile_res))
+    with open(output_filename, "w") as outfile:
+        json.dump(solc_compile_res_parsed, outfile, indent=4)
+    with open(output_filename, "r") as f:
         ast_json = json.load(f)
-        draw_graph(ast_json)
+
+
+elif args.ast_json_file:
+    filename = args.ast_json_file
+    with open(args.ast_json_file, "r") as f:
+        ast_json = json.load(f)
+
+G = nx.MultiDiGraph()
+ast_roots, G = parse_solidity_ast(ast_json, G)
+
+# Draw graph
+draw_graph(filename)
+
+# Parse YAML templates
+templates_path = Path(os.getcwd()) / "templates"
+insights = process_files_concurrently(templates_path, ast_roots)
+
+# Convert the insights to JSON and print
+insights_json = json.dumps(insights, indent=4)
+print(insights_json)

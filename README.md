@@ -6,8 +6,11 @@ eBurger is a way to quickly visualize and interact with solidity smart contracts
 `solc` probably exists in your system, but if not, please refer to the official documentation at https://docs.soliditylang.org/en/v0.8.9/installing-solidity.html
 
 ## How to use - simple example
-`python main.py -sf ../ProjectToScan/src/Vault.sol -sr @openzeppelin/=../ProjectToScan/lib/openzeppelin-contracts/`
-
+```
+git clone https://github.com/forefy/eburger.git
+cd eburger
+python main.py -folder ../ProjectToScan/src/ -r @openzeppelin/=../ProjectToScan/lib/openzeppelin-contracts/
+```
 In above example we are compiling the solidity file Vault.sol, as well as specifying remappings configured in the project.
 
 You get two types of results from this:
@@ -35,6 +38,7 @@ Here's an example of the interactive graph
 
 
 ## Features
+- YAML template support to query contract structure and raise insights for any matches
 - Call Flow Graph inspired by naming conventions of Solidity
 - Search specific segments and highlight by parameter, function, contract etc.
 - Extensive control on graph layout

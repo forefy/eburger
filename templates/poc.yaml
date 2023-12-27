@@ -1,0 +1,9 @@
+name: "SourceUnitCounter"
+description: "First template example - Count the number of SourceUnit nodes in the Solidity AST."
+severity: "Info"
+python: |
+    source_unit_count = 0
+    for node in ast_data:
+        if node.node_type == "SourceUnit":
+            source_unit_count += 1
+    print(source_unit_count)
