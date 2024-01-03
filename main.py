@@ -4,7 +4,9 @@ import os
 from pathlib import Path
 import re
 import shlex
+import shutil
 import subprocess
+import sys
 import uuid
 from eburger.serializer import parse_solidity_ast
 import networkx as nx
@@ -42,9 +44,25 @@ args = parser.parse_args()
 def draw_graph(file_name):
     nt = Network("800px", "1800px", select_menu=True, directed=True)
     nt.from_nx(G)
-
     nt.show_buttons(filter_=[])
-    nt.show(f"contract_graphs/{file_name}.html", notebook=False)
+    nt.show(f"contract_outputs/{file_name}.html", notebook=False)
+    graph_vis_lib_path = Path("contract_outputs", "lib")
+    if os.path.exists(graph_vis_lib_path):
+        shutil.rmtree(graph_vis_lib_path)
+    shutil.move("lib", graph_vis_lib_path)
+
+
+def save_python_ast(file_name, data):
+    orig_name = file_name
+    file_name = f"contract_outputs/{file_name}.py"
+    with open(file_name, "w") as file:
+        data_str = repr(data)
+        file.write(f"{orig_name} = {data_str}\n")
+
+
+def save_as_json(file_name, json_data):
+    with open(file_name, "w") as outfile:
+        json.dump(json_data, outfile, indent=4)
 
 
 def run_command(command):
@@ -109,6 +127,10 @@ def get_solidity_version_from_file(solidity_file: str) -> str:
     return solc_required_version
 
 
+if len(sys.argv) == 1:
+    parser.print_help(sys.stderr)
+    sys.exit(1)
+
 if args.solidity_file or args.solidity_folder:
     sample_file_path = None
     compilation_source_path = None
@@ -137,15 +159,14 @@ if args.solidity_file or args.solidity_folder:
     print(f"Successfully switched solc version")
     print("Trying to compile contract")
 
-    ast_workspace = Path.cwd() / "contract_asts"
+    outputs_dir = Path.cwd() / "contract_outputs"
     if args.project_name:
         filename = args.project_name
     else:
         filename_match = re.search(r"/([^/]+)\.sol$", sample_file_path)
         filename = filename_match.group(1) if filename_match else None
     filename = f"{filename}_{datetime.now().strftime('%m%y')}"
-    output_filename = ast_workspace / f"{filename}.json"
-    solc_remappings = " ".join(args.solc_remappings)
+    output_filename = outputs_dir / f"{filename}.json"
     solc_cmdline = construct_solc_cmdline(compilation_source_path)
     if solc_cmdline is None:
         print("Error constructing solc command line")
@@ -153,8 +174,7 @@ if args.solidity_file or args.solidity_folder:
     print(solc_cmdline)
     solc_compile_res = run_command(solc_cmdline)
     solc_compile_res_parsed = json.loads("".join(solc_compile_res))
-    with open(output_filename, "w") as outfile:
-        json.dump(solc_compile_res_parsed, outfile, indent=4)
+    save_as_json(output_filename, solc_compile_res_parsed)
     with open(output_filename, "r") as f:
         ast_json = json.load(f)
 
@@ -169,11 +189,13 @@ ast_roots, G = parse_solidity_ast(ast_json, G)
 
 # Draw graph
 draw_graph(filename)
+save_python_ast(filename, ast_roots)
 
 # Parse YAML templates
 templates_path = Path(os.getcwd()) / "templates"
-insights = process_files_concurrently(templates_path, ast_roots)
+insights = process_files_concurrently(templates_path, ast_json)
 
 # Convert the insights to JSON and print
-insights_json = json.dumps(insights, indent=4)
-print(insights_json)
+# insights_json = json.dumps(insights, indent=4)
+report_file_name = outputs_dir / f"{filename}_insights.json"
+save_as_json(report_file_name, insights)

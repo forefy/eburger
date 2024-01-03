@@ -7,6 +7,7 @@ from contextlib import redirect_stdout
 import io
 import ast
 import eburger.models as models
+from eburger.template_utils import *
 
 
 def load_ast_data(file_path):
@@ -42,12 +43,13 @@ def execute_python_code(python_code, ast_data):
 def process_yaml(file_path, ast_data):
     with open(file_path, "r") as file:
         yaml_data = yaml.safe_load(file)
-    result = execute_python_code(yaml_data["python"], ast_data)
+    results = execute_python_code(yaml_data["python"], ast_data)
+    print(results.splitlines())
     return {
         "name": yaml_data.get("name"),
         "description": yaml_data.get("description"),
         "severity": yaml_data.get("severity"),
-        "result": result.splitlines(),
+        "results": results.splitlines(),
     }
 
 

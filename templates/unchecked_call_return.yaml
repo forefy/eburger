@@ -1,0 +1,48 @@
+name: "Unchecked Call Return"
+description: "This checks for scenarios where a contract's call or send functions are used without checking the return value. This can lead to vulnerabilities as the success or failure of the call is not verified, potentially leading to unintended contract behavior."
+severity: "Medium"
+action-items:
+    - "Ensure all call and send functions check the return value to confirm transaction success."
+    - "Consider using safer alternatives like transfer, or implement comprehensive error handling for call and send."
+references:
+    - "https://solidity.readthedocs.io/en/v0.6.2/security-considerations.html#use-the-checks-effects-interactions-pattern"
+reports:
+    - "https://smartcontractsecurity.github.io/SWC-registry/docs/SWC-104"
+vulnerable_contracts:
+    - "../vulnerable_contracts/unchecked_call_return.sol"
+pseudo: |
+    For each node in the AST (Abstract Syntax Tree) of the Solidity contract:
+    If the node is a FunctionCall:
+        Check if the function called is 'send' or 'call'.
+        If yes, then:
+            Check if the return value of this call is being checked.
+            (Typically, this means looking for an IfStatement or a conditional that uses the result of the call.)
+            If the return value is not checked:
+                Mark this location in the code as potentially vulnerable.
+                Record the file and location details for reporting.
+    Return all recorded potentially vulnerable locations.
+python: |
+    file_list = extract_file_list_from_ast(ast_data)
+    results = []
+    stack = [ast_data]
+
+    while stack:
+        node = stack.pop()
+        if isinstance(node, dict):
+            if node.get('nodeType') == 'FunctionCall':
+                callee = node.get('expression', {}).get('typeDescriptions', {}).get('typeString')
+                if 'function (bytes memory) payable returns (bool,bytes memory)' in callee:
+                    # Checking if the parent node is a control structure that checks the call's return value
+                    parent = stack[-1] if stack else {}
+                    if not (parent.get('nodeType') in ['IfStatement', 'Conditional']):
+                        src_location = node.get('src', '')
+                        file_index = int(src_location.split(':')[2])
+                        file_name = file_list[file_index] if file_index < len(file_list) else "Unknown file"
+                        results.append(parse_code_highlight(src_location, file_name))
+
+        if isinstance(node, list):
+            stack.extend(node)
+        elif isinstance(node, dict):
+            stack.extend(node.values())
+
+    print(results)

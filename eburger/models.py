@@ -60,7 +60,10 @@ class SourceUnit(ASTNode):
     exported_symbols: Dict[str, List[int]] = field(default_factory=dict)
 
     def get_display_name(self):
-        return f"{self.node_type} {prettify_path(self.absolute_path)}"
+        display_name = self.node_type
+        if self.absolute_path is not None:
+            display_name += f" {prettify_path(self.absolute_path)}"
+        return display_name
 
 
 @dataclass

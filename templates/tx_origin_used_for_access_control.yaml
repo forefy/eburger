@@ -1,0 +1,53 @@
+name: "tx.origin Used for Access Control"
+description: "Imagine a user with an authorized address interacts with a malicious contract. This malicious contract then calls your contract that uses tx.origin for authentication. Since tx.origin will refer to the user's address (the original sender of the transaction), the malicious contract might gain unauthorized access."
+severity: "Low"
+action-items:
+    - "If tx.origin is used as an important access control, consider using a msg.sender based approach instead."   
+references:
+    - "https://github.com/ethereum/solidity/issues/683"
+reports:
+    - "https://solodit.xyz/issues/l-01-avoid-using-txorigin-code4rena-canto-identity-subprotocols-canto-identity-subprotocols-contest-git"
+vulnerable_contracts:
+    - "../vulnerable_contracts/tx_origin_used_for_access_control.sol"
+pseudo: |
+    For each node in the AST of the Solidity contract:
+        If the node is a FunctionCall with 'require':
+            For each argument in the function call:
+                If the argument is a BinaryOperation:
+                    Check if either side of the operation uses 'tx.origin'.
+                    If yes:
+                        Record the source location of this node.
+                        Determine the file index from the source location.
+                        Retrieve the corresponding file name from the file list.
+                        Add the file name and the source location to the results.
+    Return all occurrences where 'tx.origin' is used in a require statement.
+python: |
+    file_list = extract_file_list_from_ast(ast_data)
+    results = []
+    stack = [ast_data]
+
+    while stack:
+        node = stack.pop()
+
+        if isinstance(node, dict):
+            # Check if the node is a FunctionCall with 'require'
+            if node.get('nodeType') == 'FunctionCall' and node.get('expression', {}).get('name') == 'require':
+                arguments = node.get('arguments', [])
+                for arg in arguments:
+                    if arg.get('nodeType') == 'BinaryOperation':
+                        left_expr = arg.get('leftExpression', {})
+                        right_expr = arg.get('rightExpression', {})
+                        if ((left_expr.get('nodeType') == 'MemberAccess' and left_expr.get('expression', {}).get('name') == 'tx' and left_expr.get('memberName') == 'origin') \
+                            or (right_expr.get('nodeType') == 'MemberAccess' and right_expr.get('expression', {}).get('name') == 'tx' and right_expr.get('memberName') == 'origin')):
+                            src_location = node.get('src', '')
+                            file_index = int(src_location.split(':')[2])
+                            file_name = file_list[file_index] if file_index < len(file_list) else "Unknown file"
+                            results.append(parse_code_highlight(src_location, file_name))
+
+            for value in node.values():
+                if isinstance(value, (dict, list)):
+                    stack.append(value)
+
+        elif isinstance(node, list):
+            stack.extend(node)
+    print(results)

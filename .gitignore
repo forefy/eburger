@@ -1,12 +1,11 @@
 .venv/
 .pytest*
-contract_asts/*
-contract_graphs/*
+contract_outputs/*
 .DS_Store
 **/.DS_Store
 *.egg-info
 *__pycache__
-lib/
 *.html
 dist/
 .vscode
+*[0-9][0-9].py
