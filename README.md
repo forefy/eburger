@@ -61,6 +61,22 @@ Templates can be added by adding new YAML files under the `templates/` directory
 For documentation refer to the [Wiki](https://github.com/forefy/eburger/wiki/Templates).
 
 ## How it looks like
+Here's an example
+```bash
+python main.py -file ../ProblematicVault/src/Vault.sol
+cat contract_outputs/ProblematicVault_insights.json
+```
+```json
+{
+    "name": "tx.origin Used for Access Control",
+    "description": "Imagine a user with an authorized address interacts with a malicious contract. This malicious contract then calls your contract that uses tx.origin for authentication. Since tx.origin will refer to the user's address (the original sender of the transaction), the malicious contract might gain unauthorized access.",
+    "severity": "Low",
+    "results": [
+        "Line 11 Columns 8-62 - require(tx.origin == owner, 'Caller is not the owner')"
+    ]
+}
+```
+
 Here's an example of the interactive graph
 ![eBurger](static/network_graph.png?raw=true "eBurger Network Graph")
 

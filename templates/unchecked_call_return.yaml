@@ -6,8 +6,9 @@ action-items:
     - "Consider using safer alternatives like transfer, or implement comprehensive error handling for call and send."
 references:
     - "https://solidity.readthedocs.io/en/v0.6.2/security-considerations.html#use-the-checks-effects-interactions-pattern"
+    - "https://swcregistry.io/docs/SWC-104/"
 reports:
-    - "https://smartcontractsecurity.github.io/SWC-registry/docs/SWC-104"
+    - "https://solodit.xyz/issues/h-01-unchecked-erc20-transfers-can-cause-lock-up-code4rena-reality-cards-reality-cards-contest-git"
 vulnerable_contracts:
     - "../vulnerable_contracts/unchecked_call_return.sol"
 pseudo: |
