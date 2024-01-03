@@ -44,5 +44,3 @@ python: |
             stack.extend(node)
         elif isinstance(node, dict):
             stack.extend(node.values())
-    if results:
-        print(results)

@@ -245,7 +245,6 @@ def main():
 
     # Convert the insights to JSON and print
     if insights:
-        # insights_json_printable = json.dumps(insights, indent=4)
         report_file_name = outputs_dir / f"{filename}_insights.json"
         save_as_json(report_file_name, insights)
 

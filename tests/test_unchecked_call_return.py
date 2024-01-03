@@ -639,4 +639,4 @@ def test_unchecked_call_return(unchecked_call_return_ast):
         "eburger/templates/unchecked_call_return.yaml",
         unchecked_call_return_ast,
     )
-    assert "Line 4 Columns 8-40" in results["results"][0]
+    assert "Line 14 Columns 8-40" in results["results"][0]

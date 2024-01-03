@@ -1,3 +1,6 @@
+import json
+
+
 class color:
     ResetAll = "\033[0m"
 
@@ -32,3 +35,6 @@ def log(type: str, message: str):
             print(f"[{color.Warning} Warning {color.Default}] {message}")
         case "info":
             print(f"[{color.Info} Info {color.Default}] {message}")
+        case "json":
+            json_printable = json.dumps(message, indent=4)
+            print(json_printable)

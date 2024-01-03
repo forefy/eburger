@@ -50,5 +50,3 @@ python: |
 
         elif isinstance(node, list):
             stack.extend(node)
-    if results:
-        print(results)

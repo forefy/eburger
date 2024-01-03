@@ -10,8 +10,8 @@ install-local:
 	pip install dist/eburger-0.1.0-py3-none-any.whl
 	eburger -h
 
-.PHONY: test
-test:
+.PHONY: pytest
+pytest:
 	pytest -s
 
 .PHONY: uninstall
