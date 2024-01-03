@@ -43,16 +43,16 @@ eburger -h
 ## Usage
 
 ### Simple examples
+This will run a focused scan on one file and it's dependencies:
 ```
 eburger -f ../ProjectToScan/src/SomeContract.sol
 ```
-This will run a focused scan on one file and it's dependencies.
+..
 
-
+This will compile the solidity folder ProjectToScan, as well as specifying remappings configured in the project.
 ```
 eburger -f ../ProjectToScan/src/ -r @openzeppelin/=../ProjectToScan/lib/openzeppelin-contracts/
 ```
-In above example we are compiling the solidity folder ProjectToScan, as well as specifying remappings configured in the project.
 
 
 ### Advanced usage
@@ -92,7 +92,7 @@ Here's an example of the interactive graph
 ## Features
 - YAML template support to query contract structure and raise insights for any matches
 - Call Flow Graph inspired by naming conventions of Solidity
-- Search specific segments and highlight by parameter, function, contract etc.
+- Search specific segments and highlight by parameter, function, contract etc
 - Extensive control on graph layout
 - View only the code related to the contract and not all the libraries in the world
 - Community and free support via [Discord](discord.gg/WaVMpBtxdB)
