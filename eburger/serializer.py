@@ -1,3 +1,4 @@
+from eburger.logger import log
 from eburger.models import (
     ASTNode,
     Assignment,
@@ -642,7 +643,7 @@ def parse_ast_node(node_dict, G, parent=None):
             )
 
         case _:
-            print(f"[WARN] Unrecognized node type {node_type}")
+            log("warning", f"Unsupported node type {node_type}")
             parsed_node = ASTNode(
                 node_id=node_id,
                 node_type=node_type,

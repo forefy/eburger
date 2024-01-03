@@ -4,6 +4,10 @@ version = "0.1.0"
 description = ""
 authors = ["tomie <admin@forefy.com>"]
 readme = "README.md"
+include = ["eburger/templates/*.yaml"]
+
+[tool.poetry.scripts]
+eburger = 'eburger.main:main'
 
 [tool.poetry.dependencies]
 python = "^3.11"

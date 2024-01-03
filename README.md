@@ -1,19 +1,18 @@
 # eBurger - Template Based Smart Contracts Static Analysis
 <img src="static/eburger.png?raw=true" alt="eBurger" width="500"/>
 
-
 eBurger is a way to quickly interact with solidity smart contracts.
 
-Running scanners won't win you competitions, spin up custom templates tailored to specific projects in minutes ( [Wiki](https://github.com/forefy/eburger/wiki) ).
+Running scanners won't win you competitions. spin up custom templates tailored to specific projects in minutes ([Wiki](https://github.com/forefy/eburger/wiki)).
 
-* [Comparison Table](#comparison-table)
-* [How to install](#how-to-install)
-    * [Prerequisite - The Solidity Compiler](#prerequisite---the-solidity-compiler)
-    * [Clone](#Clone)
-* [How to run simply](#how-to-run-simply)
-* [How to run - advanced](#how-to-run---advanced)
-* [Adding templates](#adding-templates)
-* [What is missing](what-is-missing)
+- [Comparison Table](#comparison-table)
+- [How to install](#how-to-install)
+    - [Prerequisite - The Solidity Compiler](#prerequisite---the-solidity-compiler)
+    - [Installation](#installation)
+- [How to run simply](#how-to-run-simply)
+- [How to run - advanced](#how-to-run---advanced)
+- [Adding templates](#adding-templates)
+- [What is missing](#what-is-missing)
 
 
 
@@ -28,42 +27,50 @@ Running scanners won't win you competitions, spin up custom templates tailored t
 Forgot one? open an issue :)
 
 ## How to install
-### Prerequisite - The Solidity Compiler
+### Prerequisites
+`python 3`
+
 `solc` probably exists in your system, but if not, please refer to the official documentation at https://docs.soliditylang.org/en/v0.8.9/installing-solidity.html
 
-`poetry` - preferred python package manager. You can get it `curl -sSL https://install.python-poetry.org | python3 -`
 
-### Clone
+### Installation
 ```
 git clone https://github.com/forefy/eburger.git
-cd eburger
-poetry shell
+pip3 install .
+eburger -h
 ```
 
-## How to run simply
+## Usage
+
+### Simple examples
 ```
-python main.py -file ../ProjectToScan/src/SomeContract.sol
+eburger -f ../ProjectToScan/src/SomeContract.sol
 ```
 This will run a focused scan on one file and it's dependencies.
 
 
 ```
-python main.py -folder ../ProjectToScan/src/ -r @openzeppelin/=../ProjectToScan/lib/openzeppelin-contracts/
+eburger -f ../ProjectToScan/src/ -r @openzeppelin/=../ProjectToScan/lib/openzeppelin-contracts/
 ```
 In above example we are compiling the solidity folder ProjectToScan, as well as specifying remappings configured in the project.
 
 
-## How to run - advanced
+### Advanced usage
 Refer to the [Wiki](https://github.com/forefy/eburger/wiki/Advanced-usage).
 
+
 ## Adding templates
-Templates can be added by adding new YAML files under the `templates/` directory
+Templates can be added by adding new YAML files under the `templates/` directory.
+
+If you are using eburger as a python package (installed with pip install), the templates location can be found with running `pip3 show eburger` or by running the tool on a contract and seeing the templates path printed to the console.
+
 For documentation refer to the [Wiki](https://github.com/forefy/eburger/wiki/Templates).
+
 
 ## How it looks like
 Here's an example
 ```bash
-python main.py -file ../ProblematicVault/src/Vault.sol
+eburger -f ../ProblematicVault/src/Vault.sol
 cat contract_outputs/ProblematicVault_insights.json
 ```
 ```json
@@ -77,8 +84,10 @@ cat contract_outputs/ProblematicVault_insights.json
 }
 ```
 
+
 Here's an example of the interactive graph
 ![eBurger](static/network_graph.png?raw=true "eBurger Network Graph")
+
 
 ## Features
 - YAML template support to query contract structure and raise insights for any matches

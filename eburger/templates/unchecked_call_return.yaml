@@ -40,10 +40,9 @@ python: |
                         file_index = int(src_location.split(':')[2])
                         file_name = file_list[file_index] if file_index < len(file_list) else "Unknown file"
                         results.append(parse_code_highlight(src_location, file_name))
-
         if isinstance(node, list):
             stack.extend(node)
         elif isinstance(node, dict):
             stack.extend(node.values())
-
-    print(results)
+    if results:
+        print(results)
