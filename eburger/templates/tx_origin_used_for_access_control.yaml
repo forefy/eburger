@@ -42,7 +42,8 @@ python: |
                             src_location = node.get('src', '')
                             file_index = int(src_location.split(':')[2])
                             file_name = file_list[file_index] if file_index < len(file_list) else "Unknown file"
-                            results.append(parse_code_highlight(src_location, file_name))
+                            lines, vuln_code = parse_code_highlight(src_location, file_name)
+                            results.append({"file": file_name, "lines": lines, "code": vuln_code})
 
             for value in node.values():
                 if isinstance(value, (dict, list)):

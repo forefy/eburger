@@ -71,7 +71,7 @@ For documentation refer to the [Wiki](https://github.com/forefy/eburger/wiki/Tem
 Here's an example
 ```bash
 eburger -f ../ProblematicVault/src/Vault.sol
-cat contract_outputs/ProblematicVault_insights.json
+cat eburger-results.json
 ```
 ```json
 {
@@ -79,11 +79,16 @@ cat contract_outputs/ProblematicVault_insights.json
     "description": "Imagine a user with an authorized address interacts with a malicious contract. This malicious contract then calls your contract that uses tx.origin for authentication. Since tx.origin will refer to the user's address (the original sender of the transaction), the malicious contract might gain unauthorized access.",
     "severity": "Low",
     "results": [
-        "Line 11 Columns 8-62 - require(tx.origin == owner, 'Caller is not the owner')"
+        {
+            "file": "vulnerable_contracts/tx_origin_used_for_access_control.sol",
+            "lines": "Line 11 Columns 8-62",
+            "code": "require(tx.origin == owner, 'Caller is not the owner')"
+        }
     ]
 }
 ```
 
+Above command will also generate an AST, pythonified AST and a visual call flow graph under the folder `.eburger`.
 
 Here's an example of the interactive graph
 ![eBurger](static/network_graph.png?raw=true "eBurger Network Graph")

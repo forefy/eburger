@@ -24,7 +24,10 @@ def parse_code_highlight(src_location, file_path):
             if current_offset <= start_offset < end_offset:
                 start_char = start_offset - current_offset
                 end_char = min(start_char + length, len(line))
-                return f"Line {line_number} Columns {start_char}-{end_char}: {vulnerable_code}"
+                return (
+                    f"Line {line_number} Columns {start_char}-{end_char}",
+                    vulnerable_code,
+                )
             current_offset = end_offset + 1  # +1 for the newline character
             line_number += 1
 

@@ -1,6 +1,6 @@
 .venv/
 .pytest*
-contract_outputs/*
+.eburger
 .DS_Store
 **/.DS_Store
 *.egg-info
@@ -9,3 +9,4 @@ contract_outputs/*
 dist/
 .vscode
 *[0-9][0-9].py
+*eburger-output.json

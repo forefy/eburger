@@ -72,7 +72,6 @@ def process_files_concurrently(directory_path, ast_data):
                 log("error", "A task has timed out.")
             except Exception as e:
                 log("error", f"Unhandled error: {e}")
-
     log(
         "info",
         f"{color.Error}{len(insights)}{color.Default} insight{'s were' if (len(insights) > 1 or len(insights) == 0) else ' was'} found by eBurger.",

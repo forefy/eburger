@@ -107,7 +107,13 @@ def get_all_solidity_files(folder_path):
     for root, dirs, files in os.walk(folder_path):
         for file in files:
             if file.endswith(".sol"):
-                solidity_files.append(os.path.join(folder_path, file))
+                # only include files with a pragma statement
+                file_path = os.path.join(root, file)
+                with open(file_path, "r") as f:
+                    for i in range(10):
+                        line = f.readline()
+                        if "pragma" in line:
+                            solidity_files.append(os.path.join(folder_path, file))
     return solidity_files
 
 
@@ -129,22 +135,57 @@ def find_and_read_sol_file(folder_path):
         for file in files:
             if file.endswith(".sol"):
                 sol_file_path = os.path.join(root, file)
-                return sol_file_path
+                with open(sol_file_path, "r") as file:
+                    # Read the first 10 lines of the file
+                    for i in range(10):
+                        line = file.readline()
+                        # Check if the line contains a pragma statement
+                        if "pragma" in line:
+                            return sol_file_path
 
 
 def get_solidity_version_from_file(solidity_file_or_folder: str) -> str:
+    solc_required_version = None
+    version_pattern = r"pragma\s+solidity\s+([^;]+);"
+    version_number_pattern = r"\d+\.\d+\.\d+|\d+\.\d+"
     with open(solidity_file_or_folder, "r") as f:
-        for line in f:
-            if line.startswith("pragma solidity"):
-                solc_required_version = (
-                    line.replace("pragma solidity ", "")
-                    .replace("^", "")
-                    .replace(";", "")
-                )
-                break
-    if not solc_required_version:
-        log("error", "Couldn't extract solidity version from file")
-        exit(0)
+        content = f.read()
+
+        match = re.search(version_pattern, content)
+        if match:
+            version_match = match.group(1)
+
+            # Extract all version numbers
+            version_numbers = re.findall(version_number_pattern, version_match)
+
+            if version_numbers:
+                # If there is an upper limit, choose the version just below the upper limit
+                if "<" in version_match and len(version_numbers) > 1:
+                    upper_version = version_numbers[-1]
+                    lower_version = (
+                        version_numbers[0] if len(version_numbers) > 1 else None
+                    )
+
+                    major, minor, *patch = map(int, upper_version.split("."))
+                    lower_major, lower_minor, *lower_patch = (
+                        map(int, lower_version.split(".")) if lower_version else (0, 0)
+                    )
+
+                    if minor > 0 and (
+                        major > lower_major
+                        or (major == lower_major and minor - 1 >= lower_minor)
+                    ):
+                        # Choose the highest minor version below the upper limit
+                        solc_required_version = f"{major}.{minor - 1}.0"
+                    else:
+                        # If the upper limit is too close to the lower limit, return the lower limit
+                        solc_required_version = lower_version
+                else:
+                    # Return the highest version number found
+                    solc_required_version = version_numbers[-1]
+    if solc_required_version is None:
+        log("warning", "Couldn't extract solidity version from file, trying 0.8.20")
+        solc_required_version = "0.8.20"
     return solc_required_version
 
 
@@ -199,7 +240,7 @@ def main():
         log("info", "Successfully switched solc version")
         log("info", "Trying to compile contract")
 
-        outputs_dir = Path.cwd() / "contract_outputs"
+        outputs_dir = Path.cwd() / ".eburger"
         create_directory_if_not_exists(outputs_dir)
 
         if args.project_name:
@@ -247,6 +288,11 @@ def main():
     if insights:
         report_file_name = outputs_dir / f"{filename}_insights.json"
         save_as_json(report_file_name, insights)
+
+        # If path is a folder, also put a json insights file at the folder root.
+        if path_type == "folder":
+            project_report_file_name = Path.cwd() / "eburger-output.json"
+            save_as_json(project_report_file_name, insights)
 
     log("success", f"Results saved to {outputs_dir}/{filename}.*")
 
