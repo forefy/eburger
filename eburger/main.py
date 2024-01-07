@@ -57,6 +57,16 @@ def create_directory_if_not_exists(directory_path):
         log("info", f"Created directory: {directory_path}")
 
 
+def is_valid_json(json_string):
+    if not json_string:
+        return False
+    try:
+        json.loads("".join(json_string))
+        return True
+    except ValueError:
+        return False
+
+
 def draw_graph(outputs_dir, file_name, G):
     nt = Network("800px", "1800px", select_menu=True, directed=True)
     nt.from_nx(G)
@@ -98,7 +108,6 @@ def run_command(command):
             break
         if output:
             results.append(output.strip())
-
     return results
 
 
@@ -254,8 +263,15 @@ def main():
         if solc_cmdline is None:
             log("error", "Error constructing solc command line")
             exit(0)
-        log("info", f"[Info] {solc_cmdline}")
+        log("info", f"{solc_cmdline}")
         solc_compile_res = run_command(solc_cmdline)
+        if not is_valid_json(solc_compile_res):
+            log(
+                "error",
+                f"Locally installed solc errored out trying to compile the contract. Please review comiler warnings above or see if library remappings (using the -r option) are needed.",
+            )
+            sys.exit(0)
+
         solc_compile_res_parsed = json.loads("".join(solc_compile_res))
         save_as_json(output_filename, solc_compile_res_parsed)
         with open(output_filename, "r") as f:
