@@ -35,6 +35,23 @@ def log(type: str, message: str):
             print(f"[{color.Warning} Warning {color.Default}] {message}")
         case "info":
             print(f"[{color.Info} Info {color.Default}] {message}")
-        case "json":
-            json_printable = json.dumps(message, indent=4)
-            print(json_printable)
+        case "insights":
+            # json_printable = json.dumps(message, indent=4)
+            # print(json_printable)
+            for item in message:
+                name = item.get("name")
+                severity = item.get("severity")
+                match severity:
+                    case "High":
+                        severity = f"[{color.Error} ❗️High {color.Default}]"
+                    case "Medium":
+                        severity = f"[{color.Warning} ❗️Medium {color.Default}]"
+                    case "Low":
+                        severity = f"[{color.Info} ❗️Low {color.Default}]"
+
+                first_result = item.get("results")[0]
+                location = first_result.get("file")
+                lines = first_result.get("lines")
+                lines = lines.replace("Line ", "::").replace(" Columns ", "::")
+                location += lines
+                print(f"{severity} {name} at {location}")

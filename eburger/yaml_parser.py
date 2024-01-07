@@ -77,5 +77,5 @@ def process_files_concurrently(directory_path, ast_data):
         f"{color.Error}{len(insights)}{color.Default} insight{'s were' if (len(insights) > 1 or len(insights) == 0) else ' was'} found by eBurger.",
     )
     if insights:
-        log("json", insights)
+        log("insights", insights)
     return insights
