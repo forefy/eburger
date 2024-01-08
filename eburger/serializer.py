@@ -1,4 +1,3 @@
-from eburger.logger import log
 from eburger.models import (
     ASTNode,
     Assignment,
@@ -12,7 +11,9 @@ from eburger.models import (
     ErrorDefinition,
     EventDefinition,
     ExpressionStatement,
+    ForStatement,
     FunctionCall,
+    FunctionCallOptions,
     FunctionDefinition,
     Identifier,
     IdentifierPath,
@@ -29,11 +30,13 @@ from eburger.models import (
     PragmaDirective,
     SymbolAlias,
     TupleExpression,
+    UnaryOperation,
     UserDefinedTypeName,
     UsingForDirective,
     VariableDeclaration,
     VariableDeclarationStatement,
 )
+from eburger.utils.logger import log
 
 
 def parse_ast_node(node_dict, G, parent=None):
@@ -645,8 +648,133 @@ def parse_ast_node(node_dict, G, parent=None):
                 parsed_node.get_display_name(), index_expression.get_display_name()
             )
 
+        case "UnaryOperation":
+            src = node_dict.get("src", "")
+            is_constant = node_dict.get("isConstant", False)
+            is_lvalue = node_dict.get("isLValue", False)
+            is_pure = node_dict.get("isPure", False)
+            lvalue_requested = node_dict.get("lValueRequested", False)
+            operator = node_dict.get("operator", "")
+            prefix = node_dict.get("prefix", False)
+            type_descriptions = node_dict.get("typeDescriptions", {})
+
+            # Parsing the subExpression, which can be of various types
+            sub_expression_dict = node_dict.get("subExpression", {})
+            sub_expression, G = (
+                parse_ast_node(sub_expression_dict, G)
+                if sub_expression_dict
+                else (None, G)
+            )
+
+            parsed_node = UnaryOperation(
+                node_id=node_id,
+                node_type=node_type,
+                is_constant=is_constant,
+                is_lvalue=is_lvalue,
+                is_pure=is_pure,
+                lvalue_requested=lvalue_requested,
+                type_descriptions=type_descriptions,
+                operator=operator,
+                prefix=prefix,
+                src=src,
+                subExpression=sub_expression,
+                children=[],
+            )
+
+            # Adding edge to graph if subExpression exists
+            if sub_expression:
+                G.add_edge(
+                    parsed_node.get_display_name(), sub_expression.get_display_name()
+                )
+        case "ForStatement":
+            src = node_dict.get("src", "")
+
+            init_expr_dict = node_dict.get("initializationExpression", {})
+            initializationExpression, G = (
+                parse_ast_node(init_expr_dict, G) if init_expr_dict else (None, G)
+            )
+
+            condition_dict = node_dict.get("condition", {})
+            condition, G = (
+                parse_ast_node(condition_dict, G) if condition_dict else (None, G)
+            )
+
+            loop_expr_dict = node_dict.get("loopExpression", {})
+            loopExpression, G = (
+                parse_ast_node(loop_expr_dict, G) if loop_expr_dict else (None, G)
+            )
+
+            body_dict = node_dict.get("body", {})
+            body, G = parse_ast_node(body_dict, G) if body_dict else None
+
+            parsed_node = ForStatement(
+                initializationExpression=initializationExpression,
+                condition=condition,
+                loopExpression=loopExpression,
+                body=body,
+                node_id=node_id,
+                src=src,
+                node_type=node_type,
+                children=[],
+            )
+
+            # Building relationships in the graph G if needed
+            if initializationExpression:
+                G.add_edge(
+                    parsed_node.get_display_name(),
+                    initializationExpression.get_display_name(),
+                )
+            if condition:
+                G.add_edge(parsed_node.get_display_name(), condition.get_display_name())
+            if loopExpression:
+                G.add_edge(
+                    parsed_node.get_display_name(), loopExpression.get_display_name()
+                )
+            if body:
+                G.add_edge(parsed_node.get_display_name(), body.get_display_name())
+
+        case "FunctionCallOptions":
+            # Parsing FunctionCallOptions fields
+            expression_dict = node_dict.get("expression", {})
+            expression, G = (
+                parse_ast_node(expression_dict, G, parent=node_id)
+                if expression_dict
+                else (None, G)
+            )
+
+            options = []
+            for option_dict in node_dict.get("options", []):
+                option, G = parse_ast_node(option_dict, G, parent=node_id)
+                options.append(option)
+
+            names = node_dict.get("names", [])
+            type_descriptions = node_dict.get("typeDescriptions", {})
+            node_id = node_dict.get("id", 0)
+            src = node_dict.get("src", "")
+
+            parsed_node = FunctionCallOptions(
+                expression=expression,
+                options=options,
+                names=names,
+                typeDescriptions=type_descriptions,
+                src=src,
+                node_id=node_id,
+                node_type=node_type,
+                children=[],
+            )
+
+            if parent:
+                G.add_edge(parent, parsed_node.get_display_name())
+
+            if expression:
+                G.add_edge(
+                    parsed_node.get_display_name(), expression.get_display_name()
+                )
+            for option in options:
+                G.add_edge(parsed_node.get_display_name(), option.get_display_name())
+
         case _:
-            log("warning", f"Unsupported node type {node_type}")
+            # log("warning", f"Unsupported node type {node_type}")
             parsed_node = ASTNode(
                 node_id=node_id,
                 node_type=node_type,

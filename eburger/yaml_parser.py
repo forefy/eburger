@@ -5,10 +5,11 @@ import traceback
 import yaml
 import concurrent.futures
 import ast
+from eburger import settings
 
-from eburger.logger import color, log
 import eburger.models as models
 from eburger.template_utils import *
+from eburger.utils.logger import color, log
 
 
 def load_ast_data(file_path):
@@ -19,7 +20,11 @@ def load_ast_data(file_path):
 
 
 def execute_python_code(template_name, python_code, ast_data, src_file_list):
-    local_vars = {"ast_data": ast_data, "src_file_list": src_file_list}
+    local_vars = {
+        "ast_data": ast_data,
+        "src_file_list": src_file_list,
+        "project_root": settings.project_root,
+    }
     for attr in dir(models):
         attr_value = getattr(models, attr)
         if inspect.isclass(attr_value):

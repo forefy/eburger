@@ -70,7 +70,8 @@ For documentation refer to the [Wiki](https://github.com/forefy/eburger/wiki/Tem
 ## How it looks like
 Here's an example
 ```bash
-eburger -f ../ProblematicVault/src/Vault.sol
+cd MyProject/
+eburger
 cat eburger-results.json
 ```
 ```json

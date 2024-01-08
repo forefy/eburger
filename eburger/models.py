@@ -725,3 +725,57 @@ class IndexAccess(ASTNode):
     baseExpression: Identifier
     indexExpression: Identifier
     type_descriptions: Dict[str, str]
+
+
+@dataclass
+class UnaryOperation(ASTNode):
+    is_constant: bool
+    is_lvalue: bool
+    is_pure: bool
+    lvalue_requested: bool
+    type_descriptions: Dict
+    operator: str
+    prefix: bool
+    src: str
+    subExpression: IndexAccess
+
+
+@dataclass
+class ForStatement(ASTNode):
+    """
+    Represents a 'for' statement in a Solidity source file.
+
+    Attributes:
+        initializationExpression: VariableDeclarationStatement - The initialization expression of the for loop.
+        condition: ASTNode - The condition expression of the for loop.
+        loopExpression: ExpressionStatement - The loop expression (increment/decrement) of the for loop.
+        body: Block - The body of the for loop.
+        node_id: int - A unique identifier for the node within the AST.
+        src: str - Source location for this node within its file.
+    """
+
+    initializationExpression: Optional[VariableDeclarationStatement]
+    condition: Optional[ASTNode]
+    loopExpression: Optional[ExpressionStatement]
+    body: Block
+    node_id: int
+    src: str
+
+
+@dataclass
+class FunctionCallOptions(ASTNode):
+    """
+    Represents function call options in a Solidity source file.
+
+    Attributes:
+        expression: ASTNode - The expression representing the function being called.
+        options: List[Identifier] - The list of options used in the function call.
+        names: List[str] - The names of the options.
+        typeDescriptions: TypeDescriptions - Type descriptions for the function call.
+    """
+
+    expression: ASTNode
+    options: List[Identifier]  # Assuming Identifier is already defined
+    names: List[str]
+    typeDescriptions: Dict = field(default_factory=dict)
+    src: str

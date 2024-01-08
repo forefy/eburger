@@ -1,6 +1,3 @@
-import json
-
-
 class color:
     ResetAll = "\033[0m"
 
