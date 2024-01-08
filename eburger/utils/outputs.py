@@ -8,6 +8,8 @@ import io
 from eburger import settings
 from pyvis.network import Network
 
+from eburger.utils.filesystem import move_multiple_dirs
+
 
 class Silent(io.StringIO):
     def write(self, txt):
@@ -28,7 +30,9 @@ def draw_graph(file_name, G):
     graph_vis_lib_path = settings.outputs_dir / "lib"
     if os.path.exists(graph_vis_lib_path):
         shutil.rmtree(graph_vis_lib_path)
-    shutil.move("lib", graph_vis_lib_path)
+
+    graph_html_folders = ["bindings", "tom-select", "vis-*"]
+    move_multiple_dirs("lib", graph_html_folders, graph_vis_lib_path)
 
 
 def save_python_ast(file_name, data):

@@ -1,3 +1,6 @@
+import sys
+
+
 class color:
     ResetAll = "\033[0m"
 
@@ -28,6 +31,7 @@ def log(type: str, message: str):
             print(f"[{color.Success} 🍔 Success {color.Default}] {message}")
         case "error":
             print(f"[{color.Error} Error {color.Default}] {message}")
+            sys.exit(0)
         case "warning":
             print(f"[{color.Warning} Warning {color.Default}] {message}")
         case "info":

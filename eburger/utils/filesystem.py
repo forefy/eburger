@@ -1,3 +1,5 @@
+import fnmatch
+import json
 import os
 import re
 import shutil
@@ -95,3 +97,43 @@ def create_or_empty_directory(directory_path):
         # Create the directory if it does not exist
         os.makedirs(directory_path)
         log("info", f"Created directory: {directory_path}")
+
+
+# TODO: Add better handling for multiple build info files
+def get_foundry_ast_json(forge_out_dir) -> dict:
+    json_files = [f for f in os.listdir(forge_out_dir) if f.endswith(".json")]
+    if not json_files:
+        log("error", "forge build generated no output.")
+    if len(json_files) > 1:
+        log(
+            "warning",
+            "Multiple forge-output files found, choosing the latest.",
+        )
+    latest_file = max(
+        json_files,
+        key=lambda x: os.path.getctime(os.path.join(forge_out_dir, x)),
+    )
+    latest_file_path = os.path.join(forge_out_dir, latest_file)
+    with open(latest_file_path, "r") as f:
+        ast_json = json.load(f)
+    return ast_json["output"]
+
+
+def move_multiple_dirs(source_dir, directories_to_move, destination_dir):
+    for dir_name in directories_to_move:
+        if "*" in dir_name:
+            # For wildcard entries, find matching directories
+            for item in os.listdir(source_dir):
+                if fnmatch.fnmatch(item, dir_name):
+                    src_path = os.path.join(source_dir, item)
+                    dest_path = os.path.join(destination_dir, item)
+                    create_directory_if_not_exists(dest_path)
+                    if os.path.isdir(src_path):
+                        shutil.move(src_path, dest_path)
+        else:
+            # For exact names, move directly
+            src_path = os.path.join(source_dir, dir_name)
+            dest_path = os.path.join(destination_dir, dir_name)
+            create_directory_if_not_exists(dest_path)
+            if os.path.exists(src_path) and os.path.isdir(src_path):
+                shutil.move(src_path, dest_path)

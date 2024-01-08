@@ -723,8 +723,8 @@ class IndexAccess(ASTNode):
     """
 
     baseExpression: Identifier
-    indexExpression: Identifier
     type_descriptions: Dict[str, str]
+    indexExpression: Identifier = None
 
 
 @dataclass

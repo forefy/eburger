@@ -1,3 +1,4 @@
+from eburger import settings
 from eburger.models import (
     ASTNode,
     Assignment,
@@ -615,8 +616,9 @@ def parse_ast_node(node_dict, G, parent=None):
         case "TupleExpression":
             components = []
             for comp in node_dict.get("components", []):
-                parsed_comp, G = parse_ast_node(comp, G)
-                components.append(parsed_comp)
+                if comp is not None:
+                    parsed_comp, G = parse_ast_node(comp, G)
+                    components.append(parsed_comp)
             parsed_node = TupleExpression(
                 node_id=node_dict.get("id", 0),
                 node_type=node_dict.get("nodeType", ""),
@@ -631,7 +633,10 @@ def parse_ast_node(node_dict, G, parent=None):
                 )
         case "IndexAccess":
             base_expression, G = parse_ast_node(node_dict["baseExpression"], G)
-            index_expression, G = parse_ast_node(node_dict["indexExpression"], G)
+
+            index_expression = node_dict.get("indexExpression", None)
+            if index_expression is not None:
+                index_expression, G = parse_ast_node(index_expression, G)
             parsed_node = IndexAccess(
                 node_id=node_dict.get("id", 0),
                 node_type=node_dict.get("nodeType", ""),
@@ -644,9 +649,10 @@ def parse_ast_node(node_dict, G, parent=None):
             G.add_edge(
                 parsed_node.get_display_name(), base_expression.get_display_name()
             )
-            G.add_edge(
-                parsed_node.get_display_name(), index_expression.get_display_name()
-            )
+            if index_expression is not None:
+                G.add_edge(
+                    parsed_node.get_display_name(), index_expression.get_display_name()
+                )
 
         case "UnaryOperation":
             src = node_dict.get("src", "")
@@ -794,8 +800,6 @@ def parse_ast_node(node_dict, G, parent=None):
 
 
 def reduce_json(ast_json):
-    keys_to_remove = ["openzeppelin", "solmate", "solady"]
-
     # Maintain original file list array
     def extract_file_list_from_ast(ast_data):
         if "sources" in ast_data:
@@ -809,7 +813,7 @@ def reduce_json(ast_json):
         removal_list = [
             key
             for key in dictionary
-            if any(substring in key for substring in keys_to_remove)
+            if any(substring in key for substring in settings.excluded_contracts)
         ]
         for key in removal_list:
             log("info", f"Excluding {key}")
@@ -828,9 +832,6 @@ def parse_solidity_ast(ast_json, G):
     """
     root_nodes = []
     for key, node in ast_json.get("sources", {}).items():
-        if any(name in key for name in ["@openzeppelin", "solmate"]):
-            log("info", f"Ignoring {key}")
-            continue
         ast_node = node.get("AST", node.get("ast", {}))
         root_node, G = parse_ast_node(ast_node, G)
 

@@ -41,7 +41,6 @@ def execute_python_code(template_name, python_code, ast_data, src_file_list):
         except Exception as e:
             line = f"failed extracting traceback - {line}"
         log("error", f"Failed parsing template {template_name} -> {line}")
-        sys.exit(0)
 
 
 # Function to process a single YAML file

@@ -3,8 +3,6 @@ import json
 import os
 from pathlib import Path
 import re
-import shlex
-import subprocess
 import sys
 import networkx as nx
 from eburger.utils.cli_args import args
@@ -12,54 +10,19 @@ from eburger.utils.filesystem import (
     create_directory_if_not_exists,
     create_or_empty_directory,
     find_and_read_sol_file,
+    get_foundry_ast_json,
     get_solidity_version_from_file,
+)
+from eburger.utils.helpers import construct_solc_cmdline, is_valid_json, run_command
+from eburger.utils.installers import (
+    install_foundry_if_not_found,
+    set_solc_compiler_version,
 )
 from eburger.utils.logger import log
 import eburger.settings as settings
 from eburger.serializer import parse_solidity_ast, reduce_json
 from eburger.utils.outputs import draw_graph, save_as_json, save_python_ast
 from eburger.yaml_parser import process_files_concurrently
-
-
-def is_valid_json(json_string):
-    if not json_string:
-        return False
-    try:
-        json.loads("".join(json_string))
-        return True
-    except ValueError:
-        return False
-
-
-def run_command(command, directory=None):
-    log("info", f"{command}")
-    results = []
-    process = subprocess.Popen(
-        shlex.split(command),
-        stdout=subprocess.PIPE,
-        encoding="utf-8",
-        shell=False,
-        cwd=directory,
-    )
-    while True:
-        output = process.stdout.readline()
-        if output == "" and process.poll() is not None:
-            break
-        if output:
-            results.append(output.strip())
-    return results
-
-
-def construct_solc_cmdline(path_type: str, compilation_source_path: str) -> str:
-    solc_cmdline = "solc"
-    if args.solc_remappings:
-        solc_cmdline += " "
-        solc_cmdline += " ".join(args.solc_remappings)
-    if path_type == "folder":
-        solidity_files = get_all_solidity_files(args.solidity_file_or_folder)
-        compilation_source_path = " ".join(solidity_files)
-    solc_cmdline += f" --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes {compilation_source_path}"
-    return solc_cmdline
 
 
 def main():
@@ -86,7 +49,6 @@ def main():
                 "error",
                 f"{args.solidity_file_or_folder} is neither a file nor a directory.",
             )
-            sys.exit(0)
     elif args.ast_json_file:
         filename = args.ast_json_file
         filename = filename.replace(".json", "")  # Clean possible file extension
@@ -98,9 +60,12 @@ def main():
 
     if path_type is not None:
         if path_type == "foundry":
-            log("info", "Foundry project detected, compiling using forge")
+            log("info", "Foundry project detected, compiling using forge.")
+            install_foundry_if_not_found()
+
             if args.solc_remappings:
                 log("warning", "Ignoring the -r option in foundry based projects.")
+
             run_command(f"forge clean", args.solidity_file_or_folder)
             forge_out_dir = settings.outputs_dir / "forge-output"
             create_or_empty_directory(forge_out_dir)
@@ -110,20 +75,6 @@ def main():
             )
             for line in build_output_lines:
                 log("info", line)
-            json_files = [f for f in os.listdir(forge_out_dir) if f.endswith(".json")]
-            if not json_files:
-                log("error", "forge build generated no output.")
-                sys.exit(0)
-            if len(json_files) > 1:
-                log(
-                    "warning",
-                    "Multiple forge-output files found, choosing the latest.",
-                )
-            latest_file = max(
-                json_files,
-                key=lambda x: os.path.getctime(os.path.join(forge_out_dir, x)),
-            )
-            latest_file_path = os.path.join(forge_out_dir, latest_file)
 
             # get sample filename
             extracted_sample_file_path = find_and_read_sol_file(
@@ -133,7 +84,6 @@ def main():
                 sample_file_path = extracted_sample_file_path
             if sample_file_path is None:
                 log("error", "Can't parse path given in argument.")
-                sys.exit(0)
             if args.project_name:
                 filename = args.project_name
             else:
@@ -142,11 +92,10 @@ def main():
             filename = f"{filename}_{datetime.now().strftime('%m%y')}"
             output_filename = settings.outputs_dir / f"{filename}.json"
 
-            with open(latest_file_path, "r") as f:
-                ast_json = json.load(f)
-                ast_json = ast_json["output"]
-                ast_json, src_file_list = reduce_json(ast_json)
+            ast_json = get_foundry_ast_json(forge_out_dir)
+            ast_json, src_file_list = reduce_json(ast_json)
             save_as_json(output_filename, ast_json)
+
         elif path_type in ["file", "folder"]:
             sample_file_path = None
             compilation_source_path = None
@@ -162,25 +111,15 @@ def main():
                     sample_file_path = extracted_sample_file_path
             if sample_file_path is None:
                 log("error", "Can't parse path given in argument.")
-                sys.exit(0)
+
             # get contract version
             if args.solc_compiler_version:
                 solc_required_version = args.solc_compiler_version
             else:
                 solc_required_version = get_solidity_version_from_file(sample_file_path)
-            log("info", f"Trying to switch solc to version {solc_required_version}")
-            solc_use_res = run_command(f"solc-select use {solc_required_version}")
-            if not solc_use_res:
-                log("error", "Error switching solc version, trying to install")
-                run_command(f"solc-select install {solc_required_version}")
-                solc_use_res = run_command(f"solc-select use {solc_required_version}")
-                if not solc_use_res:
-                    log("error", "Failed to install required solc version")
-                    exit(0)
-            solc_versions_res = run_command(f"solc-select versions")
-            log("info", solc_versions_res)
-            log("info", "Successfully switched solc version")
-            log("info", "Trying to compile contract")
+
+            set_solc_compiler_version(solc_required_version)
+
             if args.project_name:
                 filename = args.project_name
             else:
@@ -191,7 +130,6 @@ def main():
             solc_cmdline = construct_solc_cmdline(path_type, compilation_source_path)
             if solc_cmdline is None:
                 log("error", "Error constructing solc command line")
-                exit(0)
             solc_compile_res = run_command(solc_cmdline)
             if not is_valid_json(solc_compile_res):
                 error_string = "Locally installed solc errored out trying to compile the contract. Please review comiler warnings above"
@@ -206,7 +144,6 @@ def main():
                     "error",
                     error_string,
                 )
-                sys.exit(0)
             solc_compile_res_parsed = json.loads("".join(solc_compile_res))
             ast_json, src_file_list = reduce_json(solc_compile_res_parsed)
             save_as_json(output_filename, solc_compile_res_parsed)
