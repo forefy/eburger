@@ -40,7 +40,7 @@ def save_python_ast(file_name, data):
     file_path = settings.outputs_dir / f"{file_name}.py"
     with open(file_path, "w") as file:
         data_str = repr(data)
-        file.write(f"{orig_name} = {data_str}\n")
+        file.write(f"from eburger.models import *\n\n{orig_name} = {data_str}\n")
 
 
 def save_as_json(file_path, json_data):

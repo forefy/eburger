@@ -156,7 +156,7 @@ def main():
     # Draw graph
     settings.outputs_dir / filename
     draw_graph(settings.outputs_dir / filename, G)
-    save_python_ast(settings.outputs_dir / filename, ast_roots)
+    save_python_ast(filename, ast_roots)
 
     # Parse YAML templates
     log("info", f"Templates path: {settings.templates_directory}")
