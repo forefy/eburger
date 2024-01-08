@@ -3,15 +3,27 @@ import json
 import os
 import re
 import shutil
+from eburger import settings
 from eburger.utils.logger import log
 
 
 def find_and_read_sol_file(folder_path):
     # Search for .sol files recursively in the given folder
+    excluded_folders = settings.excluded_dirs + ["mocks", "lib"]
     for root, dirs, files in os.walk(folder_path):
         for file in files:
-            if file.endswith(".sol") and not file.endswith(".t.sol"):
-                sol_file_path = os.path.join(root, file)
+            sol_file_path = os.path.join(root, file)
+            if any(
+                fnmatch.fnmatch(sol_file_path, f"*/{pattern}/*")
+                for pattern in excluded_folders
+            ):
+                continue
+            if (
+                file.endswith(".sol")
+                and not file.endswith(".t.sol")
+                and not file.endswith(".s.sol")
+            ):
+                print(sol_file_path)
                 with open(sol_file_path, "r") as input_file:
                     head = [line for line, _ in zip(input_file, range(10))]
                     if any("pragma" in line for line in head):

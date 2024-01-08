@@ -69,8 +69,9 @@ def main():
             run_command(f"forge clean", args.solidity_file_or_folder)
             forge_out_dir = settings.outputs_dir / "forge-output"
             create_or_empty_directory(forge_out_dir)
+
             build_output_lines = run_command(
-                f"forge build --force --skip test script --build-info --build-info-path {forge_out_dir}",
+                f"forge build --force --skip {' '.join(settings.excluded_dirs)} --build-info --build-info-path {forge_out_dir}",
                 args.solidity_file_or_folder,
             )
             for line in build_output_lines:
