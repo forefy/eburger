@@ -1,10 +1,3 @@
-# Extract the filenames from the 'sources' key, which usually contains file paths
-def extract_file_list_from_ast(ast_data):
-    if "sources" in ast_data:
-        return list(ast_data["sources"].keys())
-    return []
-
-
 # Extract highlighted code given a solidity src_location and a contract path
 def parse_code_highlight(src_location, file_path):
     start_offset, length, _ = map(int, src_location.split(":"))

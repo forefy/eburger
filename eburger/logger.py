@@ -39,6 +39,16 @@ def log(type: str, message: str):
             # json_printable = json.dumps(message, indent=4)
             # print(json_printable)
             for item in message:
+                try:
+                    item.get("results")[0]["file"]
+                except Exception:
+                    log("warning", f"Bad results for {item.get('name')}, skipping.")
+                    continue
+                first_result = item.get("results")[0]
+                location = first_result.get("file")
+                lines = first_result.get("lines")
+                lines = lines.replace("Line ", "::").replace(" Columns ", "::")
+                location += lines
                 name = item.get("name")
                 severity = item.get("severity")
                 match severity:
@@ -49,9 +59,4 @@ def log(type: str, message: str):
                     case "Low":
                         severity = f"[{color.Info} ❗️Low {color.Default}]"
 
-                first_result = item.get("results")[0]
-                location = first_result.get("file")
-                lines = first_result.get("lines")
-                lines = lines.replace("Line ", "::").replace(" Columns ", "::")
-                location += lines
                 print(f"{severity} {name} at {location}")

@@ -316,8 +316,9 @@ def parse_ast_node(node_dict, G, parent=None):
         case "Block" | "UncheckedBlock":
             statements = []
             for stmt in node_dict.get("statements", []):
-                parsed_stmt, G = parse_ast_node(stmt, G)
-                statements.append(parsed_stmt)
+                if stmt:
+                    parsed_stmt, G = parse_ast_node(stmt, G)
+                    statements.append(parsed_stmt)
 
             parsed_node = Block(
                 node_id=node_id,
@@ -489,11 +490,13 @@ def parse_ast_node(node_dict, G, parent=None):
                 src=node_dict.get("src", ""),
                 children=[],
             )
+
         case "VariableDeclarationStatement":
             declarations = []
             for decl in node_dict.get("declarations", []):
-                parsed_decl, G = parse_ast_node(decl, G)
-                declarations.append(parsed_decl)
+                if decl:
+                    parsed_decl, G = parse_ast_node(decl, G)
+                    declarations.append(parsed_decl)
 
             initialValue, G = (
                 parse_ast_node(node_dict["initialValue"], G)
@@ -662,6 +665,35 @@ def parse_ast_node(node_dict, G, parent=None):
     return parsed_node, G
 
 
+def reduce_json(ast_json):
+    keys_to_remove = ["openzeppelin", "solmate", "solady"]
+
+    # Maintain original file list array
+    def extract_file_list_from_ast(ast_data):
+        if "sources" in ast_data:
+            return list(ast_data["sources"].keys())
+        return []
+
+    original_file_list = extract_file_list_from_ast(ast_json)
+
+    # Function to remove keys in-place from a dictionary
+    def remove_keys_in_place(dictionary):
+        removal_list = [
+            key
+            for key in dictionary
+            if any(substring in key for substring in keys_to_remove)
+        ]
+        for key in removal_list:
+            log("info", f"Excluding {key}")
+            del dictionary[key]
+
+    for section in ["sources", "contracts"]:
+        if section in ast_json:
+            remove_keys_in_place(ast_json[section])
+
+    return ast_json, original_file_list
+
+
 def parse_solidity_ast(ast_json, G):
     """
     Parses the entire Solidity AST from the JSON representation.
@@ -669,8 +701,11 @@ def parse_solidity_ast(ast_json, G):
     root_nodes = []
     for key, node in ast_json.get("sources", {}).items():
         if any(name in key for name in ["@openzeppelin", "solmate"]):
+            log("info", f"Ignoring {key}")
             continue
-        root_node, G = parse_ast_node(node.get("AST", {}), G)
+        ast_node = node.get("AST", node.get("ast", {}))
+        root_node, G = parse_ast_node(ast_node, G)
+
         if root_node:
             root_nodes.append(root_node)
     return root_nodes, G

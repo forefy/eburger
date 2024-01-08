@@ -563,4 +563,4 @@ def test_tx_origin_used_for_access_control(tx_origin_used_for_access_control_ast
         "eburger/templates/tx_origin_used_for_access_control.yaml",
         tx_origin_used_for_access_control_ast,
     )
-    assert "Line 11 Columns 8-62" in results["results"][0]
+    assert "Line 11 Columns 8-62" in results["results"][0]["lines"]

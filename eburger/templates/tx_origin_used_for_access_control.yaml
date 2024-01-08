@@ -22,15 +22,12 @@ pseudo: |
                         Add the file name and the source location to the results.
     Return all occurrences where 'tx.origin' is used in a require statement.
 python: |
-    file_list = extract_file_list_from_ast(ast_data)
+    file_list = src_file_list
     results = []
     stack = [ast_data]
-
     while stack:
         node = stack.pop()
-
         if isinstance(node, dict):
-            # Check if the node is a FunctionCall with 'require'
             if node.get('nodeType') == 'FunctionCall' and node.get('expression', {}).get('name') == 'require':
                 arguments = node.get('arguments', [])
                 for arg in arguments:
@@ -44,10 +41,8 @@ python: |
                             file_name = file_list[file_index] if file_index < len(file_list) else "Unknown file"
                             lines, vuln_code = parse_code_highlight(src_location, file_name)
                             results.append({"file": file_name, "lines": lines, "code": vuln_code})
-
             for value in node.values():
                 if isinstance(value, (dict, list)):
                     stack.append(value)
-
         elif isinstance(node, list):
             stack.extend(node)

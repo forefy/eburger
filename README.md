@@ -96,6 +96,7 @@ Here's an example of the interactive graph
 
 ## Features
 - YAML template support to query contract structure and raise insights for any matches
+- Foundry support ❣️
 - Call Flow Graph inspired by naming conventions of Solidity
 - Search specific segments and highlight by parameter, function, contract etc
 - Extensive control on graph layout

@@ -1,5 +1,6 @@
 import inspect
 from pathlib import Path
+import sys
 import traceback
 import yaml
 import concurrent.futures
@@ -17,8 +18,8 @@ def load_ast_data(file_path):
     return ast_data
 
 
-def execute_python_code(python_code, ast_data):
-    local_vars = {"ast_data": ast_data}
+def execute_python_code(template_name, python_code, ast_data, src_file_list):
+    local_vars = {"ast_data": ast_data, "src_file_list": src_file_list}
     for attr in dir(models):
         attr_value = getattr(models, attr)
         if inspect.isclass(attr_value):
@@ -34,15 +35,18 @@ def execute_python_code(python_code, ast_data):
             line += f" at line {traceback.extract_tb(e.__traceback__)[-1][1]}"
         except Exception as e:
             line = f"failed extracting traceback - {line}"
-        return line
+        log("error", f"Failed parsing template {template_name} -> {line}")
+        sys.exit(0)
 
 
 # Function to process a single YAML file
-def process_yaml(file_path, ast_data):
+def process_yaml(file_path, ast_data, src_file_list):
     with open(file_path, "r") as file:
         yaml_data = yaml.safe_load(file)
 
-    results = execute_python_code(yaml_data["python"], ast_data)
+    results = execute_python_code(
+        yaml_data["name"], yaml_data["python"], ast_data, src_file_list
+    )
     return {
         "name": yaml_data.get("name"),
         "description": yaml_data.get("description"),
@@ -51,7 +55,9 @@ def process_yaml(file_path, ast_data):
     }
 
 
-def process_files_concurrently(directory_path, ast_data):
+def process_files_concurrently(
+    directory_path: str, ast_data: dict, src_file_list: list
+):
     yaml_files = list(Path(directory_path).glob("*.yaml"))
     log(
         "info",
@@ -60,7 +66,7 @@ def process_files_concurrently(directory_path, ast_data):
     insights = []
     with concurrent.futures.ThreadPoolExecutor() as executor:
         futures = [
-            executor.submit(process_yaml, str(file_path), ast_data)
+            executor.submit(process_yaml, str(file_path), ast_data, src_file_list)
             for file_path in yaml_files
         ]
         for future in concurrent.futures.as_completed(futures):
