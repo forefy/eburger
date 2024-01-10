@@ -26,6 +26,17 @@ class color:
     Info = "\033[38;5;69m"  # #528CFF
 
 
+def construct_insight_occurrences(results):
+    occurrences = []
+    for result in results:
+        location = result.get("file")
+        lines = result.get("lines")
+        lines = lines.replace("Line ", ":").replace(" Columns ", ":")
+        location += lines
+        occurrences.append(location)
+    return occurrences
+
+
 def log(type: str, message: str):
     match type:
         case "success":
@@ -45,18 +56,19 @@ def log(type: str, message: str):
             # print(json_printable)
             if "insights" not in args.no:
                 for item in message:
+                    name = item.get("name")
+                    severity = item.get("severity")
+                    results = item.get("results")
+
+                    # Check a sample result to ensure correct structure
                     try:
-                        item.get("results")[0]["file"]
+                        results[0]["file"]
                     except Exception:
                         log("warning", f"Bad results for {item.get('name')}, skipping.")
                         continue
-                    first_result = item.get("results")[0]
-                    location = first_result.get("file")
-                    lines = first_result.get("lines")
-                    lines = lines.replace("Line ", "::").replace(" Columns ", "::")
-                    location += lines
-                    name = item.get("name")
-                    severity = item.get("severity")
+
+                    occurrences = construct_insight_occurrences(results)
+
                     match severity:
                         case "High":
                             severity = f"[{color.Error} ❗️High {color.Default}]"
@@ -65,4 +77,6 @@ def log(type: str, message: str):
                         case "Low":
                             severity = f"[{color.Info} ❗️Low {color.Default}]"
 
-                    print(f"{severity} {name} at {location}")
+                    print(f"{severity} {name} at:")
+                    for occurrence in occurrences:
+                        print(f"    {occurrence}")

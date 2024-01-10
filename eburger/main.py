@@ -41,11 +41,11 @@ def main():
     path_type = None
 
     if args.solidity_file_or_folder:
-        settings.project_root = Path(args.solidity_file_or_folder)
         if os.path.isfile(args.solidity_file_or_folder):
             path_type = "file"
         elif os.path.isdir(args.solidity_file_or_folder):
             path_type = "folder"
+            settings.project_root = settings.project_root / args.solidity_file_or_folder
 
             # Check if foundry project, in which case it is better just using forge
             if os.path.isfile(
@@ -87,7 +87,7 @@ def main():
             forge_out_dir = settings.outputs_dir / "forge-output"
             create_or_empty_directory(forge_out_dir)
 
-            build_output_lines = run_command(
+            build_output_lines, _ = run_command(
                 f"forge build --force --skip {' '.join(settings.excluded_dirs)} --build-info --build-info-path {forge_out_dir}",
                 args.solidity_file_or_folder,
             )
@@ -111,7 +111,7 @@ def main():
 
             run_command(f"npx hardhat clean", directory=settings.project_root)
 
-            build_output_lines = run_command(
+            build_output_lines, _ = run_command(
                 f"npx hardhat compile --force",
                 directory=settings.project_root,
             )
@@ -157,7 +157,7 @@ def main():
             solc_cmdline = construct_solc_cmdline(path_type, compilation_source_path)
             if solc_cmdline is None:
                 log("error", "Error constructing solc command line")
-            solc_compile_res = run_command(solc_cmdline)
+            solc_compile_res, _ = run_command(solc_cmdline)
             if not is_valid_json(solc_compile_res):
                 error_string = "Locally installed solc errored out trying to compile the contract. Please review comiler warnings above"
                 if not args.solc_remappings:

@@ -53,9 +53,12 @@ def process_yaml(file_path, ast_data, src_file_list):
     )
     return {
         "name": yaml_data.get("name"),
-        "description": yaml_data.get("description"),
         "severity": yaml_data.get("severity"),
+        "description": yaml_data.get("description"),
         "results": results,
+        "action-items": yaml_data.get("action-items"),
+        "references": yaml_data.get("references"),
+        "reports": yaml_data.get("reports"),
     }
 
 

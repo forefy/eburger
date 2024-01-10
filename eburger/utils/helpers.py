@@ -23,16 +23,19 @@ def is_valid_json(json_string):
 def run_command(command, directory=None, shell=False, live_output=False):
     log("info", f"{command}")
     results = []
+    errors = []
     process = subprocess.Popen(
         command if shell else shlex.split(command),
         stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
+        stderr=subprocess.PIPE,
         encoding="utf-8",
         shell=shell,
         cwd=directory,
     )
     while True:
         output = process.stdout.readline()
+        error = process.stderr.readline()
+
         if output == "" and process.poll() is not None:
             break
         if output:
@@ -40,7 +43,14 @@ def run_command(command, directory=None, shell=False, live_output=False):
             if live_output:
                 log("info", output_stripped)
             results.append(output_stripped)
-    return results
+
+        if error:
+            error_stripped = error.strip()
+            if live_output:
+                log("error", error_stripped)
+            errors.append(error_stripped)
+
+    return results, errors
 
 
 def construct_solc_cmdline(path_type: str, compilation_source_path: str) -> str:

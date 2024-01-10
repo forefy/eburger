@@ -23,7 +23,6 @@ def find_and_read_sol_file(folder_path):
                 and not file.endswith(".t.sol")
                 and not file.endswith(".s.sol")
             ):
-                print(sol_file_path)
                 with open(sol_file_path, "r") as input_file:
                     head = [line for line, _ in zip(input_file, range(10))]
                     if any("pragma" in line for line in head):

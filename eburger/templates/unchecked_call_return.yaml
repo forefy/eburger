@@ -1,6 +1,6 @@
 name: "Unchecked Call Return"
 description: "This checks for scenarios where a contract's call or send functions are used without checking the return value. This can lead to vulnerabilities as the success or failure of the call is not verified, potentially leading to unintended contract behavior."
-severity: "Medium"
+severity: "Low"
 action-items:
     - "Ensure all call and send functions check the return value to confirm transaction success."
     - "Consider using safer alternatives like transfer, or implement comprehensive error handling for call and send."

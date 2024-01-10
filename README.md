@@ -1,22 +1,22 @@
 # eBurger - Template Based Smart Contracts Static Analysis
-<img src="static/eburger.png?raw=true" alt="eBurger" width="500"/>
+
+<img src="static/eburger.png?raw=true" alt="eBurger" width="600"/>
 
 eBurger is a way to quickly interact with solidity smart contracts.
 
 Running scanners won't win you competitions. spin up custom templates tailored to specific projects in minutes ([Wiki](https://github.com/forefy/eburger/wiki)).
 
-- [Comparison Table](#comparison-table)
+- [Comparison table](#comparison-table)
 - [How to install](#how-to-install)
-    - [Prerequisite - The Solidity Compiler](#prerequisite---the-solidity-compiler)
-    - [Installation](#installation)
-- [How to run simply](#how-to-run-simply)
-- [How to run - advanced](#how-to-run---advanced)
+- [How to run](#how-to-run)
+    - [Usage demo](#usage-demo)
+    - [How to run simply](#how-to-run-simply)
+    - [How to run - advanced](#how-to-run---advanced)
 - [Adding templates](#adding-templates)
 - [What is missing](#what-is-missing)
 
 
-
-## Comparison Table
+## Comparison table
 | Active Static Analyzer                                 | Language        | Visualization Graph    | 2 Minutes to write a custom template with Chat GPT    | Many findings that are already found before the contest began | Would want to eat |
 |--------------------------------------------------------|-----------------|------------------------|-------------------------------------------------------|---------------------------------------------------------------|-------------------|
 | [eBurger](https://github.com/forefy/eburger)           | Python          | ✅                     | ✅                                                    |                                                               | ✅                |
@@ -27,14 +27,20 @@ Running scanners won't win you competitions. spin up custom templates tailored t
 Forgot one? open an issue :)
 
 ## How to install
-### Installation
 ```
 git clone https://github.com/forefy/eburger.git
 pip3 install .
 eburger -h
 ```
 
-## Usage
+## How to run
+
+### Usage demo
+<figure class="video_container">
+    <video controls="true" allowfullscreen="true">
+        <source src="./static/eburger.mp4" type="video/mp4">
+    </video>
+</figure>
 
 ### Simple examples
 Simplest:
