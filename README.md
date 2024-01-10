@@ -27,12 +27,6 @@ Running scanners won't win you competitions. spin up custom templates tailored t
 Forgot one? open an issue :)
 
 ## How to install
-### Prerequisites
-`python 3`
-
-`solc` probably exists in your system, but if not, please refer to the official documentation at https://docs.soliditylang.org/en/v0.8.9/installing-solidity.html
-
-
 ### Installation
 ```
 git clone https://github.com/forefy/eburger.git
@@ -43,13 +37,21 @@ eburger -h
 ## Usage
 
 ### Simple examples
+Simplest:
+```bash
+cd MyProject/
+eburger
+cat eburger-results.json
+```
+..
+
 This will run a focused scan on one file and it's dependencies:
 ```
 eburger -f ../ProjectToScan/src/SomeContract.sol
 ```
 ..
 
-This will compile the solidity folder ProjectToScan, as well as specifying remappings configured in the project.
+This will compile the solidity files inside ProjectToScan, as well as specifying remappings configured in the project.
 ```
 eburger -f ../ProjectToScan/src/ -r @openzeppelin/=../ProjectToScan/lib/openzeppelin-contracts/
 ```

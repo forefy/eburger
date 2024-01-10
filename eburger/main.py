@@ -3,6 +3,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 import sys
 import networkx as nx
 from eburger.utils.cli_args import args
@@ -11,11 +12,18 @@ from eburger.utils.filesystem import (
     create_or_empty_directory,
     find_and_read_sol_file,
     get_foundry_ast_json,
+    get_hardhat_ast_json,
     get_solidity_version_from_file,
 )
-from eburger.utils.helpers import construct_solc_cmdline, is_valid_json, run_command
+from eburger.utils.helpers import (
+    construct_solc_cmdline,
+    get_filename_from_path,
+    is_valid_json,
+    run_command,
+)
 from eburger.utils.installers import (
     install_foundry_if_not_found,
+    install_hardhat_if_not_found,
     set_solc_compiler_version,
 )
 from eburger.utils.logger import log
@@ -26,7 +34,7 @@ from eburger.yaml_parser import process_files_concurrently
 
 
 def main():
-    if len(sys.argv) == 1:
+    if not args.solidity_file_or_folder and not args.ast_json_file:
         args.solidity_file_or_folder = "."
 
     create_directory_if_not_exists(settings.outputs_dir)
@@ -44,6 +52,14 @@ def main():
                 os.path.join(args.solidity_file_or_folder, "foundry.toml")
             ):
                 path_type = "foundry"
+
+            # Check if hardhat project
+            if os.path.isfile(
+                os.path.join(args.solidity_file_or_folder, "hardhat.config.js")
+            ) or os.path.isfile(
+                os.path.join(args.solidity_file_or_folder, "hardhat.config.ts")
+            ):
+                path_type = "hardhat"
         else:
             log(
                 "error",
@@ -59,6 +75,7 @@ def main():
         save_as_json(output_path, ast_json)
 
     if path_type is not None:
+        # Foundry compilation flow
         if path_type == "foundry":
             log("info", "Foundry project detected, compiling using forge.")
             install_foundry_if_not_found()
@@ -77,57 +94,66 @@ def main():
             for line in build_output_lines:
                 log("info", line)
 
-            # get sample filename
-            extracted_sample_file_path = find_and_read_sol_file(
-                args.solidity_file_or_folder
-            )
-            if extracted_sample_file_path:
-                sample_file_path = extracted_sample_file_path
-            if sample_file_path is None:
-                log("error", "Can't parse path given in argument.")
-            if args.project_name:
-                filename = args.project_name
-            else:
-                filename_match = re.search(r"/([^/]+)\.sol$", sample_file_path)
-                filename = filename_match.group(1) if filename_match else None
-            filename = f"{filename}_{datetime.now().strftime('%m%y')}"
-            output_filename = settings.outputs_dir / f"{filename}.json"
+            sample_file_path = find_and_read_sol_file(args.solidity_file_or_folder)
+            filename, output_filename = get_filename_from_path(sample_file_path)
 
             ast_json = get_foundry_ast_json(forge_out_dir)
             ast_json, src_file_list = reduce_json(ast_json)
             save_as_json(output_filename, ast_json)
 
-        elif path_type in ["file", "folder"]:
-            sample_file_path = None
-            compilation_source_path = None
-            if path_type == "file":
-                sample_file_path = args.solidity_file_or_folder
-                compilation_source_path = args.solidity_file_or_folder
-            elif path_type == "folder":
-                compilation_source_path = args.solidity_file_or_folder
-                extracted_sample_file_path = find_and_read_sol_file(
-                    args.solidity_file_or_folder
-                )
-                if extracted_sample_file_path:
-                    sample_file_path = extracted_sample_file_path
-            if sample_file_path is None:
-                log("error", "Can't parse path given in argument.")
+        # Hardhat compilation flow
+        if path_type == "hardhat":
+            log("info", "Hardhat project detected, compiling using hardhat.")
+            install_hardhat_if_not_found()
 
-            # get contract version
+            if args.solc_remappings:
+                log("warning", "Ignoring the -r option in hardhat based projects.")
+
+            run_command(f"npx hardhat clean", directory=settings.project_root)
+
+            build_output_lines = run_command(
+                f"npx hardhat compile --force",
+                directory=settings.project_root,
+            )
+            for line in build_output_lines:
+                log("info", line)
+
+            # Copy compilation results to .eburger
+            expected_hardhat_outfiles = os.path.join(
+                args.solidity_file_or_folder, "artifacts", "build-info"
+            )
+            if not os.path.isdir(expected_hardhat_outfiles):
+                log(
+                    "error",
+                    f"Hardhat's compilation files were not found in expected location {expected_hardhat_outfiles}",
+                )
+            hardhat_out_dir = settings.outputs_dir / "hardhat-output"
+            if os.path.exists(hardhat_out_dir):
+                shutil.rmtree(hardhat_out_dir)
+            shutil.copytree(expected_hardhat_outfiles, hardhat_out_dir)
+
+            sample_file_path = find_and_read_sol_file(args.solidity_file_or_folder)
+            filename, output_filename = get_filename_from_path(sample_file_path)
+
+            ast_json = get_hardhat_ast_json(hardhat_out_dir)
+            ast_json, src_file_list = reduce_json(ast_json)
+            save_as_json(output_filename, ast_json)
+
+        # solc compilation flow
+        elif path_type in ["file", "folder"]:
+            sample_file_path = args.solidity_file_or_folder
+            compilation_source_path = args.solidity_file_or_folder
+
+            if path_type == "folder":
+                sample_file_path = find_and_read_sol_file(args.solidity_file_or_folder)
+
+            filename, output_filename = get_filename_from_path(sample_file_path)
+
             if args.solc_compiler_version:
                 solc_required_version = args.solc_compiler_version
             else:
                 solc_required_version = get_solidity_version_from_file(sample_file_path)
-
             set_solc_compiler_version(solc_required_version)
-
-            if args.project_name:
-                filename = args.project_name
-            else:
-                filename_match = re.search(r"/([^/]+)\.sol$", sample_file_path)
-                filename = filename_match.group(1) if filename_match else None
-            filename = f"{filename}_{datetime.now().strftime('%m%y')}"
-            output_filename = settings.outputs_dir / f"{filename}.json"
             solc_cmdline = construct_solc_cmdline(path_type, compilation_source_path)
             if solc_cmdline is None:
                 log("error", "Error constructing solc command line")

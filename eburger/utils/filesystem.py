@@ -29,6 +29,8 @@ def find_and_read_sol_file(folder_path):
                     if any("pragma" in line for line in head):
                         return sol_file_path
 
+    log("error", "Can't parse path given in argument.")
+
 
 def get_solidity_version_from_file(solidity_file_or_folder: str) -> str:
     solc_required_version = None
@@ -126,6 +128,26 @@ def get_foundry_ast_json(forge_out_dir) -> dict:
         key=lambda x: os.path.getctime(os.path.join(forge_out_dir, x)),
     )
     latest_file_path = os.path.join(forge_out_dir, latest_file)
+    with open(latest_file_path, "r") as f:
+        ast_json = json.load(f)
+    return ast_json["output"]
+
+
+# TODO: Add better handling for multiple build info files
+def get_hardhat_ast_json(hardhat_out_dir) -> dict:
+    json_files = [f for f in os.listdir(hardhat_out_dir) if f.endswith(".json")]
+    if not json_files:
+        log("error", "npx hardhat compile generated no output.")
+    if len(json_files) > 1:
+        log(
+            "warning",
+            "Multiple hardhat output files found, choosing the latest.",
+        )
+    latest_file = max(
+        json_files,
+        key=lambda x: os.path.getctime(os.path.join(hardhat_out_dir, x)),
+    )
+    latest_file_path = os.path.join(hardhat_out_dir, latest_file)
     with open(latest_file_path, "r") as f:
         ast_json = json.load(f)
     return ast_json["output"]

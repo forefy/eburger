@@ -1,4 +1,5 @@
 import sys
+from eburger.utils.cli_args import args
 
 
 class color:
@@ -28,36 +29,40 @@ class color:
 def log(type: str, message: str):
     match type:
         case "success":
-            print(f"[{color.Success} 🍔 Success {color.Default}] {message}")
+            if "success" not in args.no:
+                print(f"[{color.Success} 🍔 Success {color.Default}] {message}")
         case "error":
             print(f"[{color.Error} Error {color.Default}] {message}")
             sys.exit(0)
         case "warning":
-            print(f"[{color.Warning} Warning {color.Default}] {message}")
+            if "warning" not in args.no:
+                print(f"[{color.Warning} Warning {color.Default}] {message}")
         case "info":
-            print(f"[{color.Info} Info {color.Default}] {message}")
+            if "info" not in args.no:
+                print(f"[{color.Info} Info {color.Default}] {message}")
         case "insights":
             # json_printable = json.dumps(message, indent=4)
             # print(json_printable)
-            for item in message:
-                try:
-                    item.get("results")[0]["file"]
-                except Exception:
-                    log("warning", f"Bad results for {item.get('name')}, skipping.")
-                    continue
-                first_result = item.get("results")[0]
-                location = first_result.get("file")
-                lines = first_result.get("lines")
-                lines = lines.replace("Line ", "::").replace(" Columns ", "::")
-                location += lines
-                name = item.get("name")
-                severity = item.get("severity")
-                match severity:
-                    case "High":
-                        severity = f"[{color.Error} ❗️High {color.Default}]"
-                    case "Medium":
-                        severity = f"[{color.Warning} ❗️Medium {color.Default}]"
-                    case "Low":
-                        severity = f"[{color.Info} ❗️Low {color.Default}]"
+            if "insights" not in args.no:
+                for item in message:
+                    try:
+                        item.get("results")[0]["file"]
+                    except Exception:
+                        log("warning", f"Bad results for {item.get('name')}, skipping.")
+                        continue
+                    first_result = item.get("results")[0]
+                    location = first_result.get("file")
+                    lines = first_result.get("lines")
+                    lines = lines.replace("Line ", "::").replace(" Columns ", "::")
+                    location += lines
+                    name = item.get("name")
+                    severity = item.get("severity")
+                    match severity:
+                        case "High":
+                            severity = f"[{color.Error} ❗️High {color.Default}]"
+                        case "Medium":
+                            severity = f"[{color.Warning} ❗️Medium {color.Default}]"
+                        case "Low":
+                            severity = f"[{color.Info} ❗️Low {color.Default}]"
 
-                print(f"{severity} {name} at {location}")
+                    print(f"{severity} {name} at {location}")

@@ -1,6 +1,9 @@
+from datetime import datetime
 import json
+import re
 import shlex
 import subprocess
+from eburger import settings
 
 from eburger.utils.cli_args import args
 from eburger.utils.filesystem import get_all_solidity_files
@@ -17,12 +20,13 @@ def is_valid_json(json_string):
         return False
 
 
-def run_command(command, directory=None, stdout=subprocess.PIPE, shell=False):
+def run_command(command, directory=None, shell=False, live_output=False):
     log("info", f"{command}")
     results = []
     process = subprocess.Popen(
         command if shell else shlex.split(command),
         stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
         encoding="utf-8",
         shell=shell,
         cwd=directory,
@@ -32,7 +36,10 @@ def run_command(command, directory=None, stdout=subprocess.PIPE, shell=False):
         if output == "" and process.poll() is not None:
             break
         if output:
-            results.append(output.strip())
+            output_stripped = output.strip()
+            if live_output:
+                log("info", output_stripped)
+            results.append(output_stripped)
     return results
 
 
@@ -46,3 +53,15 @@ def construct_solc_cmdline(path_type: str, compilation_source_path: str) -> str:
         compilation_source_path = " ".join(solidity_files)
     solc_cmdline += f" --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes {compilation_source_path}"
     return solc_cmdline
+
+
+def get_filename_from_path(file_path: str) -> tuple:
+    if args.project_name:
+        filename = args.project_name
+    else:
+        filename_match = re.search(r"/([^/]+)\.sol$", file_path)
+        filename = filename_match.group(1) if filename_match else None
+    filename = f"{filename}_{datetime.now().strftime('%m%y')}"
+    output_filename = settings.outputs_dir / f"{filename}.json"
+
+    return filename, output_filename

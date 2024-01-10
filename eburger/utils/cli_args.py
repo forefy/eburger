@@ -1,5 +1,4 @@
 import argparse
-import sys
 
 parser = argparse.ArgumentParser(description="help")
 
@@ -30,5 +29,13 @@ parser.add_argument(
     dest="project_name",
     type=str,
     help="Name of the project, if not supplied - name is automatically picked",
+)
+parser.add_argument(
+    "-no",
+    dest="no",
+    type=str,
+    nargs="+",
+    default=[],
+    help="Exclude logging output types (e.g. info warning success insights)",
 )
 args = parser.parse_args()
