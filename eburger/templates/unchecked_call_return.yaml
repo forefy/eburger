@@ -33,11 +33,7 @@ python: |
                 if 'function (bytes memory) payable returns (bool,bytes memory)' in callee:
                     parent = stack[-1] if stack and isinstance(stack[-1], dict) else {}
                     if not (parent.get('nodeType') in ['IfStatement', 'Conditional']):
-                        src_location = node.get('src', '')
-                        file_index = int(src_location.split(':')[2])
-                        file_name = src_file_list[file_index] if file_index < len(src_file_list) else "Unknown file"
-                        file_path = str(Path(project_root, file_name))
-                        lines, vuln_code = parse_code_highlight(src_location, file_path)
+                        file_path, lines, vuln_code = parse_code_highlight(node, src_file_list)
                         results.append({"file": file_path, "lines": lines, "code": vuln_code})
         if isinstance(node, list):
             stack.extend(node)

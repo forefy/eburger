@@ -12,7 +12,7 @@ install-local:
 
 .PHONY: pytest
 pytest:
-	pytest -s
+	pytest -s tests/
 
 .PHONY: uninstall
 uninstall:

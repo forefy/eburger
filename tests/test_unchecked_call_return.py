@@ -1,12 +1,13 @@
 import json
 import pytest
+from eburger.serializer import reduce_json
 from eburger.template_utils import parse_code_highlight
 
 from eburger.yaml_parser import process_yaml
 
 
 @pytest.fixture
-def unchecked_call_return_ast():
+def unchecked_call_return_ast() -> (dict, list):
     unchecked_ast = """{
     "contracts": {
         "vulnerable_contracts/unchecked_call_return.sol:VulnerableContract": {
@@ -635,8 +636,10 @@ def unchecked_call_return_ast():
 
 
 def test_unchecked_call_return(unchecked_call_return_ast):
+    ast_json, src_file_list = reduce_json(unchecked_call_return_ast)
     results = process_yaml(
         "eburger/templates/unchecked_call_return.yaml",
-        unchecked_call_return_ast,
+        ast_json,
+        src_file_list,
     )
-    assert "Line 14 Columns 8-40" in results["results"][0]["lines"]
+    assert "Line 14 Columns 9-41" in results["results"][0]["lines"]

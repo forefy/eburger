@@ -61,7 +61,7 @@ def construct_solc_cmdline(path_type: str, compilation_source_path: str) -> str:
     if path_type == "folder":
         solidity_files = get_all_solidity_files(args.solidity_file_or_folder)
         compilation_source_path = " ".join(solidity_files)
-    solc_cmdline += f" --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes {compilation_source_path}"
+    solc_cmdline += f" --allow-paths . --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes {compilation_source_path}"
     return solc_cmdline
 
 

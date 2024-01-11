@@ -1,6 +1,4 @@
 import inspect
-from pathlib import Path
-import sys
 import traceback
 import yaml
 import concurrent.futures
@@ -62,10 +60,8 @@ def process_yaml(file_path, ast_data, src_file_list):
     }
 
 
-def process_files_concurrently(
-    directory_path: str, ast_data: dict, src_file_list: list
-):
-    yaml_files = list(Path(directory_path).glob("*.yaml"))
+def process_files_concurrently(ast_data: dict, src_file_list: list):
+    yaml_files = list(settings.templates_directory.glob("*.yaml"))
     log(
         "info",
         f"Loaded {color.Success}{len(yaml_files)}{color.Default} templates for execution.",

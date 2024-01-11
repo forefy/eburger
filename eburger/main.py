@@ -187,9 +187,7 @@ def main():
     # Parse YAML templates
     log("info", f"Templates path: {settings.templates_directory}")
 
-    insights = process_files_concurrently(
-        settings.templates_directory, ast_json, src_file_list
-    )
+    insights = process_files_concurrently(ast_json, src_file_list)
 
     if insights:
         # Same data saved twice - once for historic reference and one for clarity

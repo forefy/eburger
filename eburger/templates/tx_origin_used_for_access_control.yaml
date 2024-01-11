@@ -22,7 +22,6 @@ pseudo: |
                         Add the file name and the source location to the results.
     Return all occurrences where 'tx.origin' is used in a require statement.
 python: |
-    file_list = src_file_list
     results = []
     stack = [ast_data]
     while stack:
@@ -36,11 +35,7 @@ python: |
                         right_expr = arg.get('rightExpression', {})
                         if ((left_expr.get('nodeType') == 'MemberAccess' and left_expr.get('expression', {}).get('name') == 'tx' and left_expr.get('memberName') == 'origin') \
                             or (right_expr.get('nodeType') == 'MemberAccess' and right_expr.get('expression', {}).get('name') == 'tx' and right_expr.get('memberName') == 'origin')):
-                            src_location = node.get('src', '')
-                            file_index = int(src_location.split(':')[2])
-                            file_name = file_list[file_index] if file_index < len(file_list) else "Unknown file"
-                            file_path = str(Path(project_root, file_name))
-                            lines, vuln_code = parse_code_highlight(src_location, file_path)
+                            file_path, lines, vuln_code = parse_code_highlight(node, src_file_list)
                             results.append({"file": file_path, "lines": lines, "code": vuln_code})
             for value in node.values():
                 if isinstance(value, (dict, list)):
