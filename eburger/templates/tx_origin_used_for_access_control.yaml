@@ -1,6 +1,7 @@
 name: "tx.origin Used for Access Control"
-description: "Imagine a user with an authorized address interacts with a malicious contract. This malicious contract then calls your contract that uses tx.origin for authentication. Since tx.origin will refer to the user's address (the original sender of the transaction), the malicious contract might gain unauthorized access."
 severity: "Low"
+description: "In a situation in which a user has interacted with a malicious contract, that contract can then impersonate as the victim user to perform actions in the current contract that are relying on the tx.origin."
+impact: "Malicious contracts can impersonate users to perform actions relying on the tx.origin." 
 action-items:
     - "If tx.origin is used as an important access control, consider using a msg.sender based approach instead."   
 references:
@@ -16,6 +17,7 @@ python: |
         if function_call_node.get("expression", {}).get("name") == "require":
             function_call_args = function_call_node.get("arguments")
             for arg in function_call_args:
+
                 # Find all tx.origin binary operations as args for require()
                 if arg.get("nodeType") == "BinaryOperation":
                     left_expr = arg.get('leftExpression', {})

@@ -1,0 +1,28 @@
+name: "Use of call or send on a payable address"
+severity: "Medium"
+description: "In Solidity, `.transfer()` and `.send()` both implement a risky gas limitation that reverts the transaction if the recipient's operations require more gas than the stipend of 2300 gas."
+impact: "Unexpected failed transactions and contract behavior."
+action-items:
+    - "Replace .transfer or .send with .call for transfers to payable addresses."
+    - "Implement necessary checks and error handling to ensure the safety of the new .call usage."
+references:
+    - "https://docs.soliditylang.org/en/v0.8.0/080-breaking-changes.html#new-recommendations"
+reports:
+    - "https://github.com/code-423n4/2024-01-curves/blob/main/bot-report.md#m-02"
+    - "https://github.com/code-423n4/2022-04-backd-findings/issues/52"
+vulnerable_contracts:
+    - "../vulnerable_contracts/use_of_call_or_send_on_payable.sol"
+python: |
+    results = []
+    function_call_nodes = get_nodes_by_types(ast_data, "FunctionCall")
+    for function_call_node in function_call_nodes:
+        function_call_expr_node = function_call_node.get("expression", {})
+        member_name = function_call_expr_node.get("memberName")
+        if member_name in ["transfer", "send"]:
+            if function_call_expr_node.get("nodeType") != "MemberAccess":
+                continue            
+
+            # Ensure the call is on a payable address
+            if function_call_expr_node.get("expression", {}).get("typeDescriptions", {}).get("typeString") == "address payable":
+                file_path, lines, vuln_code = parse_code_highlight(function_call_node, src_file_list)
+                results.append({"file": file_path, "lines": lines, "code": vuln_code})

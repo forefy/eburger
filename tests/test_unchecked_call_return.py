@@ -6,7 +6,7 @@ from eburger.yaml_parser import process_yaml
 
 
 @pytest.fixture
-def unchecked_call_return_ast() -> (dict, list):
+def vulnerable_ast() -> (dict, list):
     unchecked_ast = """{
     "contracts": {
         "vulnerable_contracts/unchecked_call_return.sol:VulnerableContract": {
@@ -634,8 +634,8 @@ def unchecked_call_return_ast() -> (dict, list):
     return json.loads(unchecked_ast)
 
 
-def test_unchecked_call_return(unchecked_call_return_ast):
-    ast_json, src_file_list = reduce_json(unchecked_call_return_ast)
+def test_unchecked_call_return(vulnerable_ast):
+    ast_json, src_file_list = reduce_json(vulnerable_ast)
     results = process_yaml(
         "eburger/templates/unchecked_call_return.yaml",
         ast_json,

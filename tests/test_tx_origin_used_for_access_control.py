@@ -7,7 +7,7 @@ from eburger.yaml_parser import process_yaml
 
 
 @pytest.fixture
-def tx_origin_used_for_access_control_ast() -> (dict, list):
+def vulnerable_ast() -> (dict, list):
     tx_json = """{
     "contracts": {
         "vulnerable_contracts/tx_origin_used_for_access_control.sol:BadContract": {
@@ -559,8 +559,8 @@ def tx_origin_used_for_access_control_ast() -> (dict, list):
     return json.loads(tx_json)
 
 
-def test_tx_origin_used_for_access_control(tx_origin_used_for_access_control_ast):
-    ast_json, src_file_list = reduce_json(tx_origin_used_for_access_control_ast)
+def test_tx_origin_used_for_access_control(vulnerable_ast):
+    ast_json, src_file_list = reduce_json(vulnerable_ast)
     results = process_yaml(
         "eburger/templates/tx_origin_used_for_access_control.yaml",
         ast_json,
