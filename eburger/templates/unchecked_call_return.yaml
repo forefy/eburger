@@ -11,31 +11,50 @@ reports:
     - "https://solodit.xyz/issues/h-01-unchecked-erc20-transfers-can-cause-lock-up-code4rena-reality-cards-reality-cards-contest-git"
 vulnerable_contracts:
     - "../vulnerable_contracts/unchecked_call_return.sol"
-pseudo: |
-    For each node in the AST (Abstract Syntax Tree) of the Solidity contract:
-    If the node is a FunctionCall:
-        Check if the function called is 'send' or 'call'.
-        If yes, then:
-            Check if the return value of this call is being checked.
-            (Typically, this means looking for an IfStatement or a conditional that uses the result of the call.)
-            If the return value is not checked:
-                Mark this location in the code as potentially vulnerable.
-                Record the file and location details for reporting.
-    Return all recorded potentially vulnerable locations.
 python: |
     results = []
-    stack = [ast_data]
-    while stack:
-        node = stack.pop()
-        if isinstance(node, dict):
-            if node.get('nodeType') == 'FunctionCall':
-                callee = node.get('expression', {}).get('typeDescriptions', {}).get('typeString')
-                if 'function (bytes memory) payable returns (bool,bytes memory)' in callee:
-                    parent = stack[-1] if stack and isinstance(stack[-1], dict) else {}
-                    if not (parent.get('nodeType') in ['IfStatement', 'Conditional']):
-                        file_path, lines, vuln_code = parse_code_highlight(node, src_file_list)
-                        results.append({"file": file_path, "lines": lines, "code": vuln_code})
-        if isinstance(node, list):
-            stack.extend(node)
-        elif isinstance(node, dict):
-            stack.extend(node.values())
+    call_nodes = get_nodes_by_signature(ast_data, "function (bytes memory) payable returns (bool,bytes memory)")
+    calls_and_blocks = []
+    for call_node in call_nodes:
+        if call_node.get("nodeType") == "FunctionCallOptions":
+            call_node_id = call_node.get("id")
+            parent_block = find_node_ids_first_parent_of_type(ast_data, call_node_id, "Block")
+            if parent_block is not None:
+                calls_and_blocks.append((call_node, parent_block))
+
+    # Filter false positives
+    for call_node, block_node in calls_and_blocks:
+        call_node_vulnerable = True
+        block_var_decls = get_nodes_by_types(block_node, "VariableDeclaration")
+
+        if block_var_decls:
+            block_unary_operations = get_nodes_by_types(block_node, "UnaryOperation")
+            block_expr_stmts = get_nodes_by_types(block_node, "ExpressionStatement")
+
+            block_var_declared_names = []
+            for block_var_decl in block_var_decls:
+                var_decl_name = block_var_decl.get("name")
+                if var_decl_name not in block_var_declared_names:
+                    block_var_declared_names.append(var_decl_name)
+            if block_var_declared_names:
+                
+                # Invalidate insight if a UnaryOperation contains a var declared within this block
+                for block_unary_operation in block_unary_operations:
+                    sub_expr_name = block_unary_operation.get("subExpression").get("name")
+                    if sub_expr_name in block_var_declared_names:
+                        call_node_vulnerable = False
+                
+                # Invalidate insight if an ExpressionStatement contains an expression arg within this block
+                for block_expr_stmt in block_expr_stmts:
+                    block_expr_expr = block_expr_stmt.get("expression")
+                    if block_expr_expr is None:
+                        continue
+                    if block_expr_expr.get("arguments") is None:
+                        continue
+                    for expr_arg in block_expr_expr.get("arguments"):
+                        if expr_arg.get("name") in block_var_declared_names:
+                            call_node_vulnerable = False
+
+        if call_node_vulnerable:
+            file_path, lines, vuln_code = parse_code_highlight(call_node, src_file_list)
+            results.append({"file": file_path, "lines": lines, "code": vuln_code})
