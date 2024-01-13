@@ -30,7 +30,7 @@ Forgot one? open an issue :)
 
 Here's a demo video
 
-https://github.com/forefy/eburger/assets/152717707/f119f17f-3d80-4629-8c79-b60007ebdef0
+https://github.com/forefy/eburger/assets/152717707/68f8a41c-1dfd-42d2-82ab-38c7a167e030
 
 Above example will also generate an AST, pythonified AST and a visual call flow graph under the folder `.eburger`.
 
