@@ -1,8 +1,6 @@
 import json
 import pytest
 from eburger.serializer import reduce_json
-from eburger.template_utils import parse_code_highlight
-
 from eburger.yaml_parser import process_yaml
 
 
@@ -10,7 +8,7 @@ from eburger.yaml_parser import process_yaml
 def vulnerable_ast() -> (dict, list):
     ast_json = """{
     "contracts": {
-        "vulnerable_contracts/use_of_call_or_send_on_payable.sol:UngoodContract": {
+        "vulnerable_contracts/use_of_transfer_or_send_on_payable.sol:UngoodContract": {
             "abi": [
                 {
                     "inputs": [
@@ -70,12 +68,12 @@ def vulnerable_ast() -> (dict, list):
         }
     },
     "sourceList": [
-        "vulnerable_contracts/use_of_call_or_send_on_payable.sol"
+        "vulnerable_contracts/use_of_transfer_or_send_on_payable.sol"
     ],
     "sources": {
-        "vulnerable_contracts/use_of_call_or_send_on_payable.sol": {
+        "vulnerable_contracts/use_of_transfer_or_send_on_payable.sol": {
             "AST": {
-                "absolutePath": "vulnerable_contracts/use_of_call_or_send_on_payable.sol",
+                "absolutePath": "vulnerable_contracts/use_of_transfer_or_send_on_payable.sol",
                 "exportedSymbols": {
                     "UngoodContract": [
                         36
@@ -554,10 +552,10 @@ def vulnerable_ast() -> (dict, list):
     return json.loads(ast_json)
 
 
-def test_use_of_call_or_send_on_payable(vulnerable_ast):
+def use_of_transfer_or_send_on_payable(vulnerable_ast):
     ast_json, src_file_list = reduce_json(vulnerable_ast)
     results = process_yaml(
-        "eburger/templates/use_of_call_or_send_on_payable.yaml",
+        "eburger/templates/use_of_transfer_or_send_on_payable.yaml",
         ast_json,
         src_file_list,
     )

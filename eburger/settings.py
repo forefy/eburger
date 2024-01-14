@@ -8,6 +8,7 @@ excluded_dirs = ["test", "script"]
 excluded_contracts = [
     "@openzeppelin",
     "@uniswap",
+    "@gnosis.pm",
     "solmate",
     "solady",
     "forge-std",

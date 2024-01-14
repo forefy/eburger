@@ -1,0 +1,38 @@
+name: "Modifier Without Proper Enforcement"
+severity: "High"
+description: "Using the provided modifier onlyOwner for function access control without a proper enforcement mechanism like require or revert is a dire mistake because it fails to restrict access as intended. The modifier merely evaluates a condition (msg.sender == owner) without any action taken based on the result."
+impact: "This means any user, regardless of whether they are the owner, can execute functions that are supposed to be restricted to the owner, potentially leading to unauthorized actions, such as withdrawing funds or altering critical contract settings."
+action-items:
+    - "Change the modifier so that it will enforce the ownership check using a require/revert statement."
+references:
+    - "https://docs.soliditylang.org/en/v0.8.0/080-breaking-changes.html#new-recommendations"
+reports:
+    - "https://github.com/code-423n4/2024-01-curves/blob/main/bot-report.md#m-02"
+    - "https://github.com/code-423n4/2022-04-backd-findings/issues/52"
+vulnerable_contracts:
+    - "../vulnerable_contracts/use_of_transfer_or_send_on_payable.sol"
+    - "https://github.com/code-423n4/2024-01-curves"
+python: |
+    results = []
+    modifier_nodes = get_nodes_by_types(ast_data, "ModifierDefinition")
+    for modifier_node in modifier_nodes:
+        body_nodes = modifier_node.get("body", {}).get("statements", [])
+        for statement in body_nodes:
+            if statement.get("nodeType") == "ExpressionStatement":
+                expression = statement.get("expression", {})
+                if expression.get("nodeType") == "BinaryOperation":
+                    # Check for equate operation without enforcement
+                    if expression.get("operator") == "==":
+                        # Check for enforcement mechanisms like require or revert
+                        enforcement_found = False
+                        for inner_statement in body_nodes:
+                            if inner_statement.get("nodeType") in ["ExpressionStatement", "IfStatement"]:
+                                inner_expression = inner_statement.get("expression", {})
+                                if inner_expression.get("nodeType") in ["FunctionCall"]:
+                                    function_call_name = inner_expression.get("expression", {}).get("name")
+                                    if function_call_name in ["require", "revert"]:
+                                        enforcement_found = True
+                                        break
+                        if not enforcement_found:
+                            file_path, lines, vuln_code = parse_code_highlight(modifier_node, src_file_list)
+                            results.append({"file": file_path, "lines": lines, "code": vuln_code})

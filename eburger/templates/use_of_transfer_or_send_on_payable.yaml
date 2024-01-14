@@ -1,6 +1,6 @@
-name: "Use of call or send on a payable address"
+name: "Use of transfer or send on a payable address"
 severity: "Medium"
-description: "In Solidity, `.transfer()` and `.send()` both implement a risky gas limitation that reverts the transaction if the recipient's operations require more gas than the stipend of 2300 gas."
+description: "In Solidity, .transfer and .send both implement a risky gas limitation that reverts the transaction if the recipient's operations require more gas than the stipend of 2300 gas."
 impact: "Unexpected failed transactions and contract behavior."
 action-items:
     - "Replace .transfer or .send with .call for transfers to payable addresses."
@@ -11,7 +11,8 @@ reports:
     - "https://github.com/code-423n4/2024-01-curves/blob/main/bot-report.md#m-02"
     - "https://github.com/code-423n4/2022-04-backd-findings/issues/52"
 vulnerable_contracts:
-    - "../vulnerable_contracts/use_of_call_or_send_on_payable.sol"
+    - "../vulnerable_contracts/modifier_without_proper_enforcement.sol"
+    - "https://github.com/code-423n4/2024-01-curves"
 python: |
     results = []
     function_call_nodes = get_nodes_by_types(ast_data, "FunctionCall")

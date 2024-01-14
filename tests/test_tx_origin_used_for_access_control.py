@@ -1,8 +1,6 @@
 import json
 import pytest
 from eburger.serializer import reduce_json
-from eburger.template_utils import parse_code_highlight
-
 from eburger.yaml_parser import process_yaml
 
 
