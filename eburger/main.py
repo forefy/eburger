@@ -185,6 +185,8 @@ def main():
     save_python_ast(filename, ast_roots)
 
     # Parse YAML templates
+    if args.templates_path:
+        settings.templates_directory = Path(args.templates_path)
     log("info", f"Templates path: {settings.templates_directory}")
 
     insights = process_files_concurrently(ast_json, src_file_list)
