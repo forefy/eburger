@@ -26,7 +26,7 @@ python: |
     # Filter false positives
     for call_node, block_node in calls_and_blocks:
         call_node_vulnerable = True
-        block_var_decls = get_nodes_by_types(block_node, "VariableDeclaration")
+        block_var_decls = get_nodes_by_types(block_node, ["VariableDeclaration", "Identifier"])
 
         if block_var_decls:
             block_unary_operations = get_nodes_by_types(block_node, "UnaryOperation")
