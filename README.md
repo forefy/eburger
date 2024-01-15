@@ -84,7 +84,7 @@ For documentation refer to the [Wiki](https://github.com/forefy/eburger/wiki/Tem
 - Search specific segments and highlight by parameter, function, contract etc
 - Extensive control on graph layout
 - View only the code related to the contract and not all the libraries in the world
-- Community and free support via [Discord](discord.gg/WaVMpBtxdB)
+- Community and free support via [Discord](https://discord.gg/WaVMpBtxdB)
 
 
 ## What is missing
