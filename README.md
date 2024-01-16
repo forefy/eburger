@@ -2,7 +2,7 @@
 
 <img src="static/eburger.png?raw=true" alt="eBurger" width="600"/>
 
-eBurger is a way to quickly interact with solidity smart contracts.
+eBurger is a static analysis tool that provides a way to quickly query and analyze solidity smart contracts.
 
 Running scanners won't win you competitions. spin up custom templates tailored to specific projects in minutes ([Wiki](https://github.com/forefy/eburger/wiki)).
 

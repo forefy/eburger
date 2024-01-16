@@ -1,0 +1,33 @@
+name: "Missing Reentracy Guard"
+severity: "Low"
+description: "Due to Solidity's design, when a function in your contract interacts with another contract's address, that contract gains the ability to recursively call your contract's function before handing back the control on the execution flow. If the reentrant function's logic did not expect the function to be called multiple times, it can be exposed to abuse."
+impact: "Potential draining of funds, depending on what happens when the function is retriggered."
+action-items:
+    - "Protect functions that may interact with other contracts by disallowing making nested (or re-entering) calls to them."
+    - "Refer to ecosystem-trusted solutions, like OpenZeppelin's nonReentrant modifier."
+    - "Review all raised functions for a correct implementation of the checks-effects-interactions pattern."
+references:
+    - "https://docs.openzeppelin.com/contracts/3.x/api/utils#ReentrancyGuard"
+    - "https://swcregistry.io/docs/SWC-107/"
+reports:
+    - "https://github.com/code-423n4/2023-04-caviar-findings/blob/d22bd0a22308bee92374f90d01e4bd3c2958ec42/data/Rolezn-Q.md#low6-missing-reentrancy-guard-to-withdraw-function"
+vulnerable_contracts:
+    - "../vulnerable_contracts/missing_reentrancy_guard/"
+python: |
+    results = []
+    function_nodes = get_nodes_by_types(ast_data, "FunctionDefinition")
+    reentrancy_keywords = ['nonReentrant']
+    for function_node in function_nodes:
+        # Check for the presence of known reentrancy guard modifiers
+        modifiers = []
+        for modifier in function_node.get('modifiers', []):
+            # Check if the modifier has a name, otherwise use another attribute
+            if 'name' in modifier:
+                modifiers.append(modifier['name'])
+        if not any(modifier in reentrancy_keywords for modifier in modifiers):
+            # Check for .call usage within the function
+            function_node_body = function_node.get("body", {})
+            call_nodes = get_nodes_by_signature(function_node_body, "function (bytes memory) payable returns (bool,bytes memory)")
+            if call_nodes:
+                file_path, lines, vuln_code = parse_code_highlight(function_node, src_file_list)
+                results.append({"file": file_path, "lines": lines, "code": vuln_code})

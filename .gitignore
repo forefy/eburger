@@ -7,6 +7,9 @@
 *__pycache__
 *.html
 dist/
+**/lib
+**/out
+**/cache
 .vscode
 *[0-9][0-9].py
 *eburger-output.json
