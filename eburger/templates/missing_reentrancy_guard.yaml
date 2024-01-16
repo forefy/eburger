@@ -18,16 +18,26 @@ python: |
     function_nodes = get_nodes_by_types(ast_data, "FunctionDefinition")
     reentrancy_keywords = ['nonReentrant']
     for function_node in function_nodes:
+
         # Check for the presence of known reentrancy guard modifiers
         modifiers = []
         for modifier in function_node.get('modifiers', []):
+
             # Check if the modifier has a name, otherwise use another attribute
             if 'name' in modifier:
                 modifiers.append(modifier['name'])
+
         if not any(modifier in reentrancy_keywords for modifier in modifiers):
+
             # Check for .call usage within the function
             function_node_body = function_node.get("body", {})
+
+            # Ignore .call usage within the first entries of the function (where reentrancy doesn't affect anything)
+            if function_node_body.get("statements"):
+                function_node_body["statements"] = function_node_body["statements"][1:]
+
             call_nodes = get_nodes_by_signature(function_node_body, "function (bytes memory) payable returns (bool,bytes memory)")
+
             if call_nodes:
                 file_path, lines, vuln_code = parse_code_highlight(function_node, src_file_list)
                 results.append({"file": file_path, "lines": lines, "code": vuln_code})
