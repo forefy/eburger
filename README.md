@@ -28,7 +28,7 @@ Comparison of actively maintained / popular solidity smart contract static analy
 | [aderyn](https://github.com/Cyfrin/aderyn)             | Rust            |                        |                                                       |                                                               |                   |
 
 
-Forgot one? open a pull request or an issue :)
+Forgot one or made a mistake? open a pull request or an issue :)
 
 ## How it looks like
 
