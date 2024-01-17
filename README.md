@@ -17,14 +17,18 @@ Running scanners won't win you competitions. spin up custom templates tailored t
 
 
 ## Comparison table
-| Active Static Analyzer                                 | Language        | Visualization Graph    | 2 Minutes to write a custom template with ChatGPT    | Many findings that are already found before the contest began | Would want to eat |
+Comparison of actively maintained / popular solidity smart contract static analyzers
+
+| Static Analyzer                                 | Language        | Visualization Graph    | 2 Minutes to write a custom template with ChatGPT    | Many findings that are already found before the contest began | Would want to eat |
 |--------------------------------------------------------|-----------------|------------------------|-------------------------------------------------------|---------------------------------------------------------------|-------------------|
 | [eBurger](https://github.com/forefy/eburger)           | Python          | ✅                     | ✅                                                    |                                                               | ✅                |
 | [Slither](https://github.com/crytic/slither)           | Python          | ✅                     |                                                       | ✅                                                            |                   |
 | [4naly3er](https://github.com/Picodes/4naly3er)        | TypeScript 🤮   |                        |                                                       | ✅                                                            |                   |
-| [mythril](https://github.com/Consensys/mythril)        | Python          |                        |                                                       | ✅                                                            |                   |
+| [mythril](https://github.com/Consensys/mythril)        | Python          | ✅                     |                                                       |                                                               |                   |
+| [aderyn](https://github.com/Cyfrin/aderyn)             | Rust            |                        |                                                       |                                                               |                   |
 
-Forgot one? open an issue :)
+
+Forgot one? open a pull request or an issue :)
 
 ## How it looks like
 
@@ -38,7 +42,7 @@ Here's an example of an interactive graph
 ![eBurger](static/network_graph.png?raw=true "eBurger Network Graph")
 
 ## How to install
-These 4 commands will make `eburger` available globally:
+These commands will make `eburger` available from anywhere:
 ```
 git clone https://github.com/forefy/eburger.git
 cd eburger
@@ -57,7 +61,7 @@ cat eburger-results.json
 ```
 ..
 
-This will run a focused scan on one file and it's dependencies:
+A focused scan of one file and it's dependencies:
 ```
 eburger -f ../ProjectToScan/src/SomeContract.sol
 ```
