@@ -7,7 +7,7 @@ action-items:
 references:
     - "https://detectors.auditbase.com/check-state-variable-address-zero-solidity"
 reports:
-    - ""
+    - "https://github.com/code-423n4/2024-01-curves/blob/main/bot-report.md#l-06"
 vulnerable_contracts:
     - "../vulnerable_contracts/missing_zero_address_check.sol"
 python: |
