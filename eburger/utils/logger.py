@@ -60,6 +60,10 @@ def log(type: str, message: str):
                     severity = item.get("severity")
                     results = item.get("results")
 
+                    # Skip printing user excluded items
+                    if severity.casefold() not in args.no:
+                        continue
+
                     # Check a sample result to ensure correct structure
                     try:
                         results[0]["file"]

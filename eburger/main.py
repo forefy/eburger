@@ -68,10 +68,14 @@ def main():
     elif args.ast_json_file:
         filename = args.ast_json_file
         filename = filename.replace(".json", "")  # Clean possible file extension
+        filename = filename.replace(
+            ".eburger/", ""
+        )  # Protection against analysis of files inside the output path
         with open(args.ast_json_file, "r") as f:
             ast_json = json.load(f)
             ast_json, src_file_list = reduce_json(ast_json)
         output_path = settings.outputs_dir / f"{filename}.json"
+
         save_as_json(output_path, ast_json)
 
     if path_type is not None:
@@ -180,7 +184,6 @@ def main():
     ast_roots, G = parse_solidity_ast(ast_json, G)
 
     # Draw graph
-    settings.outputs_dir / filename
     draw_graph(settings.outputs_dir / filename, G)
     save_python_ast(filename, ast_roots)
 

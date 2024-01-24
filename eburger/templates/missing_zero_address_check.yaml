@@ -1,0 +1,58 @@
+name: "Missing Zero Address Check"
+severity: "Low"
+description: "In Solidity, contracts often interact with external addresses. Failing to check for a possible 0 address input (especially in constructors, setters, and initializer functions) before such interactions can lead to unexpected dangerous behavior. A zero address check ensures that addresses are explicitly provided and not left uninitialized or set to a default, invalid state."
+impact: "Unexpected failed transactions and contract behavior."
+action-items:
+    - "Use require statements to validate addresses before any operation involving external addresses is performed, especially on constructors, setters or initializer functions."
+references:
+    - "https://detectors.auditbase.com/check-state-variable-address-zero-solidity"
+reports:
+    - ""
+vulnerable_contracts:
+    - "../vulnerable_contracts/missing_zero_address_check.sol"
+python: |
+    results = []
+    function_nodes = get_nodes_by_types(ast_data, "FunctionDefinition")
+
+    for function_node in function_nodes:
+        is_constructor = False
+        function_definition_type = function_node.get("kind")
+        if function_definition_type == "constructor":
+            is_constructor = True
+        
+        is_setter = function_node.get('name', '').startswith('set')
+
+        is_initializer = function_node.get('name', '').startswith('init')
+
+        # Skip non constructor/setter/initializer, guarded, or bodyless functions
+        if not (is_constructor or is_setter or is_initializer):
+            continue
+        
+        if any(modifier.get('modifierName', {}).get('name') == 'onlyOwner' for modifier in function_node.get('modifiers', [])):
+            continue
+        
+        if len(function_node.get('body', {}).get('statements', [])) < 0:
+            continue
+
+        # Analyze function nodes for address type parameters or variables
+        param_nodes = get_nodes_by_types(function_node, "Parameter")
+        variable_nodes = get_nodes_by_types(function_node, "VariableDeclaration")
+        address_nodes = [node for node in param_nodes + variable_nodes if node.get('typeName', {}).get('name') == 'address']
+
+        for address_node in address_nodes:
+            identifier = address_node.get('name')
+            if identifier:
+                # Search for require statements involving the address variable
+                require_nodes = get_nodes_by_signature(function_node, "require(bool)")
+
+                zero_address_check_found = False
+                for require_node in require_nodes:
+                    if identifier in str(require_node):
+                        # Assuming require statements with the address variable are checking against zero address
+                        zero_address_check_found = True
+                        break
+
+                if not zero_address_check_found:
+                    # If no zero address check is found for this address variable
+                    file_path, lines, vuln_code = parse_code_highlight(address_node, src_file_list)
+                    results.append({"file": file_path, "lines": lines, "code": vuln_code})

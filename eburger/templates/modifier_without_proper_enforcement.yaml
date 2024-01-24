@@ -11,7 +11,6 @@ reports:
     - "https://github.com/code-423n4/2022-04-backd-findings/issues/52"
 vulnerable_contracts:
     - "../vulnerable_contracts/use_of_transfer_or_send_on_payable.sol"
-    - "https://github.com/code-423n4/2024-01-curves"
 python: |
     results = []
     modifier_nodes = get_nodes_by_types(ast_data, "ModifierDefinition")
