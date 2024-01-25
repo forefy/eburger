@@ -50,8 +50,16 @@ parser.add_argument(
 parser.add_argument(
     "-t",
     "--templates",
-    dest="templates_path",
+    dest="template_paths",
     type=str,
+    nargs="+",
     help="Path to eburger yaml templates folder.",
+)
+parser.add_argument(
+    "-d",
+    "--debug",
+    dest="debug",
+    action="store_true",
+    help="Print debug output",
 )
 args = parser.parse_args()

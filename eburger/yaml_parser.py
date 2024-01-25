@@ -61,7 +61,18 @@ def process_yaml(file_path, ast_data, src_file_list):
 
 
 def process_files_concurrently(ast_data: dict, src_file_list: list):
-    yaml_files = list(settings.templates_directory.glob("*.yaml"))
+    yaml_files = []
+    for templates_directory in settings.templates_directories:
+        if templates_directory.is_dir():
+            yaml_files = list(
+                set(yaml_files + list(templates_directory.glob("*.yaml")))
+            )
+        elif templates_directory.is_file() and templates_directory.suffix == ".yaml":
+            if templates_directory not in yaml_files:
+                yaml_files.append(templates_directory)
+        else:
+            log("error", "Invalid templates directory or file.")
+
     log(
         "info",
         f"Loaded {color.Success}{len(yaml_files)}{color.Default} templates for execution.",

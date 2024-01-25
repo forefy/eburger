@@ -1,0 +1,49 @@
+name: "Unbound Loop"
+severity: "Low"
+description: "Unbounded loops, specifically, for loops that can modify state and have no apparent max restriction to the nunmber of iterations possible, can lead to excessive gas consumption, which may cause transactions to fail or become prohibitively expensive."
+impact: "Excessive gas consumption, contract denial of service."
+action-items:
+    - "Review raised loops and ensure there are acceptable limitations of maximum iterations."
+    - "If possible, reduce the complication of loops and see if there's any other way to provide a similar functionality with a smaller range of iterations required, if at all."
+references:
+    - "https://blog.b9lab.com/getting-loopy-with-solidity-1d51794622ad"
+reports:
+    - "https://github.com/code-423n4/2024-01-curves/blob/main/bot-report.md#l-12-unbounded-loop-may-run-out-of-gas"
+vulnerable_contracts:
+    - "../vulnerable_contracts/unbounded_loop.sol"
+python: |
+    results = []
+
+    function_definitions = get_nodes_by_types(ast_data, "FunctionDefinition")
+
+    for function in function_definitions:
+        # Check if the function is non-view (i.e., it can modify state)
+        if function.get("stateMutability") in ["pure", "view"]:
+            continue
+
+        for_loops = get_nodes_by_types(function, "ForStatement")
+
+        for loop in for_loops:  
+
+            # Ignore loops with a fixed maxed value such as `for (int i = 0; i < 10; i++)`
+            loop_right_hand_expression = loop.get("condition", {}).get('rightExpression', {})
+            if loop_right_hand_expression.get('nodeType') == 'Literal':
+                continue
+
+            # Continue of the loop has no state-changing nodes (no real gas spend risk)
+            loop_body = loop.get("body", {}).get("statements", [])
+            state_changing_nodes = get_nodes_by_types(loop_body, ["Assignment", "FunctionCall"]) # TODO: add more
+            if not state_changing_nodes:
+                continue
+
+            # Check if the right expression is a state variable (big gas affect)
+            loop_right_hand_expression_name = loop_right_hand_expression.get("expression", {}).get("name")
+            is_state_variable = False
+            variable_declarations = get_nodes_by_types(ast_data, "VariableDeclaration", "name", loop_right_hand_expression_name)
+            for variable_declaration in variable_declarations:
+                if variable_declaration.get("stateVariable"):
+                    is_state_variable = True
+                    break
+            if is_state_variable:
+                file_path, lines, vuln_code = parse_code_highlight(loop, src_file_list)
+                results.append({"file": file_path, "lines": lines, "code": vuln_code})

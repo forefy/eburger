@@ -7,6 +7,7 @@ outputs_dir = Path.cwd() / ".eburger"
 excluded_dirs = ["test", "script"]
 excluded_contracts = [
     "@openzeppelin",
+    "openzeppelin-contracts",
     "@uniswap",
     "@gnosis.pm",
     "solmate",
@@ -15,6 +16,6 @@ excluded_contracts = [
     "ds-test",
 ]
 
-templates_directory = Path(os.path.dirname(os.path.abspath(__file__)), "templates")
+templates_directories = [Path(os.path.dirname(os.path.abspath(__file__)), "templates")]
 if __package__ is None or __package__ == "":
-    templates_directory = Path.cwd() / "eburger" / "templates"
+    templates_directories = [Path.cwd() / "eburger" / "templates"]

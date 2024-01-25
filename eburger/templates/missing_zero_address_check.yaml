@@ -53,6 +53,5 @@ python: |
                         break
 
                 if not zero_address_check_found:
-                    # If no zero address check is found for this address variable
                     file_path, lines, vuln_code = parse_code_highlight(address_node, src_file_list)
                     results.append({"file": file_path, "lines": lines, "code": vuln_code})

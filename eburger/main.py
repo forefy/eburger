@@ -96,7 +96,7 @@ def main():
                 args.solidity_file_or_folder,
             )
             for line in build_output_lines:
-                log("info", line)
+                log("debug", line)
 
             sample_file_path = find_and_read_sol_file(args.solidity_file_or_folder)
             filename, output_filename = get_filename_from_path(sample_file_path)
@@ -188,9 +188,11 @@ def main():
     save_python_ast(filename, ast_roots)
 
     # Parse YAML templates
-    if args.templates_path:
-        settings.templates_directory = Path(args.templates_path)
-    log("info", f"Templates path: {settings.templates_directory}")
+    if args.template_paths:
+        settings.templates_directories = []
+        for template_path in args.template_paths:
+            settings.templates_directories.append(Path(template_path))
+            log("info", f"Templates path: {Path(template_path)}")
 
     insights = process_files_concurrently(ast_json, src_file_list)
 

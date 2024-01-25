@@ -51,6 +51,9 @@ def log(type: str, message: str):
         case "info":
             if "info" not in args.no:
                 print(f"[{color.Info} Info {color.Default}] {message}")
+        case "debug":
+            if args.debug:
+                print(f"[{color.Info} Debug {color.Default}] {message}")
         case "insights":
             # json_printable = json.dumps(message, indent=4)
             # print(json_printable)
@@ -61,7 +64,7 @@ def log(type: str, message: str):
                     results = item.get("results")
 
                     # Skip printing user excluded items
-                    if severity.casefold() not in args.no:
+                    if args.no and severity.casefold() in args.no:
                         continue
 
                     # Check a sample result to ensure correct structure

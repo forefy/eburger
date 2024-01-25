@@ -96,7 +96,7 @@ def create_directory_if_not_exists(directory_path):
     if not os.path.exists(directory_path):
         # Create the directory
         os.makedirs(directory_path)
-        log("info", f"Created directory: {directory_path}")
+        log("debug", f"Created directory: {directory_path}")
 
 
 def create_or_empty_directory(directory_path):

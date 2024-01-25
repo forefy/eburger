@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Union
 from eburger import settings
 
@@ -27,33 +28,36 @@ def parse_code_highlight(node: dict, src_file_list: list) -> (str, str, str):
     file_name = (
         src_file_list[file_index] if file_index < len(src_file_list) else "Unknown file"
     )
-    file_path = str(settings.project_root / file_name)
+    file_path = str(Path(settings.project_root / file_name).resolve())
     start_offset, length, _ = map(int, src_location.split(":"))
 
+    file_content = None
     with open(file_path, "r") as file:
         file_content = file.read()
-        if start_offset + length > len(file_content):
-            return "The start offset and length exceed the file content.", None, None
 
-        vulnerable_code = file_content[start_offset : start_offset + length]
+    if file_content is None:
+        return "File unreadable.", None, None
 
-        # Find the line number and character positions
-        current_offset = 0
-        line_number = 1
-        for line in file_content.split("\n"):
-            end_offset = current_offset + len(line)
-            if current_offset <= start_offset < end_offset:
-                start_char = start_offset - current_offset
-                end_char = min(start_char + length, len(line))
-                return (
-                    file_path,
-                    f"Line {line_number} Columns {start_char + 1}-{end_char + 1}",
-                    vulnerable_code,
-                )
-            current_offset = end_offset + 1  # +1 for the newline character
-            line_number += 1
+    if start_offset + length > len(file_content):
+        return "The start offset and length exceed the file content.", None, None
 
-        return "Location not found in file", None, None
+    vulnerable_code = file_content[start_offset : start_offset + length]
+    # Find the line number and character positions
+    current_offset = 0
+    line_number = 1
+    for line in file_content.split("\n"):
+        end_offset = current_offset + len(line)
+        if current_offset <= start_offset < end_offset:
+            start_char = start_offset - current_offset
+            end_char = min(start_char + length, len(line))
+            return (
+                file_path,
+                f"Line {line_number} Columns {start_char + 1}-{end_char + 1}",
+                vulnerable_code,
+            )
+        current_offset = end_offset + 1  # +1 for the newline character
+        line_number += 1
+    return "Location not found in file", None, None
 
 
 def join_lists_unique(list1, list2):
@@ -97,7 +101,9 @@ def is_entry_unique(results, file_path, lines):
     )
 
 
-def get_nodes_by_types(node, node_types: Union[str, list]) -> list:
+def get_nodes_by_types(
+    node, node_types: Union[str, list], filter_key=None, filter_value=None
+) -> list:
     """
     Finds nodes of specific types within the given node or AST.
 
@@ -112,7 +118,9 @@ def get_nodes_by_types(node, node_types: Union[str, list]) -> list:
     def search_nodes(current_node, result):
         if isinstance(current_node, dict):
             if current_node.get("nodeType") in node_types:
-                result.append(current_node)
+                # Apply filter if filter_key and filter_value are provided
+                if filter_key is None or current_node.get(filter_key) == filter_value:
+                    result.append(current_node)
             for value in current_node.values():
                 if isinstance(value, (dict, list)):
                     search_nodes(value, result)
