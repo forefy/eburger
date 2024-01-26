@@ -73,9 +73,9 @@ Refer to the [Wiki](https://github.com/forefy/eburger/wiki/Advanced-usage).
 
 
 ## Adding templates
-Templates can be added by adding new YAML files under the `templates/` directory.
+Templates can be added by creating new YAML files and either load them with `eburger -t mytemplate.yaml .` or by placing them under the `templates/` directory.
 
-If you are using eburger as a python package (installed with pip install), the templates location can be found with running `pip3 show eburger` or by running the tool on a contract and seeing the templates path printed to the console.
+If you are using eburger as a python package (installed via pip install), the templates location can be found with running `pip3 show eburger` or by running the tool on a contract and seeing the templates path printed to the console.
 
 For documentation refer to the [Wiki](https://github.com/forefy/eburger/wiki/Templates).
 
@@ -84,12 +84,12 @@ For documentation refer to the [Wiki](https://github.com/forefy/eburger/wiki/Tem
 - YAML template support to query contract structure and raise insights for any matches
 - Fast learning curve for adding templates, ability to customize templates to the current ongoing audit project
 - Foundry and Hardhat support ❣️
-- Call Flow Graph inspired by naming conventions of Solidity
-- Search specific segments and highlight by parameter, function, contract etc
-- Extensive control on graph layout
+- Call Flow Graph inspired by naming conventions of Solidity - Extensive control on graph layout, ability to search specific segments and highlight by parameter, function, contract etc
 - View only the code related to the contract and not all the libraries in the world
 - Community and free support via [Discord](https://discord.gg/WaVMpBtxdB)
 
 
 ## What is missing
 As you can see, the tool is still in the making - what features would you like to see? let us know!
+
+[Discord](https://discord.gg/WaVMpBtxdB) | [Discussions](https://github.com/forefy/eburger/discussions) | [Feature requests](https://github.com/forefy/eburger/issues/new?assignees=forefy&labels=&projects=&template=feature_request.md&title=) | [Wiki](https://github.com/forefy/eburger/wiki) | [Twitter DM](https://twitter.com/messages/compose?recipient_id=1469398978185809922)
