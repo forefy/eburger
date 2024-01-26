@@ -1,10 +1,7 @@
-from datetime import datetime
 import json
 import os
 from pathlib import Path
-import re
 import shutil
-import sys
 import networkx as nx
 from eburger.utils.cli_args import args
 from eburger.utils.filesystem import (
@@ -29,7 +26,13 @@ from eburger.utils.installers import (
 from eburger.utils.logger import log
 import eburger.settings as settings
 from eburger.serializer import parse_solidity_ast, reduce_json
-from eburger.utils.outputs import draw_graph, save_as_json, save_python_ast
+from eburger.utils.outputs import (
+    calculate_nsloc,
+    draw_graph,
+    draw_nsloc_table,
+    save_as_json,
+    save_python_ast,
+)
 from eburger.yaml_parser import process_files_concurrently
 
 
@@ -77,6 +80,10 @@ def main():
         output_path = settings.outputs_dir / f"{filename}.json"
 
         save_as_json(output_path, ast_json)
+
+    # NSLOC only mode
+    if args.nsloc:
+        draw_nsloc_table()
 
     if path_type is not None:
         # Foundry compilation flow
@@ -200,11 +207,18 @@ def main():
         # Same data saved twice - once for historic reference and one for clarity
         insights_json_path = settings.outputs_dir / f"eburger_output_{filename}.json"
         results_path = settings.project_root / "eburger-output.json"
-        save_as_json(insights_json_path, insights)
-        save_as_json(results_path, insights)
+
+        analysis_output = {}
+        analysis_output["insights"] = insights
+
+        _, summary = calculate_nsloc()
+        analysis_output["nsloc"] = summary
+
+        save_as_json(insights_json_path, analysis_output)
+        save_as_json(results_path, analysis_output)
         log(
             "success",
-            f"Results saved to {results_path}.",
+            f"Results saved to {str(Path(results_path).resolve())}.",
         )
     else:
         log("success", f"No insights found. Results saved to {settings.outputs_dir}")

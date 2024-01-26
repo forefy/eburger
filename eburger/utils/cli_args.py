@@ -53,7 +53,7 @@ parser.add_argument(
     dest="template_paths",
     type=str,
     nargs="+",
-    help="Path to eburger yaml templates folder.",
+    help="Path to eburger yaml templates folder",
 )
 parser.add_argument(
     "-d",
@@ -61,5 +61,21 @@ parser.add_argument(
     dest="debug",
     action="store_true",
     help="Print debug output",
+)
+parser.add_argument(
+    "-ns",
+    "--nsloc",
+    dest="nsloc",
+    action="store_true",
+    help="Only print summary of NSLOC (Normalized Source Code)",
+)
+
+# Only here to allow "." as an argument, ignored in the rest of the code.
+parser.add_argument(
+    "default_solidity_file_or_folder",
+    type=str,
+    nargs="?",
+    default=".",
+    help=argparse.SUPPRESS,
 )
 args = parser.parse_args()
