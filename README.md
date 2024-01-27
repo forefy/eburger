@@ -90,6 +90,6 @@ For documentation refer to the [Wiki](https://github.com/forefy/eburger/wiki/Tem
 
 
 ## What is missing
-As you can see, the tool is still in the making - what features would you like to see? let us know!
+What features would you like to see? let us know!
 
 [Discord](https://discord.gg/WaVMpBtxdB) | [Discussions](https://github.com/forefy/eburger/discussions) | [Feature requests](https://github.com/forefy/eburger/issues/new?assignees=forefy&labels=&projects=&template=feature_request.md&title=) | [Wiki](https://github.com/forefy/eburger/wiki) | [Twitter DM](https://twitter.com/messages/compose?recipient_id=1469398978185809922)
