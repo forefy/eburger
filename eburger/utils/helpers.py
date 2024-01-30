@@ -36,7 +36,7 @@ def run_command(command, directory=None, shell=False, live_output=False):
         output = process.stdout.readline()
         error = process.stderr.readline()
 
-        if output == "" and process.poll() is not None:
+        if output == "" and error == "" and process.poll() is not None:
             break
         if output:
             output_stripped = output.strip()
@@ -47,7 +47,7 @@ def run_command(command, directory=None, shell=False, live_output=False):
         if error:
             error_stripped = error.strip()
             if live_output:
-                log("error", error_stripped)
+                log("info", error_stripped)
             errors.append(error_stripped)
 
     return results, errors

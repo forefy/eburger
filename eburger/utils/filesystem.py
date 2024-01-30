@@ -1,6 +1,7 @@
 import fnmatch
 import json
 import os
+from pathlib import Path
 import re
 import shutil
 from eburger import settings
@@ -105,11 +106,11 @@ def create_or_empty_directory(directory_path):
         # Empty the directory by removing all its contents
         shutil.rmtree(directory_path)
         os.makedirs(directory_path)
-        log("info", f"Emptied and re-created directory: {directory_path}")
+        log("debug", f"Emptied and re-created directory: {directory_path}")
     else:
         # Create the directory if it does not exist
         os.makedirs(directory_path)
-        log("info", f"Created directory: {directory_path}")
+        log("debug", f"Created directory: {directory_path}")
 
 
 # TODO: Add better handling for multiple build info files
@@ -170,3 +171,40 @@ def move_multiple_dirs(source_dir, directories_to_move, destination_dir):
             create_directory_if_not_exists(dest_path)
             if os.path.exists(src_path) and os.path.isdir(src_path):
                 shutil.move(src_path, dest_path)
+
+
+def find_recursive_files_by_patterns(source_path, patterns: list) -> list:
+    file_paths = []
+    for pattern in patterns:
+        paths = Path(source_path).rglob(pattern)
+
+        filtered_paths = []
+        for path in paths:
+            if any(part in {"mocks", "lib", "node_modules"} for part in path.parts):
+                continue
+            filtered_paths.append(path)
+        file_paths.extend(filtered_paths)
+    return list(set(file_paths))
+
+
+def select_project(project_paths):
+    while True:
+        if len(project_paths) > 1:
+            print("Multiple projects found:")
+            for i, path in enumerate(project_paths, start=1):
+                print(f"{i}) {path}")
+
+            try:
+                choice = int(input("Enter your choice: "))
+                if 1 <= choice <= len(project_paths):
+                    project_path = Path(project_paths[choice - 1]).parent
+                    return project_path
+                else:
+                    print(
+                        f"Invalid choice. Please enter a number between 1 and {len(project_paths) - 1}"
+                    )
+            except ValueError:
+                print("Invalid input. Please enter a number.")
+        else:
+            print("Only one project available.")
+            return Path(project_paths[0]).parent

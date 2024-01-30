@@ -816,7 +816,7 @@ def reduce_json(ast_json):
             if any(substring in key for substring in settings.excluded_contracts)
         ]
         for key in removal_list:
-            log("info", f"Excluding {key}")
+            log("debug", f"Excluding {key}")
             del dictionary[key]
 
     for section in ["sources", "contracts"]:

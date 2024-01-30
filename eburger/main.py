@@ -8,9 +8,11 @@ from eburger.utils.filesystem import (
     create_directory_if_not_exists,
     create_or_empty_directory,
     find_and_read_sol_file,
+    find_recursive_files_by_patterns,
     get_foundry_ast_json,
     get_hardhat_ast_json,
     get_solidity_version_from_file,
+    select_project,
 )
 from eburger.utils.helpers import (
     construct_solc_cmdline,
@@ -48,6 +50,17 @@ def main():
             path_type = "file"
         elif os.path.isdir(args.solidity_file_or_folder):
             path_type = "folder"
+
+            project_paths = find_recursive_files_by_patterns(
+                args.solidity_file_or_folder,
+                ["foundry.toml", "hardhat.config.*"],
+            )
+            if len(project_paths) > 1:
+                selected_project_path = select_project(project_paths)
+                args.solidity_file_or_folder = selected_project_path
+                log("info", f"Project path set to: {args.solidity_file_or_folder}")
+
+            # Update project root to the user arg
             settings.project_root = settings.project_root / args.solidity_file_or_folder
 
             # Check if foundry project, in which case it is better just using forge
@@ -127,7 +140,7 @@ def main():
                 directory=settings.project_root,
             )
             for line in build_output_lines:
-                log("info", line)
+                log("debug", line)
 
             # Copy compilation results to .eburger
             expected_hardhat_outfiles = os.path.join(
@@ -168,7 +181,10 @@ def main():
             solc_cmdline = construct_solc_cmdline(path_type, compilation_source_path)
             if solc_cmdline is None:
                 log("error", "Error constructing solc command line")
-            solc_compile_res, _ = run_command(solc_cmdline)
+
+            solc_compile_res, _ = run_command(solc_cmdline, live_output=True)
+
+            # We continue as long as solc compiled something
             if not is_valid_json(solc_compile_res):
                 error_string = "Locally installed solc errored out trying to compile the contract. Please review comiler warnings above"
                 if not args.solc_remappings:
