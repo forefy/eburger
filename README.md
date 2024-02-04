@@ -19,13 +19,13 @@ Running scanners won't win you competitions. spin up custom templates tailored t
 ## Comparison table
 Comparison of actively maintained / popular solidity smart contract static analyzers
 
-| Static Analyzer                                 | Language        | Visualization Graph    | 2 Minutes to write a custom template with ChatGPT    | Many findings that are already found before the contest began | Would want to eat |
-|--------------------------------------------------------|-----------------|------------------------|-------------------------------------------------------|---------------------------------------------------------------|-------------------|
-| [eBurger](https://github.com/forefy/eburger)           | Python          | ✅                     | ✅                                                    |                                                               | ✅                |
-| [Slither](https://github.com/crytic/slither)           | Python          | ✅                     |                                                       | ✅                                                            |                   |
-| [4naly3er](https://github.com/Picodes/4naly3er)        | TypeScript 🤮   |                        |                                                       | ✅                                                            |                   |
-| [mythril](https://github.com/Consensys/mythril)        | Python          | ✅                     |                                                       |                                                               |                   |
-| [aderyn](https://github.com/Cyfrin/aderyn)             | Rust            |                        |                                                       |                                                               |                   |
+| Static Analyzer                                        | Language        | 2 Minutes to write a custom template with ChatGPT    | Many findings that are already found before the contest began | Would want to eat |
+|--------------------------------------------------------|-----------------|-------------------------------------------------------|---------------------------------------------------------------|-------------------|
+| [eBurger](https://github.com/forefy/eburger)           | Python          | ✅                                                    |                                                               | ✅                |
+| [Slither](https://github.com/crytic/slither)           | Python          |                                                       | ✅                                                            |                   |
+| [4naly3er](https://github.com/Picodes/4naly3er)        | TypeScript 🤮   |                                                       | ✅                                                            |                   |
+| [mythril](https://github.com/Consensys/mythril)        | Python          |                                                       |                                                               |                   |
+| [aderyn](https://github.com/Cyfrin/aderyn)             | Rust            |                                                       |                                                               |                   |
 
 
 Forgot one or made a mistake? open a pull request or an issue :)
@@ -36,10 +36,8 @@ Here's a demo video
 
 https://github.com/forefy/eburger/assets/152717707/65bf6a6d-adbc-4664-84d4-73ac641a8307
 
-Above example will also generate an AST, pythonified AST and a visual call flow graph under the folder `.eburger`.
+Besides `eburger-output.json`, above example will also generate extended info under the folder `.eburger`.
 
-Here's an example of an interactive graph
-![eBurger](static/network_graph.png?raw=true "eBurger Network Graph")
 
 ## How to install
 These commands will make `eburger` available from anywhere:
@@ -57,7 +55,7 @@ Simplest:
 ```bash
 cd MyProject/
 eburger
-cat eburger-results.json
+cat eburger-output.json
 ```
 ..
 
@@ -84,7 +82,6 @@ For documentation refer to the [Wiki](https://github.com/forefy/eburger/wiki/Tem
 - YAML template support to query contract structure and raise insights for any matches
 - Fast learning curve for adding templates, ability to customize templates to the current ongoing audit project
 - Foundry and Hardhat support ❣️
-- Call Flow Graph inspired by naming conventions of Solidity - Extensive control on graph layout, ability to search specific segments and highlight by parameter, function, contract etc
 - View only the code related to the contract and not all the libraries in the world
 - Community and free support via [Discord](https://discord.gg/WaVMpBtxdB)
 

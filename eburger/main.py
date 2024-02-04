@@ -30,10 +30,8 @@ import eburger.settings as settings
 from eburger.serializer import parse_solidity_ast, reduce_json
 from eburger.utils.outputs import (
     calculate_nsloc,
-    draw_graph,
     draw_nsloc_table,
     save_as_json,
-    save_python_ast,
 )
 from eburger.yaml_parser import process_files_concurrently
 
@@ -203,12 +201,7 @@ def main():
             save_as_json(output_filename, solc_compile_res_parsed)
 
     # Parse AST
-    G = nx.MultiDiGraph()
-    ast_roots, G = parse_solidity_ast(ast_json, G)
-
-    # Draw graph
-    draw_graph(settings.outputs_dir / filename, G)
-    save_python_ast(filename, ast_roots)
+    ast_roots = parse_solidity_ast(ast_json)
 
     # Parse YAML templates
     if args.template_paths:

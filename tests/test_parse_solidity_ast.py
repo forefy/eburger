@@ -42,8 +42,7 @@ def ast_data():
 
 
 def test_parse_solidity_ast_basic_structure(ast_data):
-    G = nx.MultiDiGraph()
-    ast_roots, G = parse_solidity_ast(ast_data, G)
+    ast_roots = parse_solidity_ast(ast_data)
 
     assert len(ast_roots) == 1
     root = ast_roots[0]
