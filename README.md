@@ -40,7 +40,14 @@ Besides `eburger-output.json`, above example will also generate extended info un
 
 
 ## How to install
-These commands will make `eburger` available from anywhere:
+
+### From PyPi
+```
+pip3 install eburger
+eburger -h
+```
+
+### From source
 ```
 git clone https://github.com/forefy/eburger.git
 cd eburger

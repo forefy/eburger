@@ -189,22 +189,20 @@ def find_recursive_files_by_patterns(source_path, patterns: list) -> list:
 
 def select_project(project_paths):
     while True:
-        if len(project_paths) > 1:
-            print("Multiple projects found:")
-            for i, path in enumerate(project_paths, start=1):
-                print(f"{i}) {path}")
-
-            try:
-                choice = int(input("Enter your choice: "))
-                if 1 <= choice <= len(project_paths):
-                    project_path = Path(project_paths[choice - 1]).parent
-                    return project_path
-                else:
-                    print(
-                        f"Invalid choice. Please enter a number between 1 and {len(project_paths) - 1}"
-                    )
-            except ValueError:
-                print("Invalid input. Please enter a number.")
+        print("Multiple projects found:")
+        for i, path in enumerate(project_paths, start=1):
+            print(f"{i}) {path}")
+        try:
+            choice = int(input("Enter your choice: "))
+            if 1 <= choice <= len(project_paths):
+                project_path = Path(project_paths[choice - 1]).parent
+                return project_path
+            else:
+                print(
+                    f"Invalid choice. Please enter a number between 1 and {len(project_paths) - 1}"
+                )
+        except ValueError:
+            print("Invalid input. Please enter a number.")
         else:
             print("Only one project available.")
             return Path(project_paths[0]).parent

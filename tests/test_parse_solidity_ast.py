@@ -3,8 +3,6 @@ import pytest
 from eburger.serializer import (
     parse_solidity_ast,
 )
-from eburger.models import ContractDefinition, FunctionDefinition
-import networkx as nx
 
 
 # Sample AST JSON data for testing
@@ -46,21 +44,19 @@ def test_parse_solidity_ast_basic_structure(ast_data):
 
     assert len(ast_roots) == 1
     root = ast_roots[0]
-    assert root.node_type == "SourceUnit"
-    assert root.node_id == 1
+    assert root.get("nodeType") == "SourceUnit"
+    assert root.get("id") == 1
 
-    assert len(root.children) == 1
-    contract = root.children[0]
+    assert len(root.get("nodes")) == 1
+    contract = root.get("nodes")[0]
 
     # Check if the contract node is of type ContractDefinition
-    assert isinstance(contract, ContractDefinition)
-    assert contract.node_type == "ContractDefinition"
-    assert contract.node_id == 2
+    assert contract.get("nodeType") == "ContractDefinition"
+    assert contract.get("id") == 2
 
-    assert len(contract.children) == 1
-    function = contract.children[0]
+    assert len(contract.get("nodes")) == 1
+    function = contract.get("nodes")[0]
 
     # Check if the function node is of type FunctionDefinition
-    assert isinstance(function, FunctionDefinition)
-    assert function.node_type == "FunctionDefinition"
-    assert function.node_id == 3
+    assert function.get("nodeType") == "FunctionDefinition"
+    assert function.get("id") == 3

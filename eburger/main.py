@@ -2,7 +2,7 @@ import json
 import os
 from pathlib import Path
 import shutil
-import networkx as nx
+import sys
 from eburger.utils.cli_args import args
 from eburger.utils.filesystem import (
     create_directory_if_not_exists,
@@ -53,7 +53,13 @@ def main():
                 args.solidity_file_or_folder,
                 ["foundry.toml", "hardhat.config.*"],
             )
-            if len(project_paths) > 1:
+            if len(project_paths) < 1:
+                log(
+                    "info",
+                    "No contracts here, specifiy a path via `-f` or run `eburger` in the smart contract project root.",
+                )
+                sys.exit(1)
+            elif len(project_paths) > 1:
                 selected_project_path = select_project(project_paths)
                 args.solidity_file_or_folder = selected_project_path
                 log("info", f"Project path set to: {args.solidity_file_or_folder}")
