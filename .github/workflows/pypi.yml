@@ -8,8 +8,7 @@ permissions:
   contents: read
 
 jobs:
-  deploy:
-
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -27,6 +26,16 @@ jobs:
       
     - name: Build package
       run: python -m build
+
+  deploy:
+    needs:
+      - build
+
+    environment: release
     
+    permissions:
+      id-token: write
+      contents: write 
+
     - name: Publish package
       uses: pypa/gh-action-pypi-publish@v1.8.10
