@@ -87,7 +87,7 @@ def join_lists_unique(list1, list2):
     return combined_list
 
 
-def is_entry_unique(results, file_path, lines):
+def is_entry_unique(results: list, file_path: str, lines: str) -> bool:
     """
     Checks if an entry with the specified file_path and lines already exists in the results.
 
@@ -102,7 +102,10 @@ def is_entry_unique(results, file_path, lines):
 
 
 def get_nodes_by_types(
-    node, node_types: Union[str, list], filter_key=None, filter_value=None
+    node: dict,
+    node_types: Union[str, list],
+    filter_key: str = None,
+    filter_value: str = None,
 ) -> list:
     """
     Finds nodes of specific types within the given node or AST.
@@ -186,9 +189,11 @@ def find_node_ids_first_parent_of_type(
                     result = search_node(
                         value,
                         target_id,
-                        current_node
-                        if current_node.get("nodeType") == parent_type
-                        else parent_node,
+                        (
+                            current_node
+                            if current_node.get("nodeType") == parent_type
+                            else parent_node
+                        ),
                     )
                     if result:
                         return result

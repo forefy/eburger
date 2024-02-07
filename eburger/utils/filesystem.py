@@ -8,7 +8,7 @@ from eburger import settings
 from eburger.utils.logger import log
 
 
-def find_and_read_sol_file(folder_path):
+def find_and_read_sol_file(folder_path: str):
     # Search for .sol files recursively in the given folder
     excluded_folders = settings.excluded_dirs + ["mocks", "lib"]
     for root, dirs, files in os.walk(folder_path):
@@ -77,7 +77,7 @@ def get_solidity_version_from_file(solidity_file_or_folder: str) -> str:
     return solc_required_version
 
 
-def get_all_solidity_files(folder_path):
+def get_all_solidity_files(folder_path: str):
     solidity_files = []
     for root, dirs, files in os.walk(folder_path):
         for file in files:
@@ -92,7 +92,7 @@ def get_all_solidity_files(folder_path):
     return solidity_files
 
 
-def create_directory_if_not_exists(directory_path):
+def create_directory_if_not_exists(directory_path: Path):
     # Check if the directory already exists
     if not os.path.exists(directory_path):
         # Create the directory
@@ -100,7 +100,7 @@ def create_directory_if_not_exists(directory_path):
         log("debug", f"Created directory: {directory_path}")
 
 
-def create_or_empty_directory(directory_path):
+def create_or_empty_directory(directory_path: Path):
     # Check if the directory already exists
     if os.path.exists(directory_path):
         # Empty the directory by removing all its contents

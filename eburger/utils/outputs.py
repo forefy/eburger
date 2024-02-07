@@ -1,5 +1,6 @@
 # Silence tool prints
 import json
+import os
 from pathlib import Path
 import sys
 from prettytable import PrettyTable
@@ -10,9 +11,150 @@ from eburger.utils.cli_args import args
 from eburger.utils.logger import log
 
 
-def save_as_json(file_path, json_data):
+def save_as_json(file_path: Path, json_data: dict):
     with open(file_path, "w") as outfile:
         json.dump(json_data, outfile, indent=4)
+
+
+def convert_severity_to_sarif_level(severity: str) -> str:
+    match severity:
+        case "High":
+            sarif_level = "error"
+        case "Medium":
+            sarif_level = "warning"
+        case "Low":
+            sarif_level = "note"
+        case _:
+            sarif_level = "note"
+    return sarif_level
+
+
+def save_as_sarif(output_file_path: Path, insights: dict):
+    sarif_run_template = {
+        "tool": {
+            "driver": {
+                "name": "eburger",
+                "informationUri": "https://github.com/forefy/eburger",
+                "rules": [],
+            }
+        },
+        "artifacts": [],
+        "results": [],
+    }
+
+    sarif_rule_template = {
+        "id": "",
+        "name": "",
+        "shortDescription": {"text": ""},
+        "helpUri": "",
+        "help": {
+            "text": "",
+            "markdown": "",
+        },
+    }
+
+    if os.path.exists(output_file_path):
+        with open(output_file_path, "r") as infile:
+            try:
+                sarif_json = json.load(infile)
+            except json.JSONDecodeError:
+                log("warninng", "")
+                sarif_json = {
+                    "$schema": "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json",
+                    "version": "2.1.0",
+                    "runs": [],
+                }
+    else:
+        sarif_json = {
+            "$schema": "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json",
+            "version": "2.1.0",
+            "runs": [],
+        }
+
+    new_run = sarif_run_template.copy()
+
+    # insight is like a result object
+    for insight in insights:
+        rule_id = insight["name"].replace(" ", "_")
+
+        rule_exists = False
+        for index, rule in enumerate(new_run["tool"]["driver"]["rules"]):
+            if rule["id"] == rule_id:
+                rule_exists = True
+                rule_index = index  # Capture the index of the existing rule
+                break
+
+        if not rule_exists:
+            new_rule = sarif_rule_template.copy()
+            new_rule["id"] = rule_id
+            new_rule["name"] = insight["name"]
+            new_rule["shortDescription"]["text"] = insight["description"]
+            new_rule["helpUri"] = insight["references"][0]
+            new_rule["help"]["text"] = insight["action-items"][0]
+            new_rule["help"][
+                "markdown"
+            ] = f"[{insight['action-items'][0]}]({insight['references'][0]})"
+            new_run["tool"]["driver"]["rules"].append(new_rule)
+            rule_index = len(new_run["tool"]["driver"]["rules"]) - 1
+
+        for result in insight["results"]:
+            new_result = {
+                "ruleId": rule_id,
+                "ruleIndex": rule_index,
+                "level": convert_severity_to_sarif_level(insight["severity"]),
+                "message": {
+                    "text": new_rule["name"]
+                },  # TODO: display an instruction instead of the finding name
+                "locations": [],
+            }
+
+            artifact_uri = f'file://{result["file"]}'
+
+            artifact_index = 0
+            artifact_exists = False
+
+            # create an artifcat location for the file, if it doesn't exist
+            # location should occur once per finding mostly
+            for existing_artifact_index, artifact in enumerate(new_run["artifacts"]):
+                if artifact["location"]["uri"] == artifact_uri:
+                    artifact_index = existing_artifact_index
+                    artifact_exists = True
+                    break
+
+            # If the artifact doesn't exist, add it
+            if not artifact_exists:
+                new_artifact = {"location": {"uri": artifact_uri}}
+                new_run["artifacts"].append(new_artifact)
+                artifact_index = len(new_run["artifacts"]) - 1
+
+            # Extract line and column info and create a new location for each result
+            line_info, column_info = (
+                result["lines"].replace("Line ", "").replace("Columns ", "").split(" ")
+            )
+            start_line = int(line_info)
+            start_column, end_column = map(int, column_info.split("-"))
+
+            new_result_location = {
+                "physicalLocation": {
+                    "artifactLocation": {
+                        "uri": result["file"],
+                        "index": artifact_index,
+                    },
+                    "region": {
+                        "startLine": start_line,
+                        "startColumn": start_column,
+                        "endColumn": end_column,
+                    },
+                }
+            }
+            new_result["locations"].append(new_result_location)
+
+            new_run["results"].append(new_result)
+
+    sarif_json["runs"].append(new_run)
+
+    with open(output_file_path, "w") as outfile:
+        json.dump(sarif_json, outfile, indent=4)
 
 
 def calculate_nsloc() -> (list, list):

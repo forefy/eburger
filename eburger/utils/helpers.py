@@ -1,5 +1,6 @@
 from datetime import datetime
 import json
+from pathlib import Path
 import re
 import shlex
 import subprocess
@@ -10,7 +11,7 @@ from eburger.utils.filesystem import get_all_solidity_files
 from eburger.utils.logger import log
 
 
-def is_valid_json(json_string):
+def is_valid_json(json_string: str) -> bool:
     if not json_string:
         return False
     try:
@@ -20,7 +21,9 @@ def is_valid_json(json_string):
         return False
 
 
-def run_command(command, directory=None, shell=False, live_output=False):
+def run_command(
+    command: str, directory: Path = None, shell: bool = False, live_output: bool = False
+):
     log("info", f"{command}")
     results = []
     errors = []

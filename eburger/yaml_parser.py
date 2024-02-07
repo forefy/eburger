@@ -1,32 +1,21 @@
-import inspect
 import traceback
 import yaml
 import concurrent.futures
 import ast
 from eburger import settings
 
-import eburger.models as models
 from eburger.template_utils import *
 from eburger.utils.logger import color, log
 
 
-def load_ast_data(file_path):
-    with open(file_path, "r") as file:
-        ast_data_content = file.read()
-    ast_data = ast.literal_eval(ast_data_content)
-    return ast_data
-
-
-def execute_python_code(template_name, python_code, ast_data, src_file_list):
+def execute_python_code(
+    template_name: str, python_code: str, ast_data: dict, src_file_list: list
+) -> list:
     local_vars = {
         "ast_data": ast_data,
         "src_file_list": src_file_list,
         "project_root": settings.project_root,
     }
-    for attr in dir(models):
-        attr_value = getattr(models, attr)
-        if inspect.isclass(attr_value):
-            local_vars[attr] = attr_value
 
     try:
         compiled_code = compile(python_code, "<string>", "exec")
@@ -60,7 +49,7 @@ def process_yaml(file_path, ast_data, src_file_list):
     }
 
 
-def process_files_concurrently(ast_data: dict, src_file_list: list):
+def process_files_concurrently(ast_data: dict, src_file_list: list) -> list:
     yaml_files = []
     for templates_directory in settings.templates_directories:
         if templates_directory.is_dir():

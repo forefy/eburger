@@ -26,7 +26,7 @@ class color:
     Info = "\033[38;5;69m"  # #528CFF
 
 
-def construct_insight_occurrences(results):
+def construct_insight_occurrences(results: list) -> list:
     occurrences = []
     for result in results:
         location = result.get("file")

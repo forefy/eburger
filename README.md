@@ -12,6 +12,7 @@ Running scanners won't win you competitions. spin up custom templates tailored t
 - [How to run](#how-to-run)
     - [How to run - simple](#simple-examples)
     - [How to run - advanced](#advanced-usage)
+- [SARIF support](#sarif-support)
 - [Adding templates](#adding-templates)
 - [What is missing](#what-is-missing)
 
@@ -77,6 +78,17 @@ eburger -f ../ProjectToScan/src/SomeContract.sol
 Refer to the [Wiki](https://github.com/forefy/eburger/wiki/Advanced-usage).
 
 
+## SARIF support
+SARIF (Static Analysis Results Interchange Format) is a standard format for static analysis tool results.
+
+To have an interactive GUI open up in VSCode that can organinze and interact with the results found, follow these steps:
+- Install Microsoft's [SARIF Viewer VSCode extenstion](marketplace.visualstudio.com/items?itemname=ms-sarifvscode.sarif-viewer)
+- Run eburger with the sarif output setting - `eburger --output sarif`
+- From within VSCode, click the resulted `eburger-output.sarif` file placed in the working directory
+
+This will open an interactive vscode menu with the issues, description, navigation of vulnerable code lines, etc.
+![eburger SARIF view](static/SARIF.png?raw=true "eburger SARIF view")
+
 ## Adding templates
 Templates can be added by creating new YAML files and either load them with `eburger -t mytemplate.yaml .` or by placing them under the `templates/` directory.
 
@@ -89,7 +101,7 @@ For documentation refer to the [Wiki](https://github.com/forefy/eburger/wiki/Tem
 - YAML template support to query contract structure and raise insights for any matches
 - Fast learning curve for adding templates, ability to customize templates to the current ongoing audit project
 - Foundry and Hardhat support ❣️
-- View only the code related to the contract and not all the libraries in the world
+- SARIF support & VSCode GUI integration
 - Community and free support via [Discord](https://discord.gg/WaVMpBtxdB)
 
 

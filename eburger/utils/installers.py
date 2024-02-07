@@ -90,7 +90,7 @@ def install_hardhat_if_not_found():
                 )
 
 
-def set_solc_compiler_version(solc_required_version):
+def set_solc_compiler_version(solc_required_version: str):
     log("info", f"Trying to set solc to version {solc_required_version}")
     solc_use_res, errors = run_command(f"solc-select use {solc_required_version}")
     if not solc_use_res or errors:

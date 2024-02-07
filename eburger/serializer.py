@@ -2,9 +2,9 @@ from eburger import settings
 from eburger.utils.logger import log
 
 
-def parse_solidity_ast(ast_json):
+def parse_solidity_ast(ast_json: dict) -> list:
     """
-    Parses the entire Solidity AST from the JSON representation.
+    Parses the Solidity AST from the JSON representation.
     """
     root_nodes = []
     for key, node in ast_json.get("sources", {}).items():
@@ -14,7 +14,7 @@ def parse_solidity_ast(ast_json):
     return root_nodes
 
 
-def reduce_json(ast_json):
+def reduce_json(ast_json: dict) -> tuple:
     # Maintain original file list array
     def extract_file_list_from_ast(ast_data):
         if "sources" in ast_data:

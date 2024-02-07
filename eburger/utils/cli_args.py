@@ -69,6 +69,13 @@ parser.add_argument(
     action="store_true",
     help="Only print summary of NSLOC (Normalized Source Code)",
 )
+parser.add_argument(
+    "-o",
+    "--output",
+    dest="output",
+    type=str,
+    help="Results output format: json (default) / sarif",
+)
 
 # Only here to allow "." as an argument, ignored in the rest of the code.
 parser.add_argument(

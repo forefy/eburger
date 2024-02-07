@@ -32,6 +32,7 @@ from eburger.utils.outputs import (
     calculate_nsloc,
     draw_nsloc_table,
     save_as_json,
+    save_as_sarif,
 )
 from eburger.yaml_parser import process_files_concurrently
 
@@ -56,7 +57,7 @@ def main():
             if len(project_paths) < 1:
                 log(
                     "info",
-                    "No contracts here, specifiy a path via `-f` or run `eburger` in the smart contract project root.",
+                    "No contract projects here, specifiy a path/single file via `-f` or run `eburger` in the smart contract project root.",
                 )
                 sys.exit(1)
             elif len(project_paths) > 1:
@@ -216,21 +217,25 @@ def main():
             settings.templates_directories.append(Path(template_path))
             log("info", f"Templates path: {Path(template_path)}")
 
-    insights = process_files_concurrently(ast_json, src_file_list)
+    insights = process_files_concurrently(ast_roots, src_file_list)
 
     if insights:
-        # Same data saved twice - once for historic reference and one for clarity
-        insights_json_path = settings.outputs_dir / f"eburger_output_{filename}.json"
-        results_path = settings.project_root / "eburger-output.json"
-
         analysis_output = {}
         analysis_output["insights"] = insights
 
         _, summary = calculate_nsloc()
         analysis_output["nsloc"] = summary
 
+        insights_json_path = settings.outputs_dir / f"eburger_output_{filename}.json"
         save_as_json(insights_json_path, analysis_output)
-        save_as_json(results_path, analysis_output)
+
+        results_path = settings.project_root / "eburger-output.json"
+        if args.output == "sarif":
+            results_path = settings.project_root / f"eburger-output.sarif"
+            save_as_sarif(results_path, insights)
+        else:
+            save_as_json(results_path, analysis_output)
+
         log(
             "success",
             f"Results saved to {str(Path(results_path).resolve())}.",
