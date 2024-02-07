@@ -1,6 +1,6 @@
 # eBurger - Template Based Smart Contracts Static Analysis
 
-<img src="static/eburger.png?raw=true" alt="eBurger" width="600"/>
+<img src="https://github.com/forefy/eburger/raw/main/static/eburger.png" alt="eBurger" title="eBurger" width="600"/>
 
 eBurger is a static analysis tool that provides a way to quickly query and analyze solidity smart contracts.
 
@@ -83,11 +83,11 @@ SARIF (Static Analysis Results Interchange Format) is a standard format for stat
 
 To have an interactive GUI open up in VSCode that can organinze and interact with the results found, follow these steps:
 - Install Microsoft's [SARIF Viewer VSCode extenstion](marketplace.visualstudio.com/items?itemname=ms-sarifvscode.sarif-viewer)
-- Run eburger with the sarif output setting - `eburger --output sarif`
+- Run `eburger --output sarif`
 - From within VSCode, click the resulted `eburger-output.sarif` file placed in the working directory
 
 This will open an interactive vscode menu with the issues, description, navigation of vulnerable code lines, etc.
-![eburger SARIF view](static/SARIF.png?raw=true "eburger SARIF view")
+![eburger SARIF view](https://github.com/forefy/eburger/raw/main/static/SARIF.png "eburger SARIF view")
 
 ## Adding templates
 Templates can be added by creating new YAML files and either load them with `eburger -t mytemplate.yaml .` or by placing them under the `templates/` directory.
