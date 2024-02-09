@@ -16,6 +16,7 @@ jobs:
         with:
           python-version: '3.x'
 
+      # artifact name and pypi version are determined by the pyproject.toml
       - name: Build
         run: |
           pip install poetry
