@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "eburger"
-version = "0.1.0"
+version = "1.0.0"
 description = ""
 authors = ["tomie <admin@forefy.com>"]
 readme = "README.md"
