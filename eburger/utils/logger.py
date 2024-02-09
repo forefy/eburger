@@ -24,6 +24,7 @@ class color:
     Error = "\033[38;5;204m"  # #FF5A87
     Warning = "\033[38;5;215m"  # #FFB752
     Info = "\033[38;5;69m"  # #528CFF
+    Debug = "\033[38;5;236m"  # #333538
 
 
 def construct_insight_occurrences(results: list) -> list:
@@ -44,6 +45,9 @@ def log(type: str, message: str):
                 print(f"[{color.Success} 🍔 Success {color.Default}] {message}")
         case "error":
             print(f"[{color.Error} Error {color.Default}] {message}")
+            print(
+                "          We are so sorry 😭🍔 try running with --debug or create an issue on https://github.com/forefy/eburger/issues/new?assignees=forefy&template=bug_report.md&title=Tool%20error%20report"
+            )
             sys.exit(0)
         case "warning":
             if "warning" not in args.no:
@@ -53,7 +57,7 @@ def log(type: str, message: str):
                 print(f"[{color.Info} Info {color.Default}] {message}")
         case "debug":
             if args.debug:
-                print(f"[{color.Info} Debug {color.Default}] {message}")
+                print(f"[{color.Debug} Debug {color.Default}] {message}")
         case "insights":
             # json_printable = json.dumps(message, indent=4)
             # print(json_printable)

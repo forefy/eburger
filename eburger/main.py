@@ -54,6 +54,8 @@ def main():
                 args.solidity_file_or_folder,
                 ["foundry.toml", "hardhat.config.*"],
             )
+
+            selected_path_file_name = None
             if len(project_paths) < 1:
                 log(
                     "info",
@@ -61,24 +63,33 @@ def main():
                 )
                 sys.exit(1)
             elif len(project_paths) > 1:
-                selected_project_path = select_project(project_paths)
-                args.solidity_file_or_folder = selected_project_path
-                log("info", f"Project path set to: {args.solidity_file_or_folder}")
+                if args.auto_selection:
+                    selected_project_path = Path(project_paths[args.auto_selection - 1])
+                else:
+                    selected_project_path = select_project(project_paths)
+
+                selected_path_file_name = selected_project_path.name
+                args.solidity_file_or_folder = selected_project_path.parent
+                log(
+                    "info",
+                    f"Project path set to: {args.solidity_file_or_folder} ({selected_path_file_name})",
+                )
+            else:
+                args.solidity_file_or_folder = project_paths[0].parent
 
             # Update project root to the user arg
             settings.project_root = settings.project_root / args.solidity_file_or_folder
 
             # Check if foundry project, in which case it is better just using forge
-            if os.path.isfile(
-                os.path.join(args.solidity_file_or_folder, "foundry.toml")
+            if (settings.project_root / "foundry.toml").exists() and (
+                selected_path_file_name in ["foundry.toml", None]
             ):
                 path_type = "foundry"
 
             # Check if hardhat project
-            if os.path.isfile(
-                os.path.join(args.solidity_file_or_folder, "hardhat.config.js")
-            ) or os.path.isfile(
-                os.path.join(args.solidity_file_or_folder, "hardhat.config.ts")
+            elif any(settings.project_root.glob("hardhat.config.*")) and (
+                selected_path_file_name
+                in ["hardhat.config.js", "hardhat.config.ts", None]
             ):
                 path_type = "hardhat"
         else:
@@ -119,6 +130,7 @@ def main():
             build_output_lines, _ = run_command(
                 f"forge build --force --skip {' '.join(settings.excluded_dirs)} --build-info --build-info-path {forge_out_dir}",
                 args.solidity_file_or_folder,
+                live_output=args.debug,
             )
             for line in build_output_lines:
                 log("debug", line)
@@ -143,6 +155,7 @@ def main():
             build_output_lines, _ = run_command(
                 f"npx hardhat compile --force",
                 directory=settings.project_root,
+                live_output=args.debug,
             )
             for line in build_output_lines:
                 log("debug", line)

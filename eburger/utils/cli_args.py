@@ -76,6 +76,13 @@ parser.add_argument(
     type=str,
     help="Results output format: json (default) / sarif",
 )
+parser.add_argument(
+    "-as",
+    "--auto-selection",
+    dest="auto_selection",
+    type=int,
+    help="If multiple projects are present within the eburger working directory, choose the N'th option without prompting.",
+)
 
 # Only here to allow "." as an argument, ignored in the rest of the code.
 parser.add_argument(

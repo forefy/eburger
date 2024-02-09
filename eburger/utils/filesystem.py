@@ -106,7 +106,10 @@ def create_or_empty_directory(directory_path: Path):
         # Empty the directory by removing all its contents
         shutil.rmtree(directory_path)
         os.makedirs(directory_path)
-        log("debug", f"Emptied and re-created directory: {directory_path}")
+        log(
+            "debug",
+            f"Emptied and re-created directory: {directory_path}",
+        )
     else:
         # Create the directory if it does not exist
         os.makedirs(directory_path)
@@ -187,15 +190,15 @@ def find_recursive_files_by_patterns(source_path, patterns: list) -> list:
     return list(set(file_paths))
 
 
-def select_project(project_paths):
+def select_project(project_paths: list) -> Path:
     while True:
-        print("Multiple projects found:")
+        print("Multiple project configurations found:")
         for i, path in enumerate(project_paths, start=1):
             print(f"{i}) {path}")
         try:
             choice = int(input("Enter your choice: "))
             if 1 <= choice <= len(project_paths):
-                project_path = Path(project_paths[choice - 1]).parent
+                project_path = Path(project_paths[choice - 1])
                 return project_path
             else:
                 print(
@@ -205,4 +208,4 @@ def select_project(project_paths):
             print("Invalid input. Please enter a number.")
         else:
             print("Only one project available.")
-            return Path(project_paths[0]).parent
+            return Path(project_paths[0])

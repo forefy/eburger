@@ -44,13 +44,19 @@ def run_command(
         if output:
             output_stripped = output.strip()
             if live_output:
-                log("info", output_stripped)
+                if args.debug:
+                    log("debug", output_stripped)
+                else:
+                    log("info", output_stripped)
             results.append(output_stripped)
 
         if error:
             error_stripped = error.strip()
             if live_output:
-                log("info", error_stripped)
+                if args.debug:
+                    log("debug", error_stripped)
+                else:
+                    log("info", error_stripped)
             errors.append(error_stripped)
 
     return results, errors
