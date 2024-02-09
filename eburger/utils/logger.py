@@ -45,8 +45,11 @@ def log(type: str, message: str):
                 print(f"[{color.Success} 🍔 Success {color.Default}] {message}")
         case "error":
             print(f"[{color.Error} Error {color.Default}] {message}")
+            post_error_message = "         We are so sorry 😭🍔 please consider"
+            if not args.debug:
+                post_error_message += " running with --debug or"
             print(
-                "          We are so sorry 😭🍔 try running with --debug or create an issue on https://github.com/forefy/eburger/issues/new?assignees=forefy&template=bug_report.md&title=Tool%20error%20report"
+                f"{post_error_message} creating an issue on https://github.com/forefy/eburger/issues/new?assignees=forefy&template=bug_report.md&title=Tool%20error%20report"
             )
             sys.exit(0)
         case "warning":

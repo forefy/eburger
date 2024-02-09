@@ -32,6 +32,7 @@ from eburger.utils.outputs import (
     calculate_nsloc,
     draw_nsloc_table,
     save_as_json,
+    save_as_markdown,
     save_as_sarif,
 )
 from eburger.yaml_parser import process_files_concurrently
@@ -246,6 +247,9 @@ def main():
         if args.output == "sarif":
             results_path = settings.project_root / f"eburger-output.sarif"
             save_as_sarif(results_path, insights)
+        elif args.output in ["markdown", "md"]:
+            results_path = settings.project_root / f"eburger-output.md"
+            save_as_markdown(results_path, analysis_output)
         else:
             save_as_json(results_path, analysis_output)
 

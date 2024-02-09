@@ -1,7 +1,7 @@
 # Template Based Smart Contracts Static Analyzer
 
 <p align="center">
-<img src="https://github.com/forefy/eburger/raw/main/static/eburger.png" alt="eBurger" title="eBurger" width="400"/>
+<img src="https://github.com/forefy/eburger/raw/main/static/eburger.png" alt="eBurger" title="eBurger" width="450"/>
 </p>
 
 <p align="center">
@@ -70,14 +70,21 @@ cat eburger-output.json
 <br>
 
 SARIF output
-```
+```bash
 eburger -f MyProject/ -o sarif
 ```
 
 <br>
 
-Focused scan of a single file and it's dependencies:
+Markdown output
+```bash
+eburger -f MyProject/ -o markdown
 ```
+
+<br>
+
+Focused scan of a single file and it's dependencies:
+```bash
 eburger -f ../ProjectToScan/src/SomeContract.sol
 ```
 
@@ -132,6 +139,7 @@ Forgot one or made a mistake? open a pull request or an issue :)
 - Fast learning curve for creating templates, ability to customize templates to the current ongoing audit project
 - Foundry and Hardhat support ❣️
 - SARIF support & VSCode GUI integration
+- Markdown report
 - Community and free support via [Discord](https://discord.gg/WaVMpBtxdB)
 
 
