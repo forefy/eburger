@@ -51,7 +51,7 @@ def log(type: str, message: str):
             print(
                 f"{post_error_message} creating an issue on https://github.com/forefy/eburger/issues/new?assignees=forefy&template=bug_report.md&title=Tool%20error%20report"
             )
-            sys.exit(0)
+            sys.exit(1)
         case "warning":
             if "warning" not in args.no:
                 print(f"[{color.Warning} Warning {color.Default}] {message}")

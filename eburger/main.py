@@ -42,13 +42,17 @@ def main():
     if not args.solidity_file_or_folder and not args.ast_json_file:
         args.solidity_file_or_folder = "."
 
+    log("debug", f"Project path: {args.solidity_file_or_folder}")
+
     create_directory_if_not_exists(settings.outputs_dir)
     path_type = None
 
     if args.solidity_file_or_folder:
         if os.path.isfile(args.solidity_file_or_folder):
+            log("debug", f"Path type: file")
             path_type = "file"
         elif os.path.isdir(args.solidity_file_or_folder):
+            log("debug", f"Path type: folder")
             path_type = "folder"
 
             project_paths = find_recursive_files_by_patterns(
@@ -62,7 +66,7 @@ def main():
                     "info",
                     "No contract projects here, specifiy a path/single file via `-f` or run `eburger` in the smart contract project root.",
                 )
-                sys.exit(1)
+                sys.exit(0)
             elif len(project_paths) > 1:
                 if args.auto_selection:
                     selected_project_path = Path(project_paths[args.auto_selection - 1])
@@ -128,13 +132,11 @@ def main():
             forge_out_dir = settings.outputs_dir / "forge-output"
             create_or_empty_directory(forge_out_dir)
 
-            build_output_lines, _ = run_command(
+            run_command(
                 f"forge build --force --skip {' '.join(settings.excluded_dirs)} --build-info --build-info-path {forge_out_dir}",
                 args.solidity_file_or_folder,
                 live_output=args.debug,
             )
-            for line in build_output_lines:
-                log("debug", line)
 
             sample_file_path = find_and_read_sol_file(args.solidity_file_or_folder)
             filename, output_filename = get_filename_from_path(sample_file_path)
@@ -153,13 +155,11 @@ def main():
 
             run_command(f"npx hardhat clean", directory=settings.project_root)
 
-            build_output_lines, _ = run_command(
+            run_command(
                 f"npx hardhat compile --force",
                 directory=settings.project_root,
                 live_output=args.debug,
             )
-            for line in build_output_lines:
-                log("debug", line)
 
             # Copy compilation results to .eburger
             expected_hardhat_outfiles = os.path.join(

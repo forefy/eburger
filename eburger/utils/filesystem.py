@@ -8,7 +8,7 @@ from eburger import settings
 from eburger.utils.logger import log
 
 
-def find_and_read_sol_file(folder_path: str):
+def find_and_read_sol_file(folder_path: str) -> str:
     # Search for .sol files recursively in the given folder
     excluded_folders = settings.excluded_dirs + ["mocks", "lib"]
     for root, dirs, files in os.walk(folder_path):

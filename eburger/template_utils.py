@@ -3,7 +3,7 @@ from typing import Union
 from eburger import settings
 
 
-def parse_code_highlight(node: dict, src_file_list: list) -> (str, str, str):
+def parse_code_highlight(node: dict, src_file_list: list) -> tuple[str, str, str]:
     """
     Extracts and highlights a specific code snippet from a source file based on a given AST node.
 
@@ -60,7 +60,7 @@ def parse_code_highlight(node: dict, src_file_list: list) -> (str, str, str):
     return "Location not found in file", None, None
 
 
-def join_lists_unique(list1, list2):
+def join_lists_unique(list1: list, list2: list) -> list:
     """
     Join two lists of dictionaries without duplicates, based on the 'id' key of the dictionaries.
 

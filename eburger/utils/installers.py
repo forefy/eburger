@@ -95,14 +95,8 @@ def set_solc_compiler_version(solc_required_version: str):
     solc_use_res, errors = run_command(f"solc-select use {solc_required_version}")
     if not solc_use_res or errors:
         log("info", "Trying to install missing solc version")
-        solc_select_install_res, errors = run_command(
-            f"solc-select install {solc_required_version}"
-        )
-        print(solc_select_install_res, errors)
-        solc_select_use_res, errors = run_command(
-            f"solc-select use {solc_required_version}"
-        )
-        print(solc_select_use_res, errors)
+        _, errors = run_command(f"solc-select install {solc_required_version}")
+        _, errors = run_command(f"solc-select use {solc_required_version}")
         if not solc_use_res or errors:
             log("error", "Failed to install required solc version")
     log(

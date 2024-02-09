@@ -6,6 +6,7 @@
 
 <p align="center">
 <a href="https://github.com/forefy/eburger/releases/"><img alt="eBurger releases" src="https://img.shields.io/github/release/forefy/eburger">
+<img alt="eBurger GitHub repo size" title="eBurger GitHub repo size" src="https://img.shields.io/github/repo-size/forefy/eburger">
 <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/forefy/eburger/.github/workflows/pip-audit.yml">
 <img alt="eBurger GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/forefy/eburger">
 <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/forefy/eburger">

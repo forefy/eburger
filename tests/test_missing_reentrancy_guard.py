@@ -5,7 +5,7 @@ from eburger.yaml_parser import process_yaml
 
 
 @pytest.fixture
-def vulnerable_ast() -> (dict, list):
+def vulnerable_ast() -> tuple[dict, list]:
     ast_json = """{
     "sources": {
         "script/Attacker.sol": {

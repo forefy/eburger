@@ -5,7 +5,7 @@ from eburger.yaml_parser import process_yaml
 
 
 @pytest.fixture
-def vulnerable_ast() -> (dict, list):
+def vulnerable_ast() -> tuple[dict, list]:
     ast_json = """{
     "contracts": {
         "vulnerable_contracts/use_of_transfer_or_send_on_payable.sol:UngoodContract": {

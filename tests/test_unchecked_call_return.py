@@ -5,7 +5,7 @@ from eburger.yaml_parser import process_yaml
 
 
 @pytest.fixture
-def vulnerable_ast() -> (dict, list):
+def vulnerable_ast() -> tuple[dict, list]:
     unchecked_ast = """{
     "contracts": {
         "vulnerable_contracts/unchecked_call_return.sol:VulnerableContract": {
