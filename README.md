@@ -61,7 +61,7 @@ eburger -h
 ## How to run
 
 ### Simple examples
-Simplest:
+Simplest
 ```bash
 cd MyProject/
 eburger
@@ -77,16 +77,30 @@ eburger -f MyProject/ -o sarif
 
 <br>
 
-Markdown output
+Markdown output (running from the project's directory)
 ```bash
-eburger -f MyProject/ -o markdown
+eburger -o markdown
 ```
 
 <br>
 
-Focused scan of a single file and it's dependencies:
+Focused scan of a single file and its dependencies
 ```bash
 eburger -f ../ProjectToScan/src/SomeContract.sol
+```
+
+<br>
+
+Only print nsloc count
+```bash
+eburger -f MyProject/ --nsloc
+```
+
+<br>
+
+Run custom YAML templates
+```bash
+eburger -t MyCustomYAMLs/ -f MyProject/
 ```
 
 ### Advanced usage
