@@ -84,6 +84,14 @@ parser.add_argument(
     help="If multiple projects are present within the eburger working directory, choose the N'th option without prompting.",
 )
 
+parser.add_argument(
+    "-si",
+    "--skip-installations",
+    dest="skip_installations",
+    action="store_true",
+    help="Don't install missing dependencies automatically.",
+)
+
 # Only here to allow "." as an argument, ignored in the rest of the code.
 parser.add_argument(
     "default_solidity_file_or_folder",
