@@ -1,11 +1,11 @@
 import traceback
 import yaml
 import concurrent.futures
-import ast
 from eburger import settings
 
 from eburger.template_utils import *
 from eburger.utils.logger import color, log
+from eburger.utils.cli_args import args
 
 
 def execute_python_code(
@@ -76,6 +76,9 @@ def process_files_concurrently(ast_data: dict, src_file_list: list) -> list:
             try:
                 results = future.result(timeout=30)  # 30 seconds timeout
                 if results.get("results"):
+                    if args.no:
+                        if results.get("severity").casefold() in args.no:
+                            continue
                     insights.append(results)
             except concurrent.futures.TimeoutError:
                 log("error", "A task has timed out.")

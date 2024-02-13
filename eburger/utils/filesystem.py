@@ -187,7 +187,12 @@ def find_recursive_files_by_patterns(source_path, patterns: list) -> list:
                 continue
             filtered_paths.append(path)
         file_paths.extend(filtered_paths)
-    return list(set(file_paths))
+
+    unique_file_paths = list(set(file_paths))
+    sorted_unique_file_paths = sorted(
+        unique_file_paths, key=lambda path: (len(str(path)), str(path))
+    )
+    return sorted_unique_file_paths
 
 
 def select_project(project_paths: list) -> Path:
@@ -209,3 +214,18 @@ def select_project(project_paths: list) -> Path:
         else:
             print("Only one project available.")
             return Path(project_paths[0])
+
+
+def roughly_check_valid_file_path_name(path_str: str) -> bool:
+    if not path_str or path_str.isspace() or "." not in path_str:
+        return False
+
+    if os.name == "nt":
+        invalid_chars = r'<>:"|?*\n\r\t'
+    else:
+        invalid_chars = "\0"
+
+    if any(char in path_str for char in invalid_chars):
+        return False
+
+    return True

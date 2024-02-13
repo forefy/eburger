@@ -1,6 +1,6 @@
 import os
 from eburger import settings
-from eburger.utils.helpers import run_command
+from eburger.utils.helpers import python_shell_source, run_command
 from eburger.utils.logger import log
 
 
@@ -14,10 +14,8 @@ def install_foundry_if_not_found():
 
     if not forge_binary_found:
         log("info", "forge wasn't found on the system, trying to install.")
-        run_command(
-            "curl -L https://foundry.paradigm.xyz | bash",
-            shell=True,
-        )
+        run_command("curl -L https://foundry.paradigm.xyz | bash", shell=True)
+        python_shell_source()
         run_command("foundryup")
         try:
             run_command("forge -V")
@@ -47,14 +45,54 @@ def install_hardhat_if_not_found():
             run_command("npm -v")
             npm_found = True
         except FileNotFoundError:
-            log(
-                "error",
-                "Can't automatically install hardhat without npm being installed manually first, please install npm and run again.",
+            run_command(
+                "curl -L https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash",
+                shell=True,
             )
+
+            # NVM
+            try:
+                _, errs = run_command(
+                    construct_sourceable_nvm_string("nvm --version"),
+                    shell=True,
+                    live_output=True,
+                )
+                if errs:
+                    raise Exception
+                log("info", "Successfully installed nvm.")
+            except Exception as e:
+                print(e)
+                log(
+                    "error",
+                    "Couldn't automatically install nvm, please install manually and try again.",
+                )
+
+            # nodejs
+            try:
+                run_command(
+                    construct_sourceable_nvm_string("nvm install --lts"),
+                    shell=True,
+                    live_output=True,
+                )
+                run_command(
+                    construct_sourceable_nvm_string("npm -v"),
+                    shell=True,
+                    live_output=True,
+                )
+                npm_found = True
+            except FileNotFoundError:
+                log(
+                    "error",
+                    "Couldn't automatically install npm, please install manually and try again.",
+                )
 
         if npm_found:
             try:
-                run_command("npx -v")
+                run_command(
+                    construct_sourceable_nvm_string("npx -v"),
+                    shell=True,
+                    live_output=True,
+                )
                 npx_found = True
             except FileNotFoundError:
                 log(
@@ -64,8 +102,21 @@ def install_hardhat_if_not_found():
 
             if not npx_found:
                 try:
-                    run_command("npm install -g npx")
-                    run_command("npx -v")
+                    run_command(
+                        construct_sourceable_nvm_string("npm install -g npx"),
+                        shell=True,
+                        live_output=True,
+                    )
+                    run_command(
+                        construct_sourceable_nvm_string("npm install -g yarn"),
+                        shell=True,
+                        live_output=True,
+                    )
+                    run_command(
+                        construct_sourceable_nvm_string("npx -v"),
+                        shell=True,
+                        live_output=True,
+                    )
                 except FileNotFoundError:
                     log(
                         "error",
@@ -75,12 +126,14 @@ def install_hardhat_if_not_found():
             try:
                 if os.path.isfile(os.path.join(settings.project_root, "yarn.lock")):
                     run_command(
-                        "yarn add --dev hardhat",
+                        construct_sourceable_nvm_string("yarn add --dev hardhat"),
                         directory=settings.project_root,
                     )
                 else:
                     run_command(
-                        "npm install --save-dev hardhat",
+                        construct_sourceable_nvm_string(
+                            "npm install --save-dev hardhat"
+                        ),
                         directory=settings.project_root,
                     )
             except:
@@ -103,3 +156,10 @@ def set_solc_compiler_version(solc_required_version: str):
         "info",
         "Successfully set solc version, trying to compile contract.",
     )
+
+
+# Used to prepare inputs for run_command for the python subprocess could reach nvm and its installed binaries,
+# without the user having to reload the terminal.
+def construct_sourceable_nvm_string(nvm_command: str) -> str:
+    source_syntax, and_sign = python_shell_source(execute_source=False)
+    return f'/bin/bash -c "{source_syntax} ~/.nvm/nvm.sh {and_sign} {nvm_command}"'

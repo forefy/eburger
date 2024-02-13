@@ -18,11 +18,12 @@ def test_arguments():
     args.solidity_file_or_folder = single_contract_path
     main()
 
-    # SARIF, Markdown
+    # SARIF
     args.output = "sarif"
     main()
 
-    args.output = "markdown"
+    # Markdown + custom file output path
+    args.output = "../eburger-output.md"
     main()
 
     # Single traversed file

@@ -12,6 +12,7 @@ from eburger.utils.filesystem import (
     get_foundry_ast_json,
     get_hardhat_ast_json,
     get_solidity_version_from_file,
+    roughly_check_valid_file_path_name,
     select_project,
 )
 from eburger.utils.helpers import (
@@ -99,9 +100,11 @@ def main():
                 path_type = "hardhat"
         else:
             log(
-                "error",
-                f"{args.solidity_file_or_folder} is neither a file nor a directory.",
+                "info",
+                f"{args.solidity_file_or_folder} is neither a file nor a directory, please select a valid path.",
             )
+            sys.exit(0)
+
     elif args.ast_json_file:
         filename = args.ast_json_file
         filename = filename.replace(".json", "")  # Clean possible file extension
@@ -243,14 +246,30 @@ def main():
         insights_json_path = settings.outputs_dir / f"eburger_output_{filename}.json"
         save_as_json(insights_json_path, analysis_output)
 
-        results_path = settings.project_root / "eburger-output.json"
-        if args.output == "sarif":
+        if roughly_check_valid_file_path_name(args.output):
+            custom_output_path = Path(args.output)
+            file_extension = custom_output_path.suffix[1:]
+            if file_extension not in ["json", "sarif", "md"]:
+                log(
+                    "error",
+                    f"Unrecognized output file extension provided. ({file_extension})",
+                )
+
+            results_path = Path.cwd() / custom_output_path
+            if file_extension == "sarif":
+                save_as_sarif(results_path, insights)
+            elif file_extension == "md":
+                save_as_markdown(results_path, analysis_output)
+            elif file_extension == "json":
+                save_as_json(results_path, analysis_output)
+        elif args.output == "sarif":
             results_path = settings.project_root / f"eburger-output.sarif"
             save_as_sarif(results_path, insights)
         elif args.output in ["markdown", "md"]:
             results_path = settings.project_root / f"eburger-output.md"
             save_as_markdown(results_path, analysis_output)
         else:
+            results_path = settings.project_root / "eburger-output.json"
             save_as_json(results_path, analysis_output)
 
         log(

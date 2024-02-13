@@ -1,5 +1,6 @@
 from datetime import datetime
 import json
+import os
 from pathlib import Path
 import re
 import shlex
@@ -22,11 +23,16 @@ def is_valid_json(json_string: str) -> bool:
 
 
 def run_command(
-    command: str, directory: Path = None, shell: bool = False, live_output: bool = False
-):
+    command: str,
+    directory: Path = None,
+    shell: bool = False,
+    live_output: bool = False,
+) -> tuple[list, list]:
     log("info", f"{command}")
+
     results = []
     errors = []
+
     process = subprocess.Popen(
         command if shell else shlex.split(command),
         stdout=subprocess.PIPE,
@@ -84,3 +90,58 @@ def get_filename_from_path(file_path: str) -> tuple:
     output_filename = settings.outputs_dir / f"{filename}.json"
 
     return filename, output_filename
+
+
+# Emulated "source" command to allow subprocesses to reload terminal state without forcing the user to reload the terminal
+def python_shell_source(execute_source: bool = True) -> tuple[str, str]:
+    shell = os.environ.get("SHELL", "")
+    home = os.environ.get("HOME", "")
+    source_command = ""
+
+    if "zsh" in shell:
+        zdotdir = os.environ.get("ZDOTDIR", home)
+        profile = os.path.join(zdotdir, ".zshenv")
+        source_command = f"{profile}"
+        source_syntax = "source"
+        and_sign = "&&"
+    elif "bash" in shell:
+        profile = os.path.join(home, ".bashrc")
+        source_command = f"{profile}"
+        source_syntax = "source"
+        and_sign = "&&"
+    elif "fish" in shell:
+        profile = os.path.join(home, ".config/fish/config.fish")
+        source_command = f"{profile}"
+        source_syntax = "source"
+        and_sign = "; and"
+    elif "ash" in shell:
+        profile = os.path.join(home, ".profile")
+        source_command = f"{profile}"
+        source_syntax = "."
+        and_sign = "&&"
+    else:
+        log(
+            "error",
+            "Couldn't automatically install, please reload the current shell or install manually, and try again.",
+        )
+
+    if execute_source:
+        # e.g. 'source .zshenv && printenv'
+        constructed_source_command = (
+            f"{source_syntax} {source_command} {and_sign} printenv"
+        )
+        log("info", f"/bin/bash -c {constructed_source_command}")
+        pipe = subprocess.Popen(
+            ["/bin/bash", "-c", f"{constructed_source_command}"],
+            stdout=subprocess.PIPE,
+            text=True,
+        )
+        env_lines = pipe.stdout.readlines()
+        env_dict = {
+            line.split("=", 1)[0]: line.split("=", 1)[1].strip()
+            for line in env_lines
+            if "=" in line
+        }
+        os.environ.update(env_dict)
+
+    return source_syntax, and_sign
