@@ -187,6 +187,13 @@ def main():
 
         # solc compilation flow
         elif path_type in ["file", "folder"]:
+            try:
+                run_command("solc --version")
+                run_command("solc-select versions")
+            except FileNotFoundError:
+                log("info", "Please ensure solc and solc-select are installed and availble globally, and run again.")
+                sys.exit(0)
+
             sample_file_path = args.solidity_file_or_folder
             compilation_source_path = args.solidity_file_or_folder
 

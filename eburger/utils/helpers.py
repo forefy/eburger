@@ -121,9 +121,13 @@ def python_shell_source(execute_source: bool = True) -> tuple[str, str]:
         and_sign = "&&"
     else:
         log(
-            "error",
-            "Couldn't automatically install, please reload the current shell or install manually, and try again.",
+            "warning",
+            f"Couldn't guess shell environment from {shell}, setting the profile file to .bashrc and trying to continue.",
         )
+        profile = os.path.join(home, ".bashrc")
+        source_command = f"{profile}"
+        source_syntax = "source"
+        and_sign = "&&"
 
     if execute_source:
         # e.g. 'source .zshenv && printenv'

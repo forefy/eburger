@@ -60,7 +60,6 @@ def install_hardhat_if_not_found():
                 shell=True,
             )
 
-            # NVM
             try:
                 _, errs = run_command(
                     construct_sourceable_nvm_string("nvm --version"),
