@@ -96,8 +96,11 @@ def create_directory_if_not_exists(directory_path: Path):
     # Check if the directory already exists
     if not os.path.exists(directory_path):
         # Create the directory
-        os.makedirs(directory_path)
-        log("debug", f"Created directory: {directory_path}")
+        try:
+            os.makedirs(directory_path)
+            log("debug", f"Created directory: {directory_path}")
+        except Exception as e:
+            log("error", f"Could not create direction {directory_path}. {e}")
 
 
 def create_or_empty_directory(directory_path: Path):
@@ -105,15 +108,19 @@ def create_or_empty_directory(directory_path: Path):
     if os.path.exists(directory_path):
         # Empty the directory by removing all its contents
         shutil.rmtree(directory_path)
-        os.makedirs(directory_path)
-        log(
-            "debug",
-            f"Emptied and re-created directory: {directory_path}",
-        )
+
+        try:
+            os.makedirs(directory_path)
+            log("debug", f"Emptied and re-created directory: {directory_path}")
+        except Exception as e:
+            log("error", f"Could not create direction {directory_path}. {e}")
     else:
         # Create the directory if it does not exist
-        os.makedirs(directory_path)
-        log("debug", f"Created directory: {directory_path}")
+        try:
+            os.makedirs(directory_path)
+            log("debug", f"Created directory: {directory_path}")
+        except Exception as e:
+            log("error", f"Could not create direction {directory_path}. {e}")
 
 
 # TODO: Add better handling for multiple build info files
