@@ -92,6 +92,14 @@ parser.add_argument(
     help="Don't install missing dependencies automatically.",
 )
 
+parser.add_argument(
+    "-rp",
+    "--relative_paths",
+    dest="relative_file_paths",
+    action="store_true",
+    help="Don't install missing dependencies automatically.",
+)
+
 # Only here to allow "." as an argument, ignored in the rest of the code.
 parser.add_argument(
     "default_solidity_file_or_folder",

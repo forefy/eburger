@@ -191,7 +191,10 @@ def main():
                 run_command("solc --version")
                 run_command("solc-select versions")
             except FileNotFoundError:
-                log("info", "Please ensure solc and solc-select are installed and availble globally, and run again.")
+                log(
+                    "info",
+                    "Please ensure solc and solc-select are installed and availble globally, and run again.",
+                )
                 sys.exit(0)
 
             sample_file_path = args.solidity_file_or_folder
@@ -281,7 +284,7 @@ def main():
 
         log(
             "success",
-            f"Results saved to {str(Path(results_path).resolve())}.",
+            f"Results saved to {str(Path(results_path).resolve())}",
         )
     else:
         log("success", f"No insights found. Results saved to {settings.outputs_dir}")

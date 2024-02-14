@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Union
 from eburger import settings
+from eburger.utils.cli_args import args
 
 
 def parse_code_highlight(node: dict, src_file_list: list) -> tuple[str, str, str]:
@@ -25,10 +26,16 @@ def parse_code_highlight(node: dict, src_file_list: list) -> tuple[str, str, str
 
     src_location = node.get("src", "")
     file_index = int(src_location.split(":")[2])
-    file_name = (
+    project_relative_file_name = (
         src_file_list[file_index] if file_index < len(src_file_list) else "Unknown file"
     )
-    file_path = str(Path(settings.project_root / file_name).resolve())
+    file_path = str(Path(settings.project_root / project_relative_file_name).resolve())
+
+    if args.relative_file_paths:
+        result_file_path_uri = project_relative_file_name
+    else:
+        result_file_path_uri = file_path
+
     start_offset, length, _ = map(int, src_location.split(":"))
 
     file_content = None
@@ -51,7 +58,7 @@ def parse_code_highlight(node: dict, src_file_list: list) -> tuple[str, str, str
             start_char = start_offset - current_offset
             end_char = min(start_char + length, len(line))
             return (
-                file_path,
+                result_file_path_uri,
                 f"Line {line_number} Columns {start_char + 1}-{end_char + 1}",
                 vulnerable_code,
             )
