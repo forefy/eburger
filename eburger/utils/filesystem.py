@@ -6,6 +6,7 @@ import re
 import shutil
 from eburger import settings
 from eburger.utils.logger import log
+from eburger.utils.cli_args import args
 
 
 def find_and_read_sol_file(folder_path: str) -> str:
@@ -125,7 +126,14 @@ def create_or_empty_directory(directory_path: Path):
 
 # TODO: Add better handling for multiple build info files
 def get_foundry_ast_json(forge_out_dir) -> dict:
-    json_files = [f for f in os.listdir(forge_out_dir) if f.endswith(".json")]
+    try:
+        json_files = [f for f in os.listdir(forge_out_dir) if f.endswith(".json")]
+    except FileNotFoundError:
+        err_line = "forge build failed to compile contract."
+        if not args.debug:
+            err_line += " try running with `--debug`."
+        log("error", err_line)
+
     if not json_files:
         log("error", "forge build generated no output.")
     if len(json_files) > 1:

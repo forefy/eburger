@@ -5,10 +5,15 @@ from eburger.utils.helpers import python_shell_source, run_command
 from eburger.utils.logger import log
 from eburger.utils.cli_args import args
 
+
 def check_if_skip_installations_requested(missing_dependency: str):
     if args.skip_installations:
-        log("info", f"Automatic installation of dependencies was disabled, please install {missing_dependency} manually (or try again without the `skip_installations` flag) and run again.")
+        log(
+            "info",
+            f"Automatic installation of dependencies was disabled, please install {missing_dependency} manually (or try again without the `skip_installations` flag) and run again.",
+        )
         sys.exit(0)
+
 
 def install_foundry_if_not_found():
     check_if_skip_installations_requested(missing_dependency="foundry")

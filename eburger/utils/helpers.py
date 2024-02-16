@@ -122,7 +122,7 @@ def python_shell_source(execute_source: bool = True) -> tuple[str, str]:
     else:
         log(
             "warning",
-            f"Couldn't guess shell environment from {shell}, setting the profile file to .bashrc and trying to continue.",
+            f"Couldn't guess shell environment from '{shell}', setting the profile file to .bashrc and trying to continue.",
         )
         profile = os.path.join(home, ".bashrc")
         source_command = f"{profile}"

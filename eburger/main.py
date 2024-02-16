@@ -22,6 +22,7 @@ from eburger.utils.helpers import (
     run_command,
 )
 from eburger.utils.installers import (
+    construct_sourceable_nvm_string,
     install_foundry_if_not_found,
     install_hardhat_if_not_found,
     set_solc_compiler_version,
@@ -156,13 +157,26 @@ def main():
             if args.solc_remappings:
                 log("warning", "Ignoring the -r option in hardhat based projects.")
 
-            run_command(f"npx hardhat clean", directory=settings.project_root)
-
-            run_command(
-                f"npx hardhat compile --force",
-                directory=settings.project_root,
-                live_output=args.debug,
-            )
+            # try runing npx normally, as a fallback try the construct_sourceable_nvm_string method
+            # if a user hadn't got npx installed / or it's not on path (meaning it was installed in same run as the analysis)
+            # it still needs the fallback option
+            try:
+                run_command(f"npx hardhat clean", directory=settings.project_root)
+                run_command(
+                    f"npx hardhat compile --force",
+                    directory=settings.project_root,
+                    live_output=args.debug,
+                )
+            except FileNotFoundError:
+                run_command(
+                    construct_sourceable_nvm_string("npx hardhat clean"),
+                    directory=settings.project_root,
+                )
+                run_command(
+                    construct_sourceable_nvm_string("npx hardhat compile --force"),
+                    directory=settings.project_root,
+                    live_output=args.debug,
+                )
 
             # Copy compilation results to .eburger
             expected_hardhat_outfiles = os.path.join(
