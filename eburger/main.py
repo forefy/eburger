@@ -169,11 +169,11 @@ def main():
                 )
             except FileNotFoundError:
                 run_command(
-                    "./node_modules/.bin/hardhat clean",
+                    construct_sourceable_nvm_string("npx hardhat clean"),
                     directory=settings.project_root,
                 )
                 run_command(
-                    "./node_modules/.bin/hardhat compile --force",
+                    construct_sourceable_nvm_string("npx hardhat compile --force"),
                     directory=settings.project_root,
                     live_output=args.debug,
                 )
