@@ -122,11 +122,6 @@ def install_hardhat_if_not_found():
                         live_output=True,
                     )
                     run_command(
-                        construct_sourceable_nvm_string("npm install -g yarn"),
-                        shell=True,
-                        live_output=True,
-                    )
-                    run_command(
                         construct_sourceable_nvm_string("npx -v"),
                         shell=True,
                         live_output=True,
@@ -139,6 +134,11 @@ def install_hardhat_if_not_found():
 
             try:
                 if os.path.isfile(os.path.join(settings.project_root, "yarn.lock")):
+                    run_command(
+                        construct_sourceable_nvm_string("npm install -g yarn"),
+                        shell=True,
+                        live_output=True,
+                    )
                     run_command(
                         construct_sourceable_nvm_string("yarn add --dev hardhat"),
                         directory=settings.project_root,
