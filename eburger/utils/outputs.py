@@ -152,7 +152,7 @@ def save_as_sarif(output_file_path: Path, insights: dict):
             "text": "",
             "markdown": "",
         },
-        "properties": {"precision": "", "problem": {"security-severity": ""}},
+        "properties": {"precision": "", "security-severity": ""},
     }
 
     if os.path.exists(output_file_path):
@@ -199,7 +199,7 @@ def save_as_sarif(output_file_path: Path, insights: dict):
                 "markdown"
             ] = f"[{insight['action-items'][0]}]({insight['references'][0]})"
             new_rule["properties"]["precision"] = insight["precision"].casefold()
-            new_rule["properties"]["problem"]["security-severity"] = (
+            new_rule["properties"]["security-severity"] = (
                 convert_severity_to_sarif_security_severity(insight["severity"])
             )
 
