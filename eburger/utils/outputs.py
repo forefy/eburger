@@ -116,7 +116,7 @@ def convert_severity_to_sarif_level(severity: str) -> str:
 
 
 def convert_severity_to_sarif_security_severity(severity: str) -> str:
-    mapping = mapping = {"High": 8.0, "Medium": 5.0, "Low": 3.0}
+    mapping = {"High": "8.0", "Medium": "5.0", "Low": "3.0"}
     mapped_severity = mapping.get(severity, None)
     if mapped_severity is None:
         log(
