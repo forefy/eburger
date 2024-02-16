@@ -1,4 +1,5 @@
 # Silence tool prints
+import copy
 from datetime import datetime
 import json
 import os
@@ -172,13 +173,14 @@ def save_as_sarif(output_file_path: Path, insights: dict):
             "runs": [],
         }
 
-    new_run = sarif_run_template.copy()
+    new_run = copy.deepcopy(sarif_run_template)
 
     # insight is like a result object
     for insight in insights:
         rule_id = insight["name"].replace(" ", "_")
 
         rule_exists = False
+
         for index, rule in enumerate(new_run["tool"]["driver"]["rules"]):
             if rule["id"] == rule_id:
                 rule_exists = True
@@ -186,7 +188,7 @@ def save_as_sarif(output_file_path: Path, insights: dict):
                 break
 
         if not rule_exists:
-            new_rule = sarif_rule_template.copy()
+            new_rule = copy.deepcopy(sarif_rule_template)
             new_rule["id"] = rule_id
             new_rule["name"] = insight["name"]
             new_rule["shortDescription"]["text"] = insight["name"]
@@ -200,6 +202,7 @@ def save_as_sarif(output_file_path: Path, insights: dict):
             new_rule["properties"]["problem"]["security-severity"] = (
                 convert_severity_to_sarif_security_severity(insight["severity"])
             )
+
             new_run["tool"]["driver"]["rules"].append(new_rule)
             rule_index = len(new_run["tool"]["driver"]["rules"]) - 1
 
