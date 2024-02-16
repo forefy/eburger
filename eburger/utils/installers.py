@@ -142,6 +142,8 @@ def install_hardhat_if_not_found():
                     run_command(
                         construct_sourceable_nvm_string("yarn add --dev hardhat"),
                         directory=settings.project_root,
+                        shell=True,
+                        live_output=True,
                     )
                 else:
                     run_command(
@@ -149,6 +151,8 @@ def install_hardhat_if_not_found():
                             "npm install --save-dev hardhat"
                         ),
                         directory=settings.project_root,
+                        shell=True,
+                        live_output=True,
                     )
             except:
                 log(
