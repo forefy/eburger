@@ -1,7 +1,8 @@
 name: "Modifier Without Proper Enforcement"
 severity: "High"
+precision: "Low"
 description: "Using the provided modifier onlyOwner for function access control without a proper enforcement mechanism like require or revert is a dire mistake because it fails to restrict access as intended. The modifier merely evaluates a condition (msg.sender == owner) without any action taken based on the result."
-impact: "This means any user, regardless of whether they are the owner, can execute functions that are supposed to be restricted to the owner, potentially leading to unauthorized actions, such as withdrawing funds or altering critical contract settings."
+impact: "Users may execute functions that are supposed to be restricted, potentially leading to unauthorized actions, such as withdrawing funds or altering critical contract settings."
 action-items:
     - "Change the modifier so that it will enforce the ownership check using a require/revert statement."
 references:

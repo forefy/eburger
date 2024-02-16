@@ -104,16 +104,25 @@ def save_as_markdown(output_file_path: Path, json_data: dict):
 
 
 def convert_severity_to_sarif_level(severity: str) -> str:
-    match severity:
-        case "High":
-            sarif_level = "error"
-        case "Medium":
-            sarif_level = "warning"
-        case "Low":
-            sarif_level = "note"
-        case _:
-            sarif_level = "note"
-    return sarif_level
+    mapping = {"High": "error", "Medium": "warning", "Low": "note"}
+    mapped_severity = mapping.get(severity, None)
+    if mapped_severity is None:
+        log(
+            "error",
+            "Failed converting a template's severity to the respective SARIF level",
+        )
+    return mapped_severity
+
+
+def convert_severity_to_sarif_security_severity(severity: str) -> str:
+    mapping = mapping = {"High": 8.0, "Medium": 5.0, "Low": 3.0}
+    mapped_severity = mapping.get(severity, None)
+    if mapped_severity is None:
+        log(
+            "error",
+            "Failed converting a template's severity to the respective SARIF/GitHub Code Scanning security severity",
+        )
+    return mapped_severity
 
 
 def save_as_sarif(output_file_path: Path, insights: dict):
@@ -129,15 +138,20 @@ def save_as_sarif(output_file_path: Path, insights: dict):
         "results": [],
     }
 
+    # precision - very-high, high, medium, or low
+    # security-severity - 9.0 is critical, 7.0 to 8.9 is high, 4.0 to 6.9 is medium and 3.9 or less is low
+    # simplified: 9.0, 8.0, 5.0, 3.0
     sarif_rule_template = {
         "id": "",
         "name": "",
         "shortDescription": {"text": ""},
+        "fullDescription": {"text": ""},
         "helpUri": "",
         "help": {
             "text": "",
             "markdown": "",
         },
+        "properties": {"precision": "", "problem": {"security-severity": ""}},
     }
 
     if os.path.exists(output_file_path):
@@ -175,12 +189,17 @@ def save_as_sarif(output_file_path: Path, insights: dict):
             new_rule = sarif_rule_template.copy()
             new_rule["id"] = rule_id
             new_rule["name"] = insight["name"]
-            new_rule["shortDescription"]["text"] = insight["description"]
+            new_rule["shortDescription"]["text"] = insight["name"]
+            new_rule["fullDescription"]["text"] = insight["description"]
             new_rule["helpUri"] = insight["references"][0]
             new_rule["help"]["text"] = insight["action-items"][0]
             new_rule["help"][
                 "markdown"
             ] = f"[{insight['action-items'][0]}]({insight['references'][0]})"
+            new_rule["properties"]["precision"] = insight["precision"].casefold()
+            new_rule["properties"]["problem"]["security-severity"] = (
+                convert_severity_to_sarif_security_severity(insight["severity"])
+            )
             new_run["tool"]["driver"]["rules"].append(new_rule)
             rule_index = len(new_run["tool"]["driver"]["rules"]) - 1
 

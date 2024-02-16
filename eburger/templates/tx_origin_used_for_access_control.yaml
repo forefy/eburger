@@ -1,5 +1,6 @@
 name: "tx.origin Used for Access Control"
 severity: "Low"
+precision: "Medium"
 description: "In a situation in which a user has interacted with a malicious contract, that contract can then impersonate as the victim user to perform actions in the current contract that are relying on the tx.origin."
 impact: "Malicious contracts can impersonate users to perform actions relying on the tx.origin." 
 action-items:

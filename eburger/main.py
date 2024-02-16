@@ -66,7 +66,7 @@ def main():
             if len(project_paths) < 1:
                 log(
                     "info",
-                    "No contract projects here, specifiy a path/single file via `-f` or run `eburger` in the smart contract project root.",
+                    "No contract projects here, specifiy a path/single files via `-f` or run `eburger` in the smart contract project root.",
                 )
                 sys.exit(0)
             elif len(project_paths) > 1:

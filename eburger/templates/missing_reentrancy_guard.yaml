@@ -1,5 +1,6 @@
 name: "Missing Reentracy Guard"
 severity: "Low"
+precision: "Low"
 description: "Due to Solidity's design, when a function in your contract interacts with another contract's address, that contract gains the ability to recursively call your contract's function before handing back the control on the execution flow. If the reentrant function's logic did not expect the function to be called multiple times, it can be exposed to abuse."
 impact: "Potential draining of funds, depending on what happens when the function is retriggered."
 action-items:

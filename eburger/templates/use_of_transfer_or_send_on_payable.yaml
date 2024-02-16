@@ -1,5 +1,6 @@
 name: "Use of transfer or send on a payable address"
 severity: "Medium"
+precision: "Medium"
 description: "In Solidity, .transfer and .send both implement a risky gas limitation that reverts the transaction if the recipient's operations require more gas than the stipend of 2300 gas."
 impact: "Unexpected failed transactions and contract behavior."
 action-items:

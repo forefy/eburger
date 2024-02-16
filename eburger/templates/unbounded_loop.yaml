@@ -1,5 +1,6 @@
-name: "Unbound Loop"
+name: "Unbounded Loop"
 severity: "Low"
+precision: "Low"
 description: "Unbounded loops, specifically, for loops that can modify state and have no apparent max restriction to the nunmber of iterations possible, can lead to excessive gas consumption, which may cause transactions to fail or become prohibitively expensive."
 impact: "Excessive gas consumption, contract denial of service."
 action-items:

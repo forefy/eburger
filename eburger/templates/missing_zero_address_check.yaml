@@ -1,5 +1,6 @@
 name: "Missing Zero Address Check"
 severity: "Low"
+precision: "Medium"
 description: "In Solidity, contracts often interact with external addresses. Failing to check for a possible 0 address input (especially in constructors, setters, and initializer functions) before such interactions can lead to unexpected dangerous behavior. A zero address check ensures that addresses are explicitly provided and not left uninitialized or set to a default, invalid state."
 impact: "Unexpected failed transactions and contract behavior."
 action-items:

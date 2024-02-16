@@ -1,5 +1,6 @@
 name: "Unchecked Call Return"
 severity: "Low"
+precision: "Low"
 description: "A contract's call or send functions are used without checking the return value."
 impact: "Unexpected contract behavior."
 action-items:
