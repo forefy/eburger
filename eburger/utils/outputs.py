@@ -209,7 +209,7 @@ def save_as_sarif(output_file_path: Path, insights: dict):
                 "ruleIndex": rule_index,
                 "level": convert_severity_to_sarif_level(insight["severity"]),
                 "message": {
-                    "text": new_rule["name"]
+                    "text": insight["name"]
                 },  # TODO: display an instruction instead of the finding name
                 "locations": [],
             }
