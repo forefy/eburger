@@ -130,7 +130,7 @@ This will open an interactive vscode menu with the issues, description, navigati
 
 
 ## GitHub Action
-CI pipelines are supported via the [eburger-action]https://github.com/forefy/eburger-action GitHub Action, it helps continuously assessing your code and viewing the raised insights on your repo's security pane.
+CI pipelines are supported via the [eburger-action](https://github.com/forefy/eburger-action) GitHub Action, it helps continuously assessing your code and viewing the raised insights on your repo's security pane.
 
 ![eburger-action](https://github.com/forefy/eburger/raw/main/static/eburger-action1.png "eburger-action security view")
 
