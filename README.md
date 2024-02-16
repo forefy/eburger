@@ -36,6 +36,7 @@ What we provide instead with eBurger is the ability to spin up custom templates 
     - [How to run - advanced](#advanced-usage)
 - [How it looks like 👀](#how-it-looks-like)
 - [SARIF support](#sarif-support)
+- [GitHub Action](#github-action)
 - [Contributing templates](#contributing-templates)
 - [Comparison table](#comparison-table)
 - [Features](#features)
@@ -127,24 +128,36 @@ To have an interactive GUI open up in VSCode that can organinze and interact wit
 This will open an interactive vscode menu with the issues, description, navigation of vulnerable code lines, etc.
 ![eburger SARIF view](https://github.com/forefy/eburger/raw/main/static/SARIF.png "eburger SARIF view")
 
+
+## GitHub Action
+CI pipelines are supported via the [eburger-action]https://github.com/forefy/eburger-action GitHub Action, it helps continuously assessing your code and viewing the raised insights on your repo's security pane.
+
+![eburger-action](https://github.com/forefy/eburger/raw/main/static/eburger-action1.png "eburger-action security view")
+
+![eburger-action](https://github.com/forefy/eburger/raw/main/static/eburger-action2.png "eburger-action issue view")
+
+Visit the action's page for more information.
+
+
+
 ## Contributing templates
 Templates can be added by creating new YAML files and either load them with `eburger -t mytemplate.yaml .` or by placing them under the `templates/` directory.
 
 If you are using eburger as a python package (installed via pip install), the templates location can be found with running `pip3 show eburger` or by running the tool on a contract and seeing the templates path printed to the console.
 
-For documentation refer to the [Wiki](https://github.com/forefy/eburger/wiki/Templates).
+For template writing and documentation refer to the [Wiki](https://github.com/forefy/eburger/wiki/Templates).
 
 
 ## Comparison table
 Comparison of actively maintained / popular solidity smart contract static analyzers
 
-| Static Analyzer                                        | Language        | 2 Minutes to write a custom template with ChatGPT    | Many findings that are already found before the contest began | Would want to eat |
-|--------------------------------------------------------|-----------------|-------------------------------------------------------|---------------------------------------------------------------|-------------------|
-| [eBurger](https://github.com/forefy/eburger)           | Python          | ✅                                                    |                                                               | ✅                |
-| [Slither](https://github.com/crytic/slither)           | Python          |                                                       | ✅                                                            |                   |
-| [4naly3er](https://github.com/Picodes/4naly3er)        | TypeScript 🤮   |                                                       | ✅                                                            |                   |
-| [mythril](https://github.com/Consensys/mythril)        | Python          |                                                       |                                                               |                   |
-| [aderyn](https://github.com/Cyfrin/aderyn)             | Rust            |                                                       |                                                               |                   |
+| Static Analyzer                                        | Language        | 2 Minutes to write a custom template with ChatGPT     | GitHub Action | Many findings that are already found before the contest began | Would want to eat |
+|--------------------------------------------------------|-----------------|-------------------------------------------------------|---------------|---------------------------------------------------------------|-------------------|
+| [eBurger](https://github.com/forefy/eburger)           | Python          | ✅                                                    | ✅            |                                                               | ✅                |
+| [Slither](https://github.com/crytic/slither)           | Python          |                                                       | ✅            | ✅                                                            |                   |
+| [4naly3er](https://github.com/Picodes/4naly3er)        | TypeScript 🤮   |                                                       |               | ✅                                                            |                   |
+| [mythril](https://github.com/Consensys/mythril)        | Python          |                                                       |               |                                                               |                   |
+| [aderyn](https://github.com/Cyfrin/aderyn)             | Rust            |                                                       |               |                                                               |                   |
 
 
 Forgot one or made a mistake? open a pull request or an issue :)
@@ -154,6 +167,7 @@ Forgot one or made a mistake? open a pull request or an issue :)
 - Fast learning curve for creating templates, ability to customize templates to the current ongoing audit project
 - Foundry and Hardhat support ❣️
 - SARIF support & VSCode GUI integration
+- GitHub Actions integration through [eburger-action](https://github.com/forefy/eburger-action)
 - Markdown report
 - Community and free support via [Discord](https://discord.gg/WaVMpBtxdB)
 
