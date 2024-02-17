@@ -24,7 +24,7 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install eBurger
+      - name: Install eburger
         run: |
           python -m venv /tmp/pip-audit-env
           source /tmp/pip-audit-env/bin/activate
