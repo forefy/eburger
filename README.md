@@ -167,7 +167,7 @@ Forgot one or made a mistake? open a pull request or an issue :)
 - Fast learning curve for creating templates, ability to customize templates to the current ongoing audit project
 - Foundry and Hardhat support ❣️
 - SARIF support & VSCode GUI integration
-- GitHub Actions integration through [eburger-action](https://github.com/forefy/eburger-action)
+- GitHub Actions integration through [eburger-action](https://github.com/marketplace/actions/eburger-action)
 - Markdown report
 - Community and free support via [Discord](https://discord.gg/WaVMpBtxdB)
 
