@@ -81,7 +81,7 @@ parser.add_argument(
     "--auto-selection",
     dest="auto_selection",
     type=int,
-    help="If multiple projects are present within the eburger working directory, choose the N'th option without prompting.",
+    help="If multiple projects are present within the eburger working directory, choose the N'th option without prompting",
 )
 
 parser.add_argument(
@@ -89,7 +89,7 @@ parser.add_argument(
     "--skip-installations",
     dest="skip_installations",
     action="store_true",
-    help="Don't install missing dependencies automatically.",
+    help="Don't install missing dependencies automatically",
 )
 
 parser.add_argument(
@@ -97,7 +97,7 @@ parser.add_argument(
     "--relative_paths",
     dest="relative_file_paths",
     action="store_true",
-    help="Don't install missing dependencies automatically.",
+    help="Output file paths in relative format rather than full paths",
 )
 
 # Only here to allow "." as an argument, ignored in the rest of the code.
