@@ -12,7 +12,7 @@ reports:
     - "https://github.com/code-423n4/2024-01-curves/blob/main/bot-report.md#m-02"
     - "https://github.com/code-423n4/2022-04-backd-findings/issues/52"
 vulnerable_contracts:
-    - "../vulnerable_contracts/modifier_without_proper_enforcement.sol"
+    - "../vulnerable_contracts/use_of_transfer_or_send_on_payable.sol"
 python: |
     results = []
     function_call_nodes = get_nodes_by_types(ast_data, "FunctionCall")

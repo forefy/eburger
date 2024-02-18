@@ -27,6 +27,17 @@
 ## What is eBurger
 eBurger is a static analysis tool that provides a way to quickly query and analyze solidity smart contracts.
 
+<p align="center">Create your template</p>
+<p align="center">
+<img src="https://github.com/forefy/eburger/raw/main/static/yaml.png" alt="eBurger YAML Template" title="eBurger YAML Template" width="500"/>
+</p>
+
+<p align="center">Run your template</p>
+<p align="center">
+<img src="https://github.com/forefy/eburger/raw/main/static/run_yaml.png" alt="eBurger YAML Template" title="eBurger YAML Template" width="500"/>
+</p>
+
+
 Running static analyzers won't win you competitions. 
 What we provide instead with eburger is the ability to spin up custom templates tailored to your current audited project in minutes ([Wiki](https://github.com/forefy/eburger/wiki)) allowing you to orchestrate unique lookups through the codebase to empower your audits.
 
@@ -41,7 +52,6 @@ What we provide instead with eburger is the ability to spin up custom templates 
 - [Comparison table](#comparison-table)
 - [Features](#features)
 - [What is missing](#what-is-missing)
-
 
 ## How to install
 
