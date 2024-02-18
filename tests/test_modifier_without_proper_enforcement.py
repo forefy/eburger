@@ -62,9 +62,6 @@ def vulnerable_ast() -> tuple[dict, list]:
             }
         }
     },
-    "sourceList": [
-        "vulnerable_contracts/modifier_without_proper_enforcement.sol"
-    ],
     "sources": {
         "vulnerable_contracts/modifier_without_proper_enforcement.sol": {
             "AST": {
@@ -445,8 +442,7 @@ def vulnerable_ast() -> tuple[dict, list]:
             },
             "id": 0
         }
-    },
-    "version": "0.8.20+commit.a1b79de6.Darwin.appleclang"
+    }
 }"""
     return json.loads(ast_json)
 

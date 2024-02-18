@@ -53,9 +53,6 @@ def vulnerable_ast() -> tuple[dict, list]:
             }
         }
     },
-    "sourceList": [
-        "vulnerable_contracts/tx_origin_used_for_access_control.sol"
-    ],
     "sources": {
         "vulnerable_contracts/tx_origin_used_for_access_control.sol": {
             "AST": {
@@ -551,8 +548,7 @@ def vulnerable_ast() -> tuple[dict, list]:
             },
             "id": 0
         }
-    },
-    "version": "0.8.20+commit.a1b79de6.Darwin.appleclang"
+    }
 }"""
     return json.loads(tx_json)
 

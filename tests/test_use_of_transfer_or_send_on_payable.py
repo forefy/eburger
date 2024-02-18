@@ -67,9 +67,6 @@ def vulnerable_ast() -> tuple[dict, list]:
             }
         }
     },
-    "sourceList": [
-        "vulnerable_contracts/use_of_transfer_or_send_on_payable.sol"
-    ],
     "sources": {
         "vulnerable_contracts/use_of_transfer_or_send_on_payable.sol": {
             "AST": {
@@ -546,13 +543,12 @@ def vulnerable_ast() -> tuple[dict, list]:
             },
             "id": 0
         }
-    },
-    "version": "0.8.20+commit.a1b79de6.Darwin.appleclang"
+    }
 }"""
     return json.loads(ast_json)
 
 
-def use_of_transfer_or_send_on_payable(vulnerable_ast):
+def test_use_of_transfer_or_send_on_payable(vulnerable_ast):
     ast_json, src_file_list = reduce_json(vulnerable_ast)
     results = process_yaml(
         "eburger/templates/use_of_transfer_or_send_on_payable.yaml",

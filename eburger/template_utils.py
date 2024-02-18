@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 from typing import Union
 from eburger import settings
 from eburger.utils.cli_args import args
@@ -143,24 +144,32 @@ def get_nodes_by_types(
     return results
 
 
-def get_nodes_by_signature(node, type_string):
+def get_nodes_by_signature(node: dict, pattern: str, use_regex: bool = False):
     """
     Searches for nodes with a specific typeString within the given node or AST.
 
     :param node: The node or AST to search.
-    :param type_string: The typeString to search for.
+    :param pattern: The typeString to search for (regex).
+    :param use_regex: Whether or not to use regex for the search.
     :return: A list of nodes that have the specified typeString.
     """
     matching_nodes = []
+    if use_regex:
+        compiled_pattern = re.compile(pattern)
 
     def search_nodes(current_node):
         if isinstance(current_node, dict):
             # Check if the current node matches the typeString
-            if (
-                current_node.get("typeDescriptions", {}).get("typeString")
-                == type_string
-            ):
-                matching_nodes.append(current_node)
+            node_type_string = current_node.get("typeDescriptions", {}).get(
+                "typeString"
+            )
+            if node_type_string:
+                if use_regex:
+                    if compiled_pattern.search(node_type_string):
+                        matching_nodes.append(current_node)
+                else:
+                    if pattern == node_type_string:
+                        matching_nodes.append(current_node)
             # Recursively search in child nodes
             for value in current_node.values():
                 if isinstance(value, (dict, list)):

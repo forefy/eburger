@@ -1,0 +1,63 @@
+name: "Emit After External Call"
+severity: "Low"
+precision: "Medium"
+description: Events are used to notify external systems/dapps about specific actions that occur within a smart contract. Emitting events after an external call in general is not best practice, but when state variables are emitted it may be dangerous. In the external call, a malicious external contract might modify the state variable, causing the following emit to send wrong data, which can cause unexpected effects.
+impact: "Unexpected contract behavior, and making it abusable by external contracts."
+action-items:
+  - "Refrain from emiting state variables after external function calls."
+  - "Ensure check-effects-interaction is properly applied in similar code sections."
+references:
+  - "https://detectors.auditbase.com/reentrancy-causing-out-of-order-event-emission-solidity"
+  - "https://twitter.com/PatrickAlphaC/status/1754913799868485633"
+reports:
+    - "https://github.com/code-423n4/2023-05-maia-findings/blob/fa2bd134824cd6bfcbc99ee6012885d727f04104/data/brgltd-Q.md?plain=1#L83"
+vulnerable_contracts:
+    - "../vulnerable_contracts/emit_after_external_call.sol"
+python: |
+    results = []
+
+    # Collect all state variables
+    mutable_state_variables = set()
+    for var_decl in get_nodes_by_types(ast_data, "VariableDeclaration"):
+        if var_decl.get("stateVariable") and not var_decl.get("constant") and var_decl.get("mutability") == "mutable":
+            mutable_state_variables.add(var_decl["name"])
+    
+    function_nodes = get_nodes_by_types(ast_data, "FunctionDefinition")
+    for func in function_nodes:
+        # Skip functions without external calls in their body
+        external_function_calls = get_nodes_by_signature(func.get("body"), "function.*external", use_regex=True)
+
+        if not external_function_calls:
+          continue
+        
+        # Check for use of emit statement
+        function_statements = func.get("body", {}).get("statements", [])
+
+        # Look for a function call, and an emit statement ordered after it in the list order
+        # This is ment to filter out emits that don't have function calls before them
+        function_call_found = False
+        for stmt in function_statements:
+          if stmt.get("nodeType") != "EmitStatement":
+            stmt_ext_func_calls = get_nodes_by_signature(stmt, "function.*external", use_regex=True)
+            if stmt_ext_func_calls:
+              function_call_found = True
+
+          elif function_call_found:
+              event_call = stmt.get("eventCall", {})
+              emitted_event_vars = []
+              # as function args
+              if event_call.get("kind") == "functionCall":
+                for emitted_func_arg in event_call.get("arguments"):
+                  arg_name = emitted_func_arg.get("name")
+                  if arg_name not in emitted_event_vars:
+                    emitted_event_vars.append(arg_name)
+              # as anything else
+              else:
+                emitted_event_vars.append(event_call.get("name"))
+              if emitted_event_vars and function_call_found:
+                for emitted_event_var in emitted_event_vars:
+                  if emitted_event_var in mutable_state_variables:
+                    file_path, lines, vuln_code = parse_code_highlight(stmt, src_file_list)
+                    results.append({"file": file_path, "lines": lines, "code": vuln_code})
+              # reset preceding function call check
+              function_call_found = False
