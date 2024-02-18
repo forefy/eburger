@@ -29,12 +29,12 @@ eBurger is a static analysis tool that provides a way to quickly query and analy
 
 <p align="center">Create your template</p>
 <p align="center">
-<img src="https://github.com/forefy/eburger/raw/main/static/yaml.png" alt="eBurger YAML Template" title="eBurger YAML Template" width="500"/>
+<img src="https://github.com/forefy/eburger/raw/main/static/yaml.png" alt="eBurger YAML Template" title="eBurger YAML Template" width="600"/>
 </p>
 
 <p align="center">Run your template</p>
 <p align="center">
-<img src="https://github.com/forefy/eburger/raw/main/static/run_yaml.png" alt="eBurger YAML Template" title="eBurger YAML Template" width="500"/>
+<img src="https://github.com/forefy/eburger/raw/main/static/run_yaml.png" alt="eBurger YAML Template" title="eBurger YAML Template" width="600"/>
 </p>
 
 
