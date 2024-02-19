@@ -5,15 +5,16 @@
 </p>
 
 <p align="center">
-<a href="https://github.com/forefy/eburger/releases/"><img alt="eBurger releases" src="https://img.shields.io/github/release/forefy/eburger">
+<a href="https://github.com/forefy/eburger/releases/"><img alt="eBurger releases" title="eBurger releases" src="https://img.shields.io/github/release/forefy/eburger">
 <img alt="eBurger GitHub repo size" title="eBurger GitHub repo size" src="https://img.shields.io/github/repo-size/forefy/eburger">
 <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/forefy/eburger/.github/workflows/pip-audit.yml">
-<img alt="eBurger GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/forefy/eburger">
-<img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/forefy/eburger">
-<img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dw/eburger">
-<a href="https://github.com/forefy/eburger/issues"><img alt="Issues" src="https://img.shields.io/github/issues-raw/forefy/eburger">
-<a href="https://discord.gg/WaVMpBtxdB"><img alt="Forefy Discord" src="https://img.shields.io/discord/1174395390494257152.svg?logo=discord"></a>
-<a href="https://twitter.com/forefy"><img alt="Forefy Twitter" src="https://img.shields.io/twitter/follow/forefy.svg?logo=twitter"></a>
+<img alt="eBurger GitHub commit activity" title="eBurger GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/forefy/eburger">
+<img alt="GitHub last commit" title="GitHub last commit" src="https://img.shields.io/github/last-commit/forefy/eburger">
+<img alt="PyPI - Downloads" title="PyPi Downloads" src="https://img.shields.io/pypi/dw/eburger">
+<a href="https://github.com/forefy/eburger/issues"><img alt="Issues" title="Issues" src="https://img.shields.io/github/issues-raw/forefy/eburger">
+<a href="https://discord.gg/WaVMpBtxdB"><img alt="Forefy Discord" title="Forefy Discord" src="https://img.shields.io/discord/1174395390494257152.svg?logo=discord"></a>
+<a href="https://twitter.com/forefy"><img alt="Forefy Twitter" title="Forefy Twitter" src="https://img.shields.io/twitter/follow/forefy.svg?logo=twitter"></a>
+<img alt="Launch on Jupyter" title="Launch on Jupyter" src="https://img.shields.io/badge/templates%20playground?logo=jupyter&label=launch&link=https%3A%2F%2Fmybinder.org%2Fv2%2Fgh%2Fforefy%2Feburger%2Fmain%3Flabpath%3Dplayground.ipynb">
 </p>
 
 <p align="center">
@@ -166,8 +167,8 @@ Comparison of actively maintained / popular solidity smart contract static analy
 | [eBurger](https://github.com/forefy/eburger)           | Python          | ✅                                                    | ✅            |                                                               | ✅                |
 | [Slither](https://github.com/crytic/slither)           | Python          |                                                       | ✅            | ✅                                                            |                   |
 | [4naly3er](https://github.com/Picodes/4naly3er)        | TypeScript 🤮   |                                                       |               | ✅                                                            |                   |
-| [mythril](https://github.com/Consensys/mythril)        | Python          |                                                       |               |                                                               |                   |
-| [aderyn](https://github.com/Cyfrin/aderyn)             | Rust            |                                                       |               |                                                               |                   |
+| [Mythril](https://github.com/Consensys/mythril)        | Python          |                                                       |               |                                                               |                   |
+| [Aderyn](https://github.com/Cyfrin/aderyn)             | Rust            |                                                       |               |                                                               |                   |
 
 
 Forgot one or made a mistake? open a pull request or an issue :)

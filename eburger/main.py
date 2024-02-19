@@ -150,7 +150,7 @@ def main():
             save_as_json(output_filename, ast_json)
 
         # Hardhat compilation flow
-        if path_type == "hardhat":
+        elif path_type == "hardhat":
             log("info", "Hardhat project detected, compiling using hardhat.")
             install_hardhat_if_not_found()
 
