@@ -15,7 +15,7 @@ def check_if_skip_installations_requested(missing_dependency: str):
         sys.exit(0)
 
 
-def install_foundry_if_not_found():
+def install_foundry_if_not_found() -> tuple[bool, bool]:
     check_if_skip_installations_requested(missing_dependency="foundry")
 
     forge_binary_found = False
@@ -25,12 +25,19 @@ def install_foundry_if_not_found():
     except FileNotFoundError:
         pass
 
-    if not forge_binary_found:
+    forge_full_path_binary_found = False
+    try:
+        run_command(f"{os.environ.get('HOME')}/.foundry/bin/forge -V")
+        forge_full_path_binary_found = True
+    except FileNotFoundError:
+        pass
+
+    if not forge_binary_found and not forge_full_path_binary_found:
         log("info", "forge wasn't found on the system, trying to install.")
-        run_command("curl -L https://foundry.paradigm.xyz | bash", shell=True)
-        python_shell_source()
-        run_command("foundryup")
         try:
+            run_command("curl -L https://foundry.paradigm.xyz | bash", shell=True)
+            python_shell_source()
+            run_command("foundryup")
             run_command("forge -V")
             log("info", "Successfully installed forge.")
         except:
@@ -38,6 +45,7 @@ def install_foundry_if_not_found():
                 "error",
                 "Couldn't automatically install forge, please install manually and try again.",
             )
+    return forge_binary_found, forge_full_path_binary_found
 
 
 def install_hardhat_if_not_found():

@@ -127,18 +127,32 @@ def main():
         # Foundry compilation flow
         if path_type == "foundry":
             log("info", "Foundry project detected, compiling using forge.")
-            install_foundry_if_not_found()
+            _, forge_full_path_binary_found = install_foundry_if_not_found()
 
             if args.solc_remappings:
                 log("warning", "Ignoring the -r option in foundry based projects.")
 
-            run_command(f"forge clean", args.solidity_file_or_folder)
+            # Call foundry's full path if necessary, otherwise use the bins available through PATH
+            forge_clean_command = "forge clean"
+            if forge_full_path_binary_found:
+                forge_clean_command = (
+                    f"{os.environ.get('HOME')}/.foundry/bin/{forge_clean_command}"
+                )
+
+            run_command(forge_clean_command, directory=args.solidity_file_or_folder)
             forge_out_dir = settings.outputs_dir / "forge-output"
             create_or_empty_directory(forge_out_dir)
 
+            # Call foundry's full path if necessary, otherwise use the bins available through PATH
+            forge_build_command = f"forge build --force --skip {' '.join(settings.excluded_dirs)} --build-info --build-info-path {forge_out_dir}"
+            if forge_full_path_binary_found:
+                forge_build_command = (
+                    f"{os.environ.get('HOME')}/.foundry/bin/{forge_build_command}"
+                )
+
             run_command(
-                f"forge build --force --skip {' '.join(settings.excluded_dirs)} --build-info --build-info-path {forge_out_dir}",
-                args.solidity_file_or_folder,
+                forge_build_command,
+                directory=args.solidity_file_or_folder,
                 live_output=args.debug,
             )
 

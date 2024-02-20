@@ -5,13 +5,14 @@
 </p>
 
 <p align="center">
-<a href="https://github.com/forefy/eburger/releases/"><img alt="eBurger releases" title="eBurger releases" src="https://img.shields.io/github/release/forefy/eburger">
+<a href="https://github.com/forefy/eburger/releases/"><img alt="eBurger releases" title="eBurger releases" src="https://img.shields.io/github/release/forefy/eburger"></a>
 <img alt="eBurger GitHub repo size" title="eBurger GitHub repo size" src="https://img.shields.io/github/repo-size/forefy/eburger">
 <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/forefy/eburger/.github/workflows/pip-audit.yml">
 <img alt="eBurger GitHub commit activity" title="eBurger GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/forefy/eburger">
 <img alt="GitHub last commit" title="GitHub last commit" src="https://img.shields.io/github/last-commit/forefy/eburger">
-<img alt="PyPI - Downloads" title="PyPi Downloads" src="https://img.shields.io/pypi/dw/eburger">
-<a href="https://github.com/forefy/eburger/issues"><img alt="Issues" title="Issues" src="https://img.shields.io/github/issues-raw/forefy/eburger">
+<a href="https://pypi.org/project/eburger/"><img alt="PyPI - Downloads" title="PyPi Downloads" src="https://img.shields.io/pypi/dw/eburger"></a>
+<a href="https://github.com/forefy/eburger/issues/new/choose"><img alt="Issues" title="Issues" src="https://img.shields.io/github/issues-raw/forefy/eburger"></a>
+<a href="https://mybinder.org/v2/gh/forefy/eburger/main?labpath=playground.ipynb"><img alt="eBurger Jupyter Notebook Templates Playground" title="eBurger Jupyter Notebook Templates Playground" src="https://img.shields.io/badge/launch-templates_playground-blue?link=https%3A%2F%2Fimg.shields.io%2Fbadge%2Ftext&logo=jupyter"></a>
 <a href="https://discord.gg/WaVMpBtxdB"><img alt="Forefy Discord" title="Forefy Discord" src="https://img.shields.io/discord/1174395390494257152.svg?logo=discord"></a>
 <a href="https://twitter.com/forefy"><img alt="Forefy Twitter" title="Forefy Twitter" src="https://img.shields.io/twitter/follow/forefy.svg?logo=twitter"></a>
 </p>
@@ -153,7 +154,11 @@ Visit the action's page for more information.
 ## Contributing templates
 Templates can be added by creating new YAML files and either load them with `eburger -t mytemplate.yaml .` or by placing them under the `templates/` directory.
 
-If you are using eburger as a python package (installed via pip install), the templates location can be found with running `pip3 show eburger` or by running the tool on a contract and seeing the templates path printed to the console.
+If you prefer playing with eburger on the browser before installation, you can try the dedicated Jupyter notebook instance:
+
+<a href="https://mybinder.org/v2/gh/forefy/eburger/main?labpath=playground.ipynb"><img alt="eBurger Jupyter Notebook Templates Playground" title="eBurger Jupyter Notebook Templates Playground" src="https://img.shields.io/badge/launch-templates_playground-blue?link=https%3A%2F%2Fimg.shields.io%2Fbadge%2Ftext&logo=jupyter"></a>
+
+If you are using eburger as a python package (installed via pip install), the existing templates location can be found with running `pip3 show eburger` or by running the tool on a contract and seeing the templates path printed to the console.
 
 For template writing and documentation refer to the [Wiki](https://github.com/forefy/eburger/wiki/Templates).
 

@@ -1,0 +1,21 @@
+#!/bin/bash
+#
+# postBuild script for mybinder instances for users wanting to quickly test/write templates online
+# Setup an eburger jupyer notebook here: https://mybinder.org/v2/gh/forefy/eburger/main?labpath=playground.ipynb (~3 minutes to load)
+# Takes ~1 minute to load
+# Unstable, but free :) you can run playground.ipynb locally for the same results, or just run your templates with `eburger -t myfile.yaml`
+##
+
+pip install --upgrade pip
+pip install argparse solc-select pyyaml pygount prettytable
+
+export NVM_DIR="$HOME/.nvm"
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+source $NVM_DIR/nvm.sh
+nvm install --lts && nvm use --lts
+npm install -g yarn
+
+curl -L https://foundry.paradigm.xyz | bash
+source $HOME/.bashrc
+
+$HOME/.foundry/bin/foundryup

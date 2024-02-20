@@ -38,9 +38,9 @@ def test_arguments():
     )
     args.solidity_file_or_folder = foundry_contract_path
     main()
-    args.project_name = None
 
     # Reset possibly changed state that can affect other tests
+    args.project_name = None
     args.no = []
     args.solidity_file_or_folder = None
     settings.project_root = original_project_root
