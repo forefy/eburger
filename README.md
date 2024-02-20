@@ -14,7 +14,6 @@
 <a href="https://github.com/forefy/eburger/issues"><img alt="Issues" title="Issues" src="https://img.shields.io/github/issues-raw/forefy/eburger">
 <a href="https://discord.gg/WaVMpBtxdB"><img alt="Forefy Discord" title="Forefy Discord" src="https://img.shields.io/discord/1174395390494257152.svg?logo=discord"></a>
 <a href="https://twitter.com/forefy"><img alt="Forefy Twitter" title="Forefy Twitter" src="https://img.shields.io/twitter/follow/forefy.svg?logo=twitter"></a>
-<img alt="Launch on Jupyter" title="Launch on Jupyter" src="https://img.shields.io/badge/templates%20playground?logo=jupyter&label=launch&link=https%3A%2F%2Fmybinder.org%2Fv2%2Fgh%2Fforefy%2Feburger%2Fmain%3Flabpath%3Dplayground.ipynb">
 </p>
 
 <p align="center">
