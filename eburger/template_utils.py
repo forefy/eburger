@@ -27,9 +27,12 @@ def parse_code_highlight(node: dict, src_file_list: list) -> tuple[str, str, str
 
     src_location = node.get("src", "")
     file_index = int(src_location.split(":")[2])
-    project_relative_file_name = (
-        src_file_list[file_index] if file_index < len(src_file_list) else "Unknown file"
-    )
+
+    if file_index < len(src_file_list):
+        project_relative_file_name = src_file_list[file_index]
+    else:
+        project_relative_file_name = src_file_list[0]
+
     file_path = str(Path(settings.project_root / project_relative_file_name).resolve())
 
     if args.relative_file_paths:

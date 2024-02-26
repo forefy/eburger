@@ -1,0 +1,26 @@
+name: "Usage of unsafe _mint"
+severity: "Medium"
+precision: "High"
+description: "ERC721 _mint is used for token creation and updates the internal mappings of token ownership. Instead of using _mint directly, it's preferrable to use _safeMint, which is a safer extension of the _mint function, that's adding a security check meant to verify that if the recipient address is a contract - it's a contract that can handle ERC721 tokens correctly (by calling that contract's onERC721Received function)."
+impact: "Tokens can be locked in contracts that can't support them."
+action-items:
+  - "Review calls to _mint in your contract, and if there's ever a chance of the recipient address of being a contact, replace it with a _safeMint implementation."
+  - "If there isn't a possibility that the recipient will ever be a contract, you may keep using _mint to save gas costs."
+references:
+  - "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/d4d8d2ed9798cc3383912a23b5e8d5cb602f7d4b/contracts/token/ERC721/ERC721.sol#L271"
+  - "https://www.appsloveworld.com/ethereum/57/openzeppelin-erc721-difference-between-safemint-and-mint"
+reports:
+  - "https://github.com/code-423n4/2024-02-wise-lending/blob/main/bot-report.md#m-04-use-_safemint-instead-of-_mint"
+vulnerable_contracts:
+  - "../vulnerable_contracts/use_of_unsafe_mint/"
+python: |
+  results = []
+  import_nodes = get_nodes_by_types(ast_data, "ImportDirective")
+  mint_function_calls = get_nodes_by_types(ast_data, "FunctionCall")
+  erc721_imports = [node for node in import_nodes if "ERC721" in node.get("absolutePath", "")]
+
+  if erc721_imports:
+      for function_call_node in mint_function_calls:
+          if function_call_node.get("expression", {}).get("name") == "_mint":
+              file_path, lines, vuln_code = parse_code_highlight(function_call_node, src_file_list)
+              results.append({"file": file_path, "lines": lines, "code": vuln_code})
