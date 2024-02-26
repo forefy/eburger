@@ -10,6 +10,7 @@ excluded_contracts = [
     "openzeppelin-contracts",
     "@uniswap",
     "@gnosis.pm",
+    "pendle",
     "solmate",
     "solady",
     "forge-std",

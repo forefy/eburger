@@ -166,13 +166,13 @@ For template writing and documentation refer to the [Wiki](https://github.com/fo
 ## Comparison table
 Comparison of actively maintained / popular solidity smart contract static analyzers
 
-| Static Analyzer                                        | Language        | 2 Minutes to write a custom template with ChatGPT     | GitHub Action | Many findings that are already found before the contest began | Would want to eat |
-|--------------------------------------------------------|-----------------|-------------------------------------------------------|---------------|---------------------------------------------------------------|-------------------|
-| [eBurger](https://github.com/forefy/eburger)           | Python          | ✅                                                    | ✅            |                                                               | ✅                |
-| [Slither](https://github.com/crytic/slither)           | Python          |                                                       | ✅            | ✅                                                            |                   |
-| [4naly3er](https://github.com/Picodes/4naly3er)        | TypeScript 🤮   |                                                       |               | ✅                                                            |                   |
-| [Mythril](https://github.com/Consensys/mythril)        | Python          |                                                       |               |                                                               |                   |
-| [Aderyn](https://github.com/Cyfrin/aderyn)             | Rust            |                                                       |               |                                                               |                   |
+| Static Analyzer                                        | Language        | 2 Minutes to write a [custom template with ChatGPT](https://chat.openai.com/g/g-gKaBfljnY-eburger-templates-generator) | GitHub Action | Many findings that are already found before the contest began | Would want to eat |
+|--------------------------------------------------------|-----------------|------------------------------------------------------------------------------------------------------------------------|---------------|---------------------------------------------------------------|-------------------|
+| [eBurger](https://github.com/forefy/eburger)           | Python          | ✅                                                                                                                     | ✅            |                                                               | ✅                |
+| [Slither](https://github.com/crytic/slither)           | Python          |                                                                                                                        | ✅            | ✅                                                            |                   |
+| [4naly3er](https://github.com/Picodes/4naly3er)        | TypeScript 🤮   |                                                                                                                        |               | ✅                                                            |                   |
+| [Mythril](https://github.com/Consensys/mythril)        | Python          |                                                                                                                        |               |                                                               |                   |
+| [Aderyn](https://github.com/Cyfrin/aderyn)             | Rust            |                                                                                                                        |               |                                                               |                   |
 
 
 Forgot one or made a mistake? open a pull request or an issue :)
@@ -184,6 +184,7 @@ Forgot one or made a mistake? open a pull request or an issue :)
 - SARIF support & VSCode GUI integration
 - GitHub Actions integration through [eburger-action](https://github.com/marketplace/actions/eburger-action)
 - Markdown report
+- Quick custom template generation via the [eBurger Templates Generator GPT](https://chat.openai.com/g/g-gKaBfljnY-eburger-templates-generator)
 - Community and free support via [Discord](https://discord.gg/WaVMpBtxdB)
 
 
