@@ -143,8 +143,11 @@ def main():
             forge_out_dir = settings.outputs_dir / "forge-output"
             create_or_empty_directory(forge_out_dir)
 
+            foundry_excluded_dirs = " ".join(
+                [item for item in settings.excluded_dirs if item != "lib"]
+            )
             # Call foundry's full path if necessary, otherwise use the bins available through PATH
-            forge_build_command = f"forge build --force --skip {' '.join(settings.excluded_dirs)} --build-info --build-info-path {forge_out_dir}"
+            forge_build_command = f"forge build --force --skip {foundry_excluded_dirs} --build-info --build-info-path {forge_out_dir}"
             if forge_full_path_binary_found:
                 forge_build_command = (
                     f"{os.environ.get('HOME')}/.foundry/bin/{forge_build_command}"

@@ -293,7 +293,7 @@ def calculate_nsloc() -> tuple[list, list]:
         source_path_str = str(source_path)
         if any(
             substring in source_path_str.casefold()
-            for substring in settings.excluded_dirs + ["mocks", "lib", "node_modules"]
+            for substring in settings.excluded_dirs
         ):
             continue
 

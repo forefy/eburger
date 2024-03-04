@@ -11,7 +11,7 @@ from eburger.utils.cli_args import args
 
 def find_and_read_sol_file(folder_path: str) -> str:
     # Search for .sol files recursively in the given folder
-    excluded_folders = settings.excluded_dirs + ["mocks", "lib"]
+    excluded_folders = settings.excluded_dirs
     for root, dirs, files in os.walk(folder_path):
         for file in files:
             sol_file_path = os.path.join(root, file)
@@ -191,7 +191,7 @@ def move_multiple_dirs(source_dir, directories_to_move, destination_dir):
                 shutil.move(src_path, dest_path)
 
 
-def find_recursive_files_by_patterns(source_path, patterns: list) -> list:
+def find_recursive_files_by_patterns(source_path: str, patterns: list) -> list:
     file_paths = []
     for pattern in patterns:
         paths = Path(source_path).rglob(pattern)
