@@ -296,8 +296,9 @@ def calculate_nsloc() -> tuple[list, list]:
             for substring in settings.excluded_dirs
         ):
             continue
-
-        source_analysis = SourceAnalysis.from_file(source_path, "nsloc")
+        source_analysis = SourceAnalysis.from_file(
+            source_path, "nsloc", encoding="utf-8"
+        )
         project_summary.add(source_analysis)
         project_sources.append(source_analysis)
 

@@ -1,3 +1,4 @@
+version: 1.0.0
 name: "Unchecked Call Return"
 severity: "Low"
 precision: "Low"

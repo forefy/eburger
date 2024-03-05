@@ -1,3 +1,4 @@
+version: 1.0.0
 name: "tx.origin Used for Access Control"
 severity: "Low"
 precision: "Medium"

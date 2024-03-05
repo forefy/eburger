@@ -123,6 +123,8 @@ def get_nodes_by_types(
 
     :param node: The node or AST to search.
     :param node_types: The type(s) of nodes to find.
+    :param filter_key: A JSON key to find and filter by.
+    :param filter_value: filter_key value to search.
     :return: A list of nodes of the specified types.
     """
 
@@ -132,9 +134,7 @@ def get_nodes_by_types(
     def search_nodes(current_node, result):
         if isinstance(current_node, dict):
             if current_node.get("nodeType") in node_types:
-                # Apply filter if filter_key and filter_value are provided
-                if filter_key is None or current_node.get(filter_key) == filter_value:
-                    result.append(current_node)
+                result.append(current_node)
             for value in current_node.values():
                 if isinstance(value, (dict, list)):
                     search_nodes(value, result)
@@ -144,6 +144,15 @@ def get_nodes_by_types(
 
     results = []
     search_nodes(node, results)
+
+    # Only after results were colelcted, apply filter if filter_key and filter_value are provided
+    if filter_key is not None:
+        results_filtered = []
+        for result in results:
+            if filter_key is None or result.get(filter_key) == filter_value:
+                results_filtered.append(result)
+        results = results_filtered
+
     return results
 
 
@@ -225,3 +234,49 @@ def find_node_ids_first_parent_of_type(
         return None
 
     return search_node(ast, node_id)
+
+
+def function_def_has_following_check_statements(
+    function_def: dict, id_key: str
+) -> bool:
+    """
+    Verifies if there are nodes after the given node_id that do some sort of validations.
+
+    :param function_def: FunctionDefinition node to analyze
+    :param id_key: String representing the JSON key to search the node within the statements as.
+    :return: A boolean indicating if a check was found or not.
+    """
+    if function_def.get("nodeType") != "FunctionDefinition":
+        return False
+
+    statements = function_def.get("body", {}).get("statements", [])
+    check_started = False
+
+    for statement in statements:
+        # If we have already started checking and found a validation, return True
+        if check_started:
+            # Flatten expression statements to their core components
+            if statement.get("nodeType") == "ExpressionStatement":
+                statement = statement.get("expression")
+
+            # Check for require statements
+            require_stmts = get_nodes_by_types(
+                statement, "Identifier", filter_key="name", filter_value="require"
+            )
+            if require_stmts:
+                return True
+
+            # Check for direct reverts
+            revert_stmts = get_nodes_by_types(
+                statement, "Identifier", filter_key="name", filter_value="revert"
+            )
+
+            if revert_stmts:
+                return True
+
+        # If we find the target node, start the check
+        if statement.get(id_key) == function_def.get(id_key):
+            check_started = True
+
+    # If we go through all statements following the target node without finding a validation, return False
+    return False

@@ -1,0 +1,25 @@
+version: 1.0.4
+name: "Unchecked Chainlink Oracle Price"
+severity: "Medium"
+precision: "Medium"
+description: "Chainlink aggregators return incorrect prices if the asset's price drops below the minAnswer, potentially causing protocols to value tokens incorrectly and leading to exploitation or loss of funds."
+impact: "Incorrect pricing due to Chainlink's minAnswer circuit breaker can lead to major financial loss, allowing users to exploit protocols by trading assets at incorrect valuations."
+action-items:
+    - "Implement checks to ensure the price received from Chainlink oracles is within expected bounds."
+references:
+    - "https://docs.chain.link/data-feeds#check-the-latest-answer-against-reasonable-limits"
+    - "https://rekt.news/venus-blizz-rekt"
+reports:
+    - "https://github.com/code-423n4/2024-02-wise-lending/blob/main/bot-report.md#m-01"
+vulnerable_contracts:
+    - "../vulnerable_contracts/unchecked_chainlink_oracle_price/"
+python: |
+    results = []
+    for function_def in get_nodes_by_types(ast_data, "FunctionDefinition"):
+        for member_access_node in get_nodes_by_types(function_def, "MemberAccess"):
+            if member_access_node.get("typeDescriptions", {}).get("typeString") != "function () view external returns (uint80,int256,uint256,uint256,uint80)":
+                continue
+                
+            if not function_def_has_following_check_statements(function_def, id_key="memberName"):
+                file_path, lines, vuln_code = parse_code_highlight(function_def, src_file_list)
+                results.append({"file": file_path, "lines": lines, "code": vuln_code})

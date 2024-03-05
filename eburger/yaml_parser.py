@@ -1,8 +1,9 @@
 import traceback
 import yaml
 import concurrent.futures
-from eburger import settings
+from pkg_resources import parse_version, get_distribution
 
+from eburger import settings
 from eburger.template_utils import *
 from eburger.utils.logger import color, log
 from eburger.utils.cli_args import args
@@ -34,10 +35,21 @@ def execute_python_code(
 def process_yaml(file_path, ast_data, src_file_list):
     with open(file_path, "r") as file:
         yaml_data = yaml.safe_load(file)
+    template_compatibility_version = yaml_data.get("version", "1.0.0")
+    if parse_version(get_distribution("eburger").version) < parse_version(
+        template_compatibility_version
+    ):
+        template_name = yaml_data.get("name")
+        log(
+            "warning",
+            f"Skipping template '{template_name}' due to version compatibility. Upgrade eburger to version {template_compatibility_version} to utilize new templates.",
+        )
+        results = []
+    else:
+        results = execute_python_code(
+            yaml_data["name"], yaml_data["python"], ast_data, src_file_list
+        )
 
-    results = execute_python_code(
-        yaml_data["name"], yaml_data["python"], ast_data, src_file_list
-    )
     return {
         "name": yaml_data.get("name"),
         "severity": yaml_data.get("severity"),
@@ -62,7 +74,6 @@ def process_files_concurrently(ast_data: dict, src_file_list: list) -> list:
                 yaml_files.append(templates_directory)
         else:
             log("error", "Invalid templates directory or file.")
-
     log(
         "info",
         f"Loaded {color.Success}{len(yaml_files)}{color.Default} templates for execution.",

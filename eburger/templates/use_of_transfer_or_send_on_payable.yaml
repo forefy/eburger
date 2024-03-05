@@ -1,3 +1,4 @@
+version: 1.0.0
 name: "Use of transfer or send on a payable address"
 severity: "Medium"
 precision: "Medium"

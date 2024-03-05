@@ -158,10 +158,8 @@ def main():
                 directory=args.solidity_file_or_folder,
                 live_output=args.debug,
             )
-
             sample_file_path = find_and_read_sol_file(args.solidity_file_or_folder)
             filename, output_filename = get_filename_from_path(sample_file_path)
-
             ast_json = get_foundry_ast_json(forge_out_dir)
             ast_json, src_file_list = reduce_json(ast_json)
             save_as_json(output_filename, ast_json)
@@ -280,13 +278,11 @@ def main():
     if insights:
         analysis_output = {}
         analysis_output["insights"] = insights
-
         _, summary = calculate_nsloc()
         analysis_output["nsloc"] = summary
 
         insights_json_path = settings.outputs_dir / f"eburger_output_{filename}.json"
         save_as_json(insights_json_path, analysis_output)
-
         if roughly_check_valid_file_path_name(args.output):
             custom_output_path = Path(args.output)
             file_extension = custom_output_path.suffix[1:]

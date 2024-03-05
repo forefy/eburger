@@ -1,3 +1,4 @@
+version: 1.0.0
 name: "Missing Zero Address Check"
 severity: "Low"
 precision: "Medium"
