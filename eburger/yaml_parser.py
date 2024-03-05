@@ -1,7 +1,8 @@
 import traceback
 import yaml
 import concurrent.futures
-from pkg_resources import parse_version, get_distribution
+from importlib.metadata import version
+from packaging.version import parse as parse_version
 
 from eburger import settings
 from eburger.template_utils import *
@@ -35,8 +36,10 @@ def execute_python_code(
 def process_yaml(file_path, ast_data, src_file_list):
     with open(file_path, "r") as file:
         yaml_data = yaml.safe_load(file)
+
     template_compatibility_version = yaml_data.get("version", "1.0.0")
-    eburger_version = parse_version(get_distribution("eburger").version)
+    eburger_version = parse_version(version("eburger"))
+
     if eburger_version < parse_version(template_compatibility_version):
         template_name = yaml_data.get("name")
         log(

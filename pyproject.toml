@@ -15,6 +15,7 @@ argparse = "^1.4.0"
 pyyaml = "^6.0.1"
 pygount = "^1.6.1"
 prettytable = "^3.9.0"
+packaging = "^23.2"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.11.0"

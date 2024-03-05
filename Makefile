@@ -7,7 +7,7 @@ install:
 install-local:
 	$(MAKE) uninstall-local
 	poetry build
-	poetry run pip install -y eburger
+	poetry run pip install eburger
 
 .PHONY: pytest
 pytest:
