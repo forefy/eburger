@@ -36,13 +36,12 @@ def process_yaml(file_path, ast_data, src_file_list):
     with open(file_path, "r") as file:
         yaml_data = yaml.safe_load(file)
     template_compatibility_version = yaml_data.get("version", "1.0.0")
-    if parse_version(get_distribution("eburger").version) < parse_version(
-        template_compatibility_version
-    ):
+    eburger_version = parse_version(get_distribution("eburger").version)
+    if eburger_version < parse_version(template_compatibility_version):
         template_name = yaml_data.get("name")
         log(
             "warning",
-            f"Skipping template '{template_name}' due to version compatibility. Upgrade eburger to version {template_compatibility_version} to utilize new templates.",
+            f"Skipping template '{template_name}' due to version compatibility. Template version: {template_compatibility_version}, eburger version: {eburger_version}",
         )
         results = []
     else:

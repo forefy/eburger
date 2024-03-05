@@ -582,10 +582,10 @@ def vulnerable_ast() -> tuple[dict, list]:
                 "license": "MIT"
             }
         },
-        "src/LatestBadContract.sol": {
+        "vulnerable_contracts/unchecked_chainlink_oracle_price/src/unchecked_chainlink_oracle_price.sol": {
             "id": 1,
             "ast": {
-                "absolutePath": "src/LatestBadContract.sol",
+                "absolutePath": "vulnerable_contracts/unchecked_chainlink_oracle_price/src/unchecked_chainlink_oracle_price.sol",
                 "id": 110,
                 "exportedSymbols": {
                     "AggregatorV3Interface": [
@@ -1403,5 +1403,4 @@ def test_unchecked_chainlink_oracle_price(vulnerable_ast):
         ast_json,
         src_file_list,
     )
-    
     assert "Line 22 Columns 5-34" in results["results"][0]["lines"]
