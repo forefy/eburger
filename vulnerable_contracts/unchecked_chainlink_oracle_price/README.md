@@ -4,15 +4,18 @@ An intentionally vulnerable Foundry project.
 ```bash
 tree
 .
-├── foundry.toml                            # Contract's root
+├── foundry.toml                                    # Contract's root
 ├── src/                                    
 │   └── unchecked_chainlink_oracle_price.sol        # Vulnerable contract
 ```
 ## Usage
 
-### Build
+### Install dependencies
+```bash
+forge install smartcontractkit/chainlink --no-commit
+```
 
-Download chainlink dependencies to build.
+### Build
 
 ```bash
 forge build
