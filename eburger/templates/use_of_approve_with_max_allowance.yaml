@@ -1,0 +1,35 @@
+name: "Use of approve with Max Allowance"
+severity: "Low"
+precision: "High"
+description: "Setting ERC-20 token approval to type(uint256).max could lead to issues with tokens that have extended transferFrom functionality or integrated fees."
+impact: "Unexpected token behavior when using maximum allowances."
+action-items:
+    - "Only approve the amount of tokens that is required for the intended transactions."
+references:
+    - "https://eips.ethereum.org/EIPS/eip-20"
+reports:
+  - "https://github.com/code-423n4/2024-02-uniswap-foundation/blob/main/bot-report.md#l-04-approve-typeuint256max-may-not-work-with-some-tokens"
+vulnerable_contracts: 
+  - ""
+python: |
+    results = []
+    function_calls = get_nodes_by_types(ast_data, ["FunctionCall"])
+    for function_call in function_calls:
+        # look for heuristics of an ERC20 approve call
+        function_call_args = function_call.get("arguments")
+        if len(function_call_args) != 2:
+          continue
+        
+        if function_call.get("expression", {}).get("typeDescriptions", {}).get("typeString", "") != "function (address,uint256) external returns (bool)":
+          continue
+        
+        # look for a .max member access on the second function argument
+        second_arg = function_call_args[1]
+        if second_arg.get("memberName") != "max":
+          continue
+        if second_arg.get("nodeType") != "MemberAccess":
+          continue
+
+        # if we got here, its vulnerable
+        file_path, lines, vuln_code = parse_code_highlight(function_call, src_file_list)
+        results.append({"file": file_path, "lines": lines, "code": vuln_code})
