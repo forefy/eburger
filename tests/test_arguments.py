@@ -23,7 +23,7 @@ def test_arguments():
     main()
 
     # Markdown + custom file output path
-    args.output = "../eburger-output.md"
+    args.output = "../eburger/eburger-output.md"
     main()
 
     # Single traversed file

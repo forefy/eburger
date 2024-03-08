@@ -24,8 +24,14 @@ def execute_python_code(
         exec(compiled_code, globals(), local_vars)
 
         parsed_results = []
-        for node in local_vars["results"]:
-            file_path, lines, vuln_code = parse_code_highlight(node, src_paths)
+        for result in local_vars["results"]:
+            if result.get("nodeType", None) is None:
+                log(
+                    "warning",
+                    f"An unsupported result structure was sent in the template '{template_name}', skipping.",
+                )
+
+            file_path, lines, vuln_code = parse_code_highlight(result, src_paths)
             parsed_results.append(
                 {"file": file_path, "lines": lines, "code": vuln_code}
             )

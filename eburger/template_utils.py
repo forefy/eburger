@@ -1,3 +1,4 @@
+import copy
 import re
 from typing import Union
 
@@ -211,3 +212,12 @@ def function_def_has_following_check_statements(
 
     # If we go through all statements following the target node without finding a validation, return False
     return False
+
+
+def deep_clone_node(node: dict):
+    """
+    Deep clone an AST node for template level manipulations.
+
+    :param node: AST Node to clone.
+    """
+    return copy.deepcopy(node)

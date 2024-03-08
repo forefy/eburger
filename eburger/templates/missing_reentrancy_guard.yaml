@@ -1,4 +1,4 @@
-version: 1.0.5
+version: 1.0.6
 name: "Missing Reentracy Guard"
 severity: "Low"
 precision: "Low"
@@ -35,10 +35,11 @@ python: |
             function_node_body = function_node.get("body", {})
 
             # Ignore .call usage within the first entries of the function (where reentrancy doesn't affect anything)
-            if function_node_body.get("statements"):
-                function_node_body["statements"] = function_node_body["statements"][1:]
+            function_node_body_clone = deep_clone_node(function_node_body)
+            if function_node_body_clone.get("statements"):
+                function_node_body_clone["statements"] = function_node_body["statements"][1:]
 
-            call_nodes = get_nodes_by_signature(function_node_body, "function (bytes memory) payable returns (bool,bytes memory)")
+            call_nodes = get_nodes_by_signature(function_node_body_clone, "function (bytes memory) payable returns (bool,bytes memory)")
 
             if call_nodes:
                 results.append(function_node)
