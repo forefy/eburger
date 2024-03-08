@@ -1,15 +1,17 @@
-from datetime import datetime
 import json
 import os
-from pathlib import Path
 import re
 import shlex
 import subprocess
-from eburger import settings
+from datetime import datetime
+from importlib.metadata import version
+from pathlib import Path
 
+from eburger import settings
 from eburger.utils.cli_args import args
 from eburger.utils.filesystem import get_all_solidity_files
 from eburger.utils.logger import log
+from packaging.version import parse as parse_version
 
 
 def is_valid_json(json_string: str) -> bool:
@@ -149,3 +151,73 @@ def python_shell_source(execute_source: bool = True) -> tuple[str, str]:
         os.environ.update(env_dict)
 
     return source_syntax, and_sign
+
+
+def get_eburger_version() -> str:
+    return parse_version(version("eburger"))
+
+
+def parse_code_highlight(node: dict, src_paths: list) -> tuple[str, str, str]:
+    """
+    Extracts and highlights a specific code snippet from a source file based on a given AST node.
+
+    Parameters:
+    - node (dict): The AST node containing the 'src' attribute with location details.
+    - src_paths (list): A list of source files associated with the AST.
+
+    Returns:
+    - Tuple (str, str, str): A tuple containing:
+      1. The file path of the source file where the code snippet is located.
+      2. A string representation of the line and column range in the file for the code snippet.
+      3. The extracted code snippet itself.
+
+    The 'src' attribute in the node is expected to be in the format 'start_offset:length:file_index'.
+    The function calculates the exact location of the code in the file and extracts it along with its
+    line and column position. If the location exceeds the content of the file or is not found, appropriate
+    messages and null values are returned.
+    """
+
+    src_location = node.get("src", "")
+    file_index = int(src_location.split(":")[2])
+
+    if file_index < len(src_paths):
+        project_relative_file_name = src_paths[file_index]
+    else:
+        project_relative_file_name = src_paths[0]
+
+    file_path = str(Path(settings.project_root / project_relative_file_name).resolve())
+
+    if args.relative_file_paths:
+        result_file_path_uri = project_relative_file_name
+    else:
+        result_file_path_uri = file_path
+
+    start_offset, length, _ = map(int, src_location.split(":"))
+
+    file_content = None
+    with open(file_path, "r") as file:
+        file_content = file.read()
+
+    if file_content is None:
+        return "File unreadable.", None, None
+
+    if start_offset + length > len(file_content):
+        return "The start offset and length exceed the file content.", None, None
+
+    vulnerable_code = file_content[start_offset : start_offset + length]
+    # Find the line number and character positions
+    current_offset = 0
+    line_number = 1
+    for line in file_content.split("\n"):
+        end_offset = current_offset + len(line)
+        if current_offset <= start_offset < end_offset:
+            start_char = start_offset - current_offset
+            end_char = min(start_char + length, len(line))
+            return (
+                result_file_path_uri,
+                f"Line {line_number} Columns {start_char + 1}-{end_char + 1}",
+                vulnerable_code,
+            )
+        current_offset = end_offset + 1  # +1 for the newline character
+        line_number += 1
+    return "Location not found in file.", None, None

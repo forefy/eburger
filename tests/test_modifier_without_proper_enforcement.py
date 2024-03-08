@@ -448,10 +448,10 @@ def vulnerable_ast() -> tuple[dict, list]:
 
 
 def test_modifier_without_proper_enforcement(vulnerable_ast):
-    ast_json, src_file_list = reduce_json(vulnerable_ast)
+    ast_json, src_paths = reduce_json(vulnerable_ast)
     results = process_yaml(
         "eburger/templates/modifier_without_proper_enforcement.yaml",
         ast_json,
-        src_file_list,
+        src_paths,
     )
     assert "Line 8 Columns 5-27" in results["results"][0]["lines"]

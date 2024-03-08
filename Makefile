@@ -3,11 +3,11 @@ install:
 	$(MAKE) uninstall
 	pip3 install .
 
-.PHONY: install-local
-install-local:
-	$(MAKE) uninstall-local
+.PHONY: install-poetry
+install-poetry:
+	$(MAKE) uninstall-poetry
 	poetry build
-	poetry run pip install eburger
+	poetry run pip install .
 
 .PHONY: pytest
 pytest:
@@ -17,6 +17,6 @@ pytest:
 uninstall:
 	pip3 uninstall -y eburger
 
-.PHONY: uninstall-local
-uninstall-local:
+.PHONY: uninstall-poetry
+uninstall-poetry:
 	poetry run pip uninstall -y eburger

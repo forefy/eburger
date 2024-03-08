@@ -1,28 +1,36 @@
-import traceback
-import yaml
 import concurrent.futures
-from importlib.metadata import version
+import traceback
+
+import yaml
 from packaging.version import parse as parse_version
 
 from eburger import settings
 from eburger.template_utils import *
-from eburger.utils.logger import color, log
 from eburger.utils.cli_args import args
+from eburger.utils.helpers import get_eburger_version, parse_code_highlight
+from eburger.utils.logger import color, log
 
 
 def execute_python_code(
-    template_name: str, python_code: str, ast_data: dict, src_file_list: list
+    template_name: str, python_code: str, ast_data: dict, src_paths: list
 ) -> list:
     local_vars = {
         "ast_data": ast_data,
-        "src_file_list": src_file_list,
         "project_root": settings.project_root,
     }
 
     try:
         compiled_code = compile(python_code, "<string>", "exec")
         exec(compiled_code, globals(), local_vars)
-        return local_vars["results"]
+
+        parsed_results = []
+        for node in local_vars["results"]:
+            file_path, lines, vuln_code = parse_code_highlight(node, src_paths)
+            parsed_results.append(
+                {"file": file_path, "lines": lines, "code": vuln_code}
+            )
+        return parsed_results
+
     except Exception as e:
         line = f"Error occurred during execution: {str(e)}"
         try:
@@ -33,12 +41,12 @@ def execute_python_code(
 
 
 # Function to process a single YAML file
-def process_yaml(file_path, ast_data, src_file_list):
+def process_yaml(file_path, ast_data, src_paths):
     with open(file_path, "r") as file:
         yaml_data = yaml.safe_load(file)
 
     template_compatibility_version = yaml_data.get("version", "1.0.0")
-    eburger_version = parse_version(version("eburger"))
+    eburger_version = get_eburger_version()
 
     if eburger_version < parse_version(template_compatibility_version):
         template_name = yaml_data.get("name")
@@ -49,7 +57,7 @@ def process_yaml(file_path, ast_data, src_file_list):
         results = []
     else:
         results = execute_python_code(
-            yaml_data["name"], yaml_data["python"], ast_data, src_file_list
+            yaml_data["name"], yaml_data["python"], ast_data, src_paths
         )
 
     return {
@@ -64,7 +72,7 @@ def process_yaml(file_path, ast_data, src_file_list):
     }
 
 
-def process_files_concurrently(ast_data: dict, src_file_list: list) -> list:
+def process_files_concurrently(ast_data: dict, src_paths: list) -> list:
     yaml_files = []
     for templates_directory in settings.templates_directories:
         if templates_directory.is_dir():
@@ -83,7 +91,7 @@ def process_files_concurrently(ast_data: dict, src_file_list: list) -> list:
     insights = []
     with concurrent.futures.ThreadPoolExecutor() as executor:
         futures = [
-            executor.submit(process_yaml, str(file_path), ast_data, src_file_list)
+            executor.submit(process_yaml, str(file_path), ast_data, src_paths)
             for file_path in yaml_files
         ]
         for future in concurrent.futures.as_completed(futures):

@@ -1,4 +1,4 @@
-version: 1.0.0
+version: 1.0.5
 name: "Use of transfer or send on a payable address"
 severity: "Medium"
 precision: "Medium"
@@ -26,5 +26,4 @@ python: |
 
             # Ensure the call is on a payable address
             if function_call_expr_node.get("expression", {}).get("typeDescriptions", {}).get("typeString") == "address payable":
-                file_path, lines, vuln_code = parse_code_highlight(function_call_node, src_file_list)
-                results.append({"file": file_path, "lines": lines, "code": vuln_code})
+                results.append(function_call_node)

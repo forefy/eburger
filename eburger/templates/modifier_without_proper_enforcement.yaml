@@ -1,4 +1,4 @@
-version: 1.0.0
+version: 1.0.5
 name: "Modifier Without Proper Enforcement"
 severity: "High"
 precision: "Low"
@@ -42,5 +42,4 @@ python: |
                     break
                             
             if not enforcement_found:
-                file_path, lines, vuln_code = parse_code_highlight(mod_node, src_file_list)
-                results.append({"file": file_path, "lines": lines, "code": vuln_code})
+                results.append(mod_node)

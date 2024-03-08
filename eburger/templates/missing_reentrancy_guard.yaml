@@ -1,4 +1,4 @@
-version: 1.0.0
+version: 1.0.5
 name: "Missing Reentracy Guard"
 severity: "Low"
 precision: "Low"
@@ -41,5 +41,4 @@ python: |
             call_nodes = get_nodes_by_signature(function_node_body, "function (bytes memory) payable returns (bool,bytes memory)")
 
             if call_nodes:
-                file_path, lines, vuln_code = parse_code_highlight(function_node, src_file_list)
-                results.append({"file": file_path, "lines": lines, "code": vuln_code})
+                results.append(function_node)

@@ -1140,10 +1140,10 @@ def vulnerable_ast() -> tuple[dict, list]:
 
 
 def test_emit_after_external_call(vulnerable_ast):
-    ast_json, src_file_list = reduce_json(vulnerable_ast)
+    ast_json, src_paths = reduce_json(vulnerable_ast)
     results = process_yaml(
         "eburger/templates/emit_after_external_call.yaml",
         ast_json,
-        src_file_list,
+        src_paths,
     )
     assert "Line 40 Columns 9-40" in results["results"][0]["lines"]

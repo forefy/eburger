@@ -370,10 +370,10 @@ def vulnerable_ast() -> tuple[dict, list]:
 
 
 def test_use_of_unsafe_mint(vulnerable_ast):
-    ast_json, src_file_list = reduce_json(vulnerable_ast)
+    ast_json, src_paths = reduce_json(vulnerable_ast)
     results = process_yaml(
         "eburger/templates/use_of_unsafe_mint.yaml",
         ast_json,
-        src_file_list,
+        src_paths,
     )
     assert "Line 9 Columns 9-27" in results["results"][0]["lines"]

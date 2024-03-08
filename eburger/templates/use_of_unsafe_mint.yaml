@@ -1,4 +1,4 @@
-version: 1.0.0
+version: 1.0.5
 name: "Usage of unsafe _mint"
 severity: "Medium"
 precision: "High"
@@ -23,5 +23,4 @@ python: |
   if erc721_imports:
       for function_call_node in mint_function_calls:
           if function_call_node.get("expression", {}).get("name") == "_mint":
-              file_path, lines, vuln_code = parse_code_highlight(function_call_node, src_file_list)
-              results.append({"file": file_path, "lines": lines, "code": vuln_code})
+              results.append(function_call_node)

@@ -549,10 +549,10 @@ def vulnerable_ast() -> tuple[dict, list]:
 
 
 def test_use_of_transfer_or_send_on_payable(vulnerable_ast):
-    ast_json, src_file_list = reduce_json(vulnerable_ast)
+    ast_json, src_paths = reduce_json(vulnerable_ast)
     results = process_yaml(
         "eburger/templates/use_of_transfer_or_send_on_payable.yaml",
         ast_json,
-        src_file_list,
+        src_paths,
     )
     assert "Line 7 Columns 9-35" in results["results"][0]["lines"]

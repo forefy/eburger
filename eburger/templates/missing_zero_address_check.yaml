@@ -1,4 +1,4 @@
-version: 1.0.0
+version: 1.0.5
 name: "Missing Zero Address Check"
 severity: "Low"
 precision: "Medium"
@@ -55,5 +55,4 @@ python: |
                         break
 
                 if not zero_address_check_found:
-                    file_path, lines, vuln_code = parse_code_highlight(address_node, src_file_list)
-                    results.append({"file": file_path, "lines": lines, "code": vuln_code})
+                    results.append(address_node)

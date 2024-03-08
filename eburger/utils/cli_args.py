@@ -100,6 +100,14 @@ parser.add_argument(
     help="Output file paths in relative format rather than full paths",
 )
 
+parser.add_argument(
+    "-v",
+    "--version",
+    dest="version",
+    action="store_true",
+    help="Print current eburger version",
+)
+
 # Only here to allow "." as an argument, ignored in the rest of the code.
 parser.add_argument(
     "default_solidity_file_or_folder",

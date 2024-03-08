@@ -630,10 +630,10 @@ def vulnerable_ast() -> tuple[dict, list]:
 
 
 def test_unchecked_call_return(vulnerable_ast):
-    ast_json, src_file_list = reduce_json(vulnerable_ast)
+    ast_json, src_paths = reduce_json(vulnerable_ast)
     results = process_yaml(
         "eburger/templates/unchecked_call_return.yaml",
         ast_json,
-        src_file_list,
+        src_paths,
     )
     assert "Line 14 Columns 9-37" in results["results"][0]["lines"]

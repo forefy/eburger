@@ -1,4 +1,4 @@
-version: 1.0.0
+version: 1.0.5
 name: "Unbounded Loop"
 severity: "Low"
 precision: "Low"
@@ -47,5 +47,4 @@ python: |
                     is_state_variable = True
                     break
             if is_state_variable:
-                file_path, lines, vuln_code = parse_code_highlight(loop, src_file_list)
-                results.append({"file": file_path, "lines": lines, "code": vuln_code})
+                results.append(loop)

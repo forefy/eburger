@@ -567,10 +567,10 @@ def vulnerable_ast() -> tuple[dict, list]:
 
 
 def test_unbounded_loop(vulnerable_ast):
-    ast_json, src_file_list = reduce_json(vulnerable_ast)
+    ast_json, src_paths = reduce_json(vulnerable_ast)
     results = process_yaml(
         "eburger/templates/unbounded_loop.yaml",
         ast_json,
-        src_file_list,
+        src_paths,
     )
     assert "Line 15 Columns 9-58" in results["results"][0]["lines"]

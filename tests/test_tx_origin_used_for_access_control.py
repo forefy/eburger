@@ -554,10 +554,10 @@ def vulnerable_ast() -> tuple[dict, list]:
 
 
 def test_tx_origin_used_for_access_control(vulnerable_ast):
-    ast_json, src_file_list = reduce_json(vulnerable_ast)
+    ast_json, src_paths = reduce_json(vulnerable_ast)
     results = process_yaml(
         "eburger/templates/tx_origin_used_for_access_control.yaml",
         ast_json,
-        src_file_list,
+        src_paths,
     )
     assert "Line 11 Columns 9-63" in results["results"][0]["lines"]

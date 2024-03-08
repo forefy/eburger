@@ -21,7 +21,7 @@ def reduce_json(ast_json: dict) -> tuple:
             return list(ast_data["sources"].keys())
         return []
 
-    original_file_list = extract_file_list_from_ast(ast_json)
+    src_paths = extract_file_list_from_ast(ast_json)
 
     # Function to remove keys in-place from a dictionary
     def remove_keys_in_place(dictionary):
@@ -38,4 +38,4 @@ def reduce_json(ast_json: dict) -> tuple:
         if section in ast_json:
             remove_keys_in_place(ast_json[section])
 
-    return ast_json, original_file_list
+    return ast_json, src_paths

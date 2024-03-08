@@ -196,10 +196,10 @@ def vulnerable_ast() -> tuple[dict, list]:
 
 
 def test_missing_zero_address_check(vulnerable_ast):
-    ast_json, src_file_list = reduce_json(vulnerable_ast)
+    ast_json, src_paths = reduce_json(vulnerable_ast)
     results = process_yaml(
         "eburger/templates/missing_zero_address_check.yaml",
         ast_json,
-        src_file_list,
+        src_paths,
     )
     assert "Line 6 Columns 27-45" in results["results"][0]["lines"]

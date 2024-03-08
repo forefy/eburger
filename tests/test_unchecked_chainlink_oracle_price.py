@@ -1397,10 +1397,10 @@ def vulnerable_ast() -> tuple[dict, list]:
 
 
 def test_unchecked_chainlink_oracle_price(vulnerable_ast):
-    ast_json, src_file_list = reduce_json(vulnerable_ast)
+    ast_json, src_paths = reduce_json(vulnerable_ast)
     results = process_yaml(
         "eburger/templates/unchecked_chainlink_oracle_price.yaml",
         ast_json,
-        src_file_list,
+        src_paths,
     )
-    assert "Line 22 Columns 5-34" in results["results"][0]["lines"]
+    assert "Line 39 Columns 13-38" in results["results"][0]["lines"]

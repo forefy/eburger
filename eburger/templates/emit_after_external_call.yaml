@@ -1,4 +1,4 @@
-version: 1.0.0
+version: 1.0.5
 name: "Emit After External Call"
 severity: "Low"
 precision: "Medium"
@@ -58,7 +58,7 @@ python: |
               if emitted_event_vars and function_call_found:
                 for emitted_event_var in emitted_event_vars:
                   if emitted_event_var in mutable_state_variables:
-                    file_path, lines, vuln_code = parse_code_highlight(stmt, src_file_list)
-                    results.append({"file": file_path, "lines": lines, "code": vuln_code})
+                    results.append(stmt)
+
               # reset preceding function call check
               function_call_found = False

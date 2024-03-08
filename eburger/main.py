@@ -17,6 +17,7 @@ from eburger.utils.filesystem import (
 )
 from eburger.utils.helpers import (
     construct_solc_cmdline,
+    get_eburger_version,
     get_filename_from_path,
     is_valid_json,
     run_command,
@@ -41,6 +42,10 @@ from eburger.yaml_parser import process_files_concurrently
 
 
 def main():
+    if args.version:
+        print(get_eburger_version())
+        sys.exit(0)
+
     if not args.solidity_file_or_folder and not args.ast_json_file:
         args.solidity_file_or_folder = "."
 
@@ -114,7 +119,7 @@ def main():
         )  # Protection against analysis of files inside the output path
         with open(args.ast_json_file, "r") as f:
             ast_json = json.load(f)
-            ast_json, src_file_list = reduce_json(ast_json)
+            ast_json, src_paths = reduce_json(ast_json)
         output_path = settings.outputs_dir / f"{filename}.json"
 
         save_as_json(output_path, ast_json)
@@ -161,7 +166,7 @@ def main():
             sample_file_path = find_and_read_sol_file(args.solidity_file_or_folder)
             filename, output_filename = get_filename_from_path(sample_file_path)
             ast_json = get_foundry_ast_json(forge_out_dir)
-            ast_json, src_file_list = reduce_json(ast_json)
+            ast_json, src_paths = reduce_json(ast_json)
             save_as_json(output_filename, ast_json)
 
         # Hardhat compilation flow
@@ -211,7 +216,7 @@ def main():
             filename, output_filename = get_filename_from_path(sample_file_path)
 
             ast_json = get_hardhat_ast_json(hardhat_out_dir)
-            ast_json, src_file_list = reduce_json(ast_json)
+            ast_json, src_paths = reduce_json(ast_json)
             save_as_json(output_filename, ast_json)
 
         # solc compilation flow
@@ -243,7 +248,7 @@ def main():
             if solc_cmdline is None:
                 log("error", "Error constructing solc command line")
 
-            solc_compile_res, _ = run_command(solc_cmdline, live_output=True)
+            solc_compile_res, _ = run_command(solc_cmdline, live_output=args.debug)
 
             # We continue as long as solc compiled something
             if not is_valid_json(solc_compile_res):
@@ -260,7 +265,7 @@ def main():
                     error_string,
                 )
             solc_compile_res_parsed = json.loads("".join(solc_compile_res))
-            ast_json, src_file_list = reduce_json(solc_compile_res_parsed)
+            ast_json, src_paths = reduce_json(solc_compile_res_parsed)
             save_as_json(output_filename, solc_compile_res_parsed)
 
     # Parse AST
@@ -273,7 +278,7 @@ def main():
             settings.templates_directories.append(Path(template_path))
             log("info", f"Templates path: {Path(template_path)}")
 
-    insights = process_files_concurrently(ast_roots, src_file_list)
+    insights = process_files_concurrently(ast_roots, src_paths)
 
     if insights:
         analysis_output = {}

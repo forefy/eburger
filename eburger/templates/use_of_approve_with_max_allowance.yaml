@@ -1,3 +1,4 @@
+version: 1.0.5
 name: "Use of approve with Max Allowance"
 severity: "Low"
 precision: "High"
@@ -31,5 +32,4 @@ python: |
           continue
 
         # if we got here, its vulnerable
-        file_path, lines, vuln_code = parse_code_highlight(function_call, src_file_list)
-        results.append({"file": file_path, "lines": lines, "code": vuln_code})
+        results.append(function_call)
