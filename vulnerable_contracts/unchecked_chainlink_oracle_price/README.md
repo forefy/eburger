@@ -12,7 +12,7 @@ tree
 
 ### Install dependencies
 ```bash
-forge install smartcontractkit/chainlink-brownie-contracts --no-git
+forge install smartcontractkit/chainlink-brownie-contracts@0.6.1 --no-git
 ```
 
 ### Build
