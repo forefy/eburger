@@ -55,7 +55,7 @@ def compile_solc(path_type: str) -> tuple[Path, dict, str, list, dict]:
     if solc_cmdline is None:
         log("error", "Error constructing solc command line", sorry=True)
 
-    solc_compile_res, _ = run_command(solc_cmdline, live_output=args.debug)
+    solc_compile_res, _ = run_command(solc_cmdline, live_output=True)
 
     # We continue as long as solc compiled something
     if not is_valid_json(solc_compile_res):
