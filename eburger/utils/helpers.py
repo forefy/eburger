@@ -54,6 +54,8 @@ def run_command(
             if live_output:
                 if args.debug:
                     log("debug", output_stripped)
+                else:
+                    log("info", output_stripped)
             results.append(output_stripped)
 
         if error:
