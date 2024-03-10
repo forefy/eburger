@@ -78,7 +78,7 @@ def save_as_markdown(output_file_path: Path, json_data: dict):
                     )  # Indent for better readability
                     details_md += f"\t```\n\t{code_snippet}\n\t```\n"
             except ValueError as e:
-                log("error", f"Error processing path {result['file']}: {e}")
+                log("error", f"Error processing path {result['file']}: {e}", sorry=True)
 
         details_md += "\n"
 

@@ -53,7 +53,7 @@ def compile_solc(path_type: str) -> tuple[Path, dict, str, list, dict]:
     set_solc_compiler_version(solc_required_version)
     solc_cmdline = construct_solc_cmdline(path_type, compilation_source_path)
     if solc_cmdline is None:
-        log("error", "Error constructing solc command line")
+        log("error", "Error constructing solc command line", sorry=True)
 
     solc_compile_res, _ = run_command(solc_cmdline, live_output=args.debug)
 

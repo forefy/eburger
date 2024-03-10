@@ -177,7 +177,7 @@ def set_solc_compiler_version(solc_required_version: str):
         _, errors = run_command(f"solc-select install {solc_required_version}")
         _, errors = run_command(f"solc-select use {solc_required_version}")
         if not solc_use_res or errors:
-            log("error", "Failed to install required solc version")
+            log("error", "Failed to install required solc version.", sorry=True)
     log(
         "info",
         "Successfully set solc version, trying to compile contract.",

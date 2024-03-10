@@ -30,7 +30,7 @@ def find_and_read_sol_file(folder_path: str) -> str:
                     if any("pragma" in line for line in head):
                         return sol_file_path
 
-    log("error", "Can't parse path given in argument.")
+    log("error", "Can't parse path given in argument.", sorry=True)
 
 
 def get_solidity_version_from_file(solidity_file_or_folder: str) -> str:
@@ -101,7 +101,9 @@ def create_directory_if_not_exists(directory_path: Path):
             os.makedirs(directory_path)
             log("debug", f"Created directory: {directory_path}")
         except Exception as e:
-            log("error", f"Could not create direction {directory_path}. {e}")
+            log(
+                "error", f"Could not create directory {directory_path}. {e}", sorry=True
+            )
 
 
 def create_or_empty_directory(directory_path: Path):
@@ -114,14 +116,18 @@ def create_or_empty_directory(directory_path: Path):
             os.makedirs(directory_path)
             log("debug", f"Emptied and re-created directory: {directory_path}")
         except Exception as e:
-            log("error", f"Could not create direction {directory_path}. {e}")
+            log(
+                "error", f"Could not create directory {directory_path}. {e}", sorry=True
+            )
     else:
         # Create the directory if it does not exist
         try:
             os.makedirs(directory_path)
             log("debug", f"Created directory: {directory_path}")
         except Exception as e:
-            log("error", f"Could not create direction {directory_path}. {e}")
+            log(
+                "error", f"Could not create directory {directory_path}. {e}", sorry=True
+            )
 
 
 # TODO: Add better handling for multiple build info files
@@ -135,7 +141,11 @@ def get_foundry_ast_json(forge_out_dir) -> dict:
         log("error", err_line)
 
     if not json_files:
-        log("error", "forge build generated no output.")
+        err_line = "forge build generated no output."
+        if not args.debug:
+            err_line += " try running with `--debug`."
+        log("error", err_line)
+
     if len(json_files) > 1:
         log(
             "warning",

@@ -43,7 +43,7 @@ def execute_python_code(
             line += f" at line {traceback.extract_tb(e.__traceback__)[-1][1]}"
         except Exception as e:
             line = f"failed extracting traceback - {line}"
-        log("error", f"Failed parsing template {template_name} -> {line}")
+        log("error", f"Failed parsing template {template_name} -> {line}", sorry=True)
 
 
 # Function to process a single YAML file
@@ -85,11 +85,13 @@ def process_files_concurrently(ast_data: dict, src_paths: list) -> list:
             yaml_files = list(
                 set(yaml_files + list(templates_directory.glob("*.yaml")))
             )
-        elif templates_directory.is_file() and templates_directory.suffix == ".yaml":
+        elif templates_directory.is_file():
+            if templates_directory.suffix != ".yaml":
+                log("error", "Please load files with a .yaml file extension.")
             if templates_directory not in yaml_files:
                 yaml_files.append(templates_directory)
         else:
-            log("error", "Invalid templates directory or file.")
+            log("error", "Invalid templates directory or file.", sorry=True)
     log(
         "info",
         f"Loaded {color.Success}{len(yaml_files)}{color.Default} templates for execution.",
@@ -109,9 +111,9 @@ def process_files_concurrently(ast_data: dict, src_paths: list) -> list:
                             continue
                     insights.append(results)
             except concurrent.futures.TimeoutError:
-                log("error", "A task has timed out.")
+                log("error", "A task has timed out.", sorry=True)
             except Exception as e:
-                log("error", f"Unhandled error: {e}")
+                log("error", f"Unhandled error: {e}", sorry=True)
     log(
         "info",
         f"{color.Error}{len(insights)}{color.Default} insight{'s were' if (len(insights) > 1 or len(insights) == 0) else ' was'} found by eBurger.",

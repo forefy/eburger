@@ -38,19 +38,20 @@ def construct_insight_occurrences(results: list) -> list:
     return occurrences
 
 
-def log(type: str, message: str):
+def log(type: str, message: str, sorry: bool = False):
     match type:
         case "success":
             if "success" not in args.no:
                 print(f"[{color.Success} 🍔 Success {color.Default}] {message}")
         case "error":
             print(f"[{color.Error} Error {color.Default}] {message}")
-            post_error_message = "         We are so sorry 😭🍔 please consider"
-            if not args.debug:
-                post_error_message += " running with --debug or"
-            print(
-                f"{post_error_message} creating an issue on https://github.com/forefy/eburger/issues/new?assignees=forefy&template=bug_report.md&title=Tool%20error%20report"
-            )
+            if sorry:
+                post_error_message = "         We are so sorry 😭🍔 please consider"
+                if not args.debug:
+                    post_error_message += " running with --debug or"
+                print(
+                    f"{post_error_message} creating an issue on https://github.com/forefy/eburger/issues/new?assignees=forefy&template=bug_report.md&title=Tool%20error%20report"
+                )
             sys.exit(1)
         case "warning":
             if "warning" not in args.no:
