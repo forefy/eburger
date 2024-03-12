@@ -1,9 +1,10 @@
 import os
 import sys
+
 from eburger import settings
+from eburger.utils.cli_args import args
 from eburger.utils.helpers import python_shell_source, run_command
 from eburger.utils.logger import log
-from eburger.utils.cli_args import args
 
 
 def check_if_skip_installations_requested(missing_dependency: str):

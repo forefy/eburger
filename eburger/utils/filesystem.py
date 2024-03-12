@@ -1,12 +1,13 @@
 import fnmatch
 import json
 import os
-from pathlib import Path
 import re
 import shutil
+from pathlib import Path
+
 from eburger import settings
-from eburger.utils.logger import log
 from eburger.utils.cli_args import args
+from eburger.utils.logger import log
 
 
 def find_and_read_sol_file(folder_path: str) -> str:

@@ -1,16 +1,16 @@
 # Silence tool prints
 import copy
-from datetime import datetime
 import json
 import os
-from pathlib import Path
 import sys
-from prettytable import PrettyTable, MARKDOWN
-from pygount import ProjectSummary, SourceAnalysis
+from datetime import datetime
+from pathlib import Path
 
 from eburger import settings
 from eburger.utils.cli_args import args
 from eburger.utils.logger import log
+from prettytable import MARKDOWN, PrettyTable
+from pygount import ProjectSummary, SourceAnalysis
 
 
 def save_as_json(file_path: Path, json_data: dict):

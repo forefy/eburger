@@ -13,9 +13,7 @@ from eburger.utils.filesystem import (
     roughly_check_valid_file_path_name,
     select_project,
 )
-from eburger.utils.helpers import (
-    get_eburger_version,
-)
+from eburger.utils.helpers import get_eburger_version
 from eburger.utils.installers import (
     install_foundry_if_not_found,
     install_hardhat_if_not_found,
@@ -27,7 +25,6 @@ from eburger.utils.outputs import (
     save_as_json,
     save_as_markdown,
     save_as_sarif,
-    save_as_json,
 )
 from eburger.yaml_parser import process_files_concurrently
 

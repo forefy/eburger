@@ -1,11 +1,12 @@
 import json
 import os
-from pathlib import Path
 import shutil
 import sys
+from pathlib import Path
 
 from eburger import settings
 from eburger.serializer import reduce_json
+from eburger.utils.cli_args import args
 from eburger.utils.filesystem import (
     create_or_empty_directory,
     find_and_read_sol_file,
@@ -24,7 +25,6 @@ from eburger.utils.installers import (
     set_solc_compiler_version,
 )
 from eburger.utils.logger import log
-from eburger.utils.cli_args import args
 
 
 def compile_solc(path_type: str) -> tuple[Path, dict, str, list, dict]:
