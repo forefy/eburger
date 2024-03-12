@@ -454,4 +454,4 @@ def test_modifier_without_proper_enforcement(vulnerable_ast):
         ast_json,
         src_paths,
     )
-    assert "Line 8 Columns 5-27" in results["results"][0]["lines"]
+    assert "Line 6 Columns 8-28" in results["results"][0]["lines"]

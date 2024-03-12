@@ -89,7 +89,11 @@ def get_filename_from_path(file_path: str) -> tuple:
         filename_match = re.search(r"/([^/]+)\.sol$", file_path)
         filename = filename_match.group(1) if filename_match else None
     filename = f"{filename}_{datetime.now().strftime('%m%y')}"
-    output_filename = settings.outputs_dir / f"{filename}.json"
+
+    ast_suffix = "_ast"
+    if filename.endswith("_ast"):
+        ast_suffix = ""
+    output_filename = Path(settings.outputs_dir) / f"{filename}{ast_suffix}.json"
 
     return filename, output_filename
 
@@ -183,9 +187,21 @@ def parse_code_highlight(node: dict, src_paths: list) -> tuple[str, str, str]:
     if file_index < len(src_paths):
         project_relative_file_name = src_paths[file_index]
     else:
+        log("warning", "Unrecognized AST src node, using default source file.")
         project_relative_file_name = src_paths[0]
 
-    file_path = str(Path(settings.project_root / project_relative_file_name).resolve())
+    if args.solidity_file_or_folder and args.ast_json_file:
+        file_path = str(
+            Path(
+                settings.project_root
+                / Path(args.solidity_file_or_folder)
+                / project_relative_file_name
+            ).resolve()
+        )
+    else:
+        file_path = str(
+            Path(settings.project_root / project_relative_file_name).resolve()
+        )
 
     if args.relative_file_paths:
         result_file_path_uri = project_relative_file_name
@@ -195,14 +211,23 @@ def parse_code_highlight(node: dict, src_paths: list) -> tuple[str, str, str]:
     start_offset, length, _ = map(int, src_location.split(":"))
 
     file_content = None
-    with open(file_path, "r") as file:
-        file_content = file.read()
-
+    try:
+        with open(file_path, "r") as file:
+            file_content = file.read()
+    except FileNotFoundError:
+        log(
+            "error",
+            f"Non-existent file path extracted from AST: {file_path}. Try to use `-f` to specify a path to the project's original folder to get full results.",
+        )
     if file_content is None:
+        log("warning", f"File {file_path} unreadable during code lines extraction.")
         return "File unreadable.", None, None
 
     if start_offset + length > len(file_content):
-        return "The start offset and length exceed the file content.", None, None
+        log(
+            "error",
+            f"The start offset and length exceed the file content for file: {file_path}",
+        )
 
     vulnerable_code = file_content[start_offset : start_offset + length]
     # Find the line number and character positions

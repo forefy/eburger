@@ -24,6 +24,7 @@ def execute_python_code(
         exec(compiled_code, globals(), local_vars)
 
         parsed_results = []
+
         for result in local_vars["results"]:
             if result.get("nodeType", None) is None:
                 log(
@@ -32,9 +33,11 @@ def execute_python_code(
                 )
 
             file_path, lines, vuln_code = parse_code_highlight(result, src_paths)
+
             parsed_results.append(
                 {"file": file_path, "lines": lines, "code": vuln_code}
             )
+
         return parsed_results
 
     except Exception as e:

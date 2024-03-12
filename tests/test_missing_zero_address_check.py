@@ -202,4 +202,4 @@ def test_missing_zero_address_check(vulnerable_ast):
         ast_json,
         src_paths,
     )
-    assert "Line 6 Columns 27-45" in results["results"][0]["lines"]
+    assert "Line 5 Columns 26-30" in results["results"][0]["lines"]

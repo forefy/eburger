@@ -27,6 +27,7 @@ from eburger.utils.outputs import (
     save_as_json,
     save_as_markdown,
     save_as_sarif,
+    save_as_json,
 )
 from eburger.yaml_parser import process_files_concurrently
 
@@ -39,21 +40,29 @@ def main():
     if not args.solidity_file_or_folder:
         args.solidity_file_or_folder = "."
 
-    log("debug", f"Project path: {args.solidity_file_or_folder}")
+    if args.ast_json_file and args.solidity_file_or_folder:
+        settings.outputs_dir = (
+            settings.project_root / args.solidity_file_or_folder
+        ).resolve() / ".eburger"
 
     create_directory_if_not_exists(settings.outputs_dir)
+
+    log("debug", f"Project path: {args.solidity_file_or_folder}")
+
     path_type = None
 
     if args.ast_json_file:
-        filename = args.ast_json_file
-        filename = filename.replace(".json", "")  # Clean possible file extension
-        filename = filename.replace(
-            ".eburger/", ""
-        )  # Protection against analysis of files inside the output path
+        filename = Path(args.ast_json_file).name
+
         with open(args.ast_json_file, "r") as f:
             ast_json = json.load(f)
             ast_json, src_paths = reduce_json(ast_json)
-        output_path = settings.outputs_dir / f"{filename}.json"
+
+        ast_suffix = "_ast"
+        if filename.endswith("_ast"):
+            ast_suffix = ""
+
+        output_path = (settings.outputs_dir / f"{filename}{ast_suffix}.json").resolve()
 
         save_as_json(output_path, ast_json)
 
@@ -168,7 +177,7 @@ def main():
         _, summary = calculate_nsloc()
         analysis_output["nsloc"] = summary
 
-        insights_json_path = settings.outputs_dir / f"eburger_output_{filename}.json"
+        insights_json_path = settings.outputs_dir / f"{filename}_eburger_output.json"
         save_as_json(insights_json_path, analysis_output)
         if roughly_check_valid_file_path_name(args.output):
             custom_output_path = Path(args.output)

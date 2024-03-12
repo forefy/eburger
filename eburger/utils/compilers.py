@@ -109,6 +109,7 @@ def compile_foundry(forge_full_path_binary_found: bool) -> tuple[Path, dict, str
     sample_file_path = find_and_read_sol_file(args.solidity_file_or_folder)
     filename, output_filename = get_filename_from_path(sample_file_path)
     ast_json = get_foundry_ast_json(forge_out_dir)
+
     ast_json, src_paths = reduce_json(ast_json)
 
     return output_filename, ast_json, filename, src_paths
@@ -154,6 +155,7 @@ def compile_hardhat() -> tuple[Path, dict, str, list]:
     filename, output_filename = get_filename_from_path(sample_file_path)
 
     ast_json = get_hardhat_ast_json(hardhat_out_dir)
+
     ast_json, src_paths = reduce_json(ast_json)
 
     return output_filename, ast_json, filename, src_paths
