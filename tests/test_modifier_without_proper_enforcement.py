@@ -7,61 +7,6 @@ from eburger.yaml_parser import process_yaml
 @pytest.fixture
 def vulnerable_ast() -> tuple[dict, list]:
     ast_json = """{
-    "contracts": {
-        "vulnerable_contracts/modifier_without_proper_enforcement.sol:BuggieContract": {
-            "abi": [
-                {
-                    "inputs": [],
-                    "stateMutability": "nonpayable",
-                    "type": "constructor"
-                },
-                {
-                    "inputs": [
-                        {
-                            "internalType": "address",
-                            "name": "_newOwner",
-                            "type": "address"
-                        }
-                    ],
-                    "name": "changeOwner",
-                    "outputs": [],
-                    "stateMutability": "nonpayable",
-                    "type": "function"
-                },
-                {
-                    "inputs": [],
-                    "name": "owner",
-                    "outputs": [
-                        {
-                            "internalType": "address",
-                            "name": "",
-                            "type": "address"
-                        }
-                    ],
-                    "stateMutability": "view",
-                    "type": "function"
-                }
-            ],
-            "bin": "608060405234801561000f575f80fd5b50335f806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055506101e18061005c5f395ff3fe608060405234801561000f575f80fd5b5060043610610034575f3560e01c80638da5cb5b14610038578063a6f9dae114610056575b5f80fd5b610040610072565b60405161004d9190610139565b60405180910390f35b610070600480360381019061006b9190610180565b610095565b005b5f8054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b3373ffffffffffffffffffffffffffffffffffffffff165f8054906101000a90505050805f806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555050565b5f73ffffffffffffffffffffffffffffffffffffffff82169050919050565b5f610123826100fa565b9050919050565b61013381610119565b82525050565b5f60208201905061014c5f83018461012a565b92915050565b5f80fd5b61015f81610119565b8114610169575f80fd5b50565b5f8135905061017a81610156565b92915050565b5f6020828403121561019557610194610152565b5b5f6101a28482850161016c565b9150509291505056fea26469706673582212204dfdf9cdf39c2629ee7ab4252d3f4b30cf7baa53e291837111ad42c15e4936ed64736f6c63430008140033",
-            "bin-runtime": "608060405234801561000f575f80fd5b5060043610610034575f3560e01c80638da5cb5b14610038578063a6f9dae114610056575b5f80fd5b610040610072565b60405161004d9190610139565b60405180910390f35b610070600480360381019061006b9190610180565b610095565b005b5f8054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b3373ffffffffffffffffffffffffffffffffffffffff165f8054906101000a90505050805f806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555050565b5f73ffffffffffffffffffffffffffffffffffffffff82169050919050565b5f610123826100fa565b9050919050565b61013381610119565b82525050565b5f60208201905061014c5f83018461012a565b92915050565b5f80fd5b61015f81610119565b8114610169575f80fd5b50565b5f8135905061017a81610156565b92915050565b5f6020828403121561019557610194610152565b5b5f6101a28482850161016c565b9150509291505056fea26469706673582212204dfdf9cdf39c2629ee7ab4252d3f4b30cf7baa53e291837111ad42c15e4936ed64736f6c63430008140033",
-            "devdoc": {
-                "kind": "dev",
-                "methods": {},
-                "version": 1
-            },
-            "hashes": {
-                "changeOwner(address)": "a6f9dae1",
-                "owner()": "8da5cb5b"
-            },
-            "srcmap": "24:507:0:-:0;;;80:49;;;;;;;;;;112:10;104:5;;:18;;;;;;;;;;;;;;;;;;24:507;;;;;;",
-            "srcmap-runtime": "24:507:0:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;54:20;;;:::i;:::-;;;;;;;:::i;:::-;;;;;;;;280:249;;;;;;;;;;;;;:::i;:::-;;:::i;:::-;;54:20;;;;;;;;;;;;:::o;280:249::-;246:10;237:19;;:5;;;;;;;;;:19;513:9:::1;505:5;::::0;:17:::1;;;;;;;;;;;;;;;;;;280:249:::0;:::o;7:126:1:-;44:7;84:42;77:5;73:54;62:65;;7:126;;;:::o;139:96::-;176:7;205:24;223:5;205:24;:::i;:::-;194:35;;139:96;;;:::o;241:118::-;328:24;346:5;328:24;:::i;:::-;323:3;316:37;241:118;;:::o;365:222::-;458:4;496:2;485:9;481:18;473:26;;509:71;577:1;566:9;562:17;553:6;509:71;:::i;:::-;365:222;;;;:::o;674:117::-;783:1;780;773:12;920:122;993:24;1011:5;993:24;:::i;:::-;986:5;983:35;973:63;;1032:1;1029;1022:12;973:63;920:122;:::o;1048:139::-;1094:5;1132:6;1119:20;1110:29;;1148:33;1175:5;1148:33;:::i;:::-;1048:139;;;;:::o;1193:329::-;1252:6;1301:2;1289:9;1280:7;1276:23;1272:32;1269:119;;;1307:79;;:::i;:::-;1269:119;1427:1;1452:53;1497:7;1488:6;1477:9;1473:22;1452:53;:::i;:::-;1442:63;;1398:117;1193:329;;;;:::o",
-            "userdoc": {
-                "kind": "user",
-                "methods": {},
-                "version": 1
-            }
-        }
-    },
     "sources": {
         "vulnerable_contracts/modifier_without_proper_enforcement.sol": {
             "AST": {
