@@ -1,0 +1,28 @@
+name: "Discourage `abi.encodePacked()` Usage with Dynamic Data Types"
+severity: "Low"
+precision: "High"
+description: "It's recommended to avoid `abi.encodePacked()` for dynamic data types before hashing operations, like with `keccak256()`."
+impact: "Utilizing `abi.encodePacked()` alongside dynamic data types might provoke hash collisions. Prefer `abi.encode()`, which ensures 32-byte padding for safer operations."
+action-items:
+    - "Switch from `abi.encodePacked()` to `abi.encode()` in scenarios involving dynamic types ahead of hash function usage."
+    - "For single arguments in `abi.encodePacked()`, casting to `bytes()` or `bytes32()` could be a better alternative."
+    - "Utilize `bytes.concat()` for concatenating strings or bytes, as a preferable method over `abi.encodePacked()`."
+references:
+    - "https://docs.soliditylang.org/en/v0.8.13/abi-spec.html#non-standard-packed-mode"
+    - "https://ethereum.stackexchange.com/questions/30912/how-to-compare-strings-in-solidity#answer-82739"
+reports: []
+vulnerable_contracts: []
+python: |
+    results = []
+    nodes = get_nodes_by_types(ast_data, ["MemberAccess"])
+    for node in nodes:
+        if node.get("memberName") == "encodePacked":
+            count = 0
+            argument_types = node.get("argumentTypes", [])
+            for argument_type in argument_types:
+                type_string = argument_type.get("typeString", "")
+                if "bytes " in type_string or "[]" in type_string or "string" in type_string:
+                    count += 1
+            if count > 1:
+                results.append(node)
+

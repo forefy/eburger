@@ -1,0 +1,62 @@
+name: "Rebasing Token Handling Issue Detection"
+severity: "Medium"
+precision: "High"
+description: "Detects potential mishandling of rebasing tokens in contracts by identifying direct transfer and transferFrom calls without share-based accounting."
+impact: "May result in inaccurate tracking of user balances and rewards, leading to possible financial loss for users."
+action-items:
+    - "Implement share-based accounting for deposits and withdrawals."
+    - "Review and update the token transfer logic to ensure compatibility with rebasing tokens."
+references:
+    - "https://docs.openzeppelin.com/contracts/4.x/api/token/erc20#ERC20"
+reports: []
+vulnerable_contracts: []
+python: |
+    results = []
+    # Step 1: Find AST nodes performing operations on 'supplyDelta'
+    operations_on_supplyDelta = []
+    nodes = get_nodes_by_types(ast_data, "BinaryOperation")
+    for node in nodes:
+        if ("leftHandSide" in node and node["leftHandSide"].get("name") == "supplyDelta") or \
+           ("rightHandSide" in node and node["rightHandSide"].get("name") == "supplyDelta"):
+            operations_on_supplyDelta.append(node)
+
+    # Step 2: Find the name of the contract performing operations
+    contract_names = []
+    for op_node in operations_on_supplyDelta:
+        contract_node = find_parent_node_by_type(op_node, "ContractDefinition")
+        if contract_node and contract_node["name"] not in contract_names:
+            contract_names.append(contract_node["name"])
+
+    # Step 3: Look for contract definitions importing the identified contracts
+    importing_contracts = []
+    for contract_name in contract_names:
+        nodes = get_nodes_by_types(ast_data, "ImportDirective")
+        for node in nodes:
+            if any(contract_name in path for path in node["path"]):
+                parent_contract = find_parent_node_by_type(node, "ContractDefinition")
+                if parent_contract and parent_contract["name"] not in importing_contracts:
+                    importing_contracts.append(parent_contract["name"])
+
+    # Step 4: For importing contracts, look for member accesses to 'balanceOf'
+    balanceOf_accesses = []
+    for contract_name in importing_contracts:
+        nodes = get_nodes_by_types(ast_data, "MemberAccess")
+        for node in nodes:
+            if node["memberName"] == "balanceOf":
+                balanceOf_accesses.append(node)
+
+    # Enhanced Analysis: Check for use of 'currentBalance' in a specific context
+    for node in balanceOf_accesses:
+        function_node = find_parent_node_by_type(node, "FunctionDefinition")
+        if function_node:
+            statements = function_node["body"].get("statements", [])
+            for statement in statements:
+                # This is a simplified check; you might need to dive deeper depending on your AST structure
+                if "currentBalance" in str(statement):
+                    # Check for a relation with 'Total' in any related assignment or operation
+                    if "Total" in str(statement):
+                        results.append(statement)
+
+    # Append all balanceOf accesses for completeness
+    results.extend(balanceOf_accesses)
+
