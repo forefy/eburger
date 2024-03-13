@@ -1,15 +1,17 @@
-name: "Unverified from Address Usage in transferFrom and safeTransferFrom"
-severity: "High"
-precision: "High"
+version: 1.0.6
+author: "@Seecoalba"
+name: "Unverified from Address Usage in transferFrom"
+severity: "Low"
+precision: "Medium"
 description: "Employing an unverified from address in transferFrom or safeTransferFrom operations poses a substantial risk of fund loss. This risk arises from the potential for any party to execute token transfers from the specified from address, contingent upon having received adequate approval."
-impact: "There's a hazard of unauthorized token transactions emanating from the specified from address, if it has been authorized, which could lead to significant asset depletion."
+impact: "Unauthorized token transactions emanating from the specified from address, if it has been authorized, which could lead to significant asset depletion."
 action-items:
-    - "Verify that the from address used in calls to transferFrom or safeTransferFrom is neither arbitrary nor under user control without proper validation."
-    - "Implement extra measures to ascertain the authenticity of the from address involved in token transfer activities."
+    - "Verify that the from address used in calls to transferFrom or safeTransferFrom is validated properly."
 references:
     - "https://solidity.readthedocs.io/en/latest/types.html#members-of-addresses"
 reports: []
-vulnerable_contracts: []
+vulnerable_contracts: 
+    - "../vulnerable_contracts/unverified_from_address_in_transfer/"
 python: |
     results = []
     # Retrieve all function call nodes from the AST.
