@@ -1579,4 +1579,4 @@ def test_missing_reentrancy_guard(vulnerable_ast):
         ast_json,
         src_paths,
     )
-    assert "Line 12 Columns 5-33" in results["results"][0]["lines"]
+    assert "Line 12 Columns 4-33" in results["results"][0]["lines"]
