@@ -1,0 +1,54 @@
+version: 1.0.6
+author: "@Seecoalba"
+name: "Unverified from Address Usage in transferFrom"
+severity: "Low"
+precision: "Medium"
+description: "Employing an unverified from address in transferFrom or safeTransferFrom operations poses a substantial risk of fund loss. This risk arises from the potential for any party to execute token transfers from the specified from address, contingent upon having received adequate approval."
+impact: "Unauthorized token transactions emanating from the specified from address, if it has been authorized, which could lead to significant asset depletion."
+action-items:
+    - "Verify that the from address used in calls to transferFrom or safeTransferFrom is validated properly."
+references:
+    - "https://solidity.readthedocs.io/en/latest/types.html#members-of-addresses"
+reports: []
+vulnerable_contracts: 
+    - "../vulnerable_contracts/unverified_from_address_in_transfer/"
+python: |
+    results = []
+    # Retrieve all function call nodes from the AST.
+    function_calls = get_nodes_by_types(ast_data, ["FunctionCall"])
+    
+    # Define a function to check the validity of the 'from' argument in a function call.
+    def check_argument_validity(function_call):
+        # Extract arguments from the function call.
+        args = function_call.get("arguments", [])
+        # Determine the index of the 'from' argument based on the number of arguments.
+        arg_index = 0 if len(args) == 3 else 1 if len(args) == 4 else -1
+        
+        # Ensure the arg_index is valid.
+        if arg_index not in [-1, len(args)]:
+            # Get the 'from' argument based on its index.
+            arg = args[arg_index]
+            # If the 'from' argument is accessed via a member access,
+            # verify if it securely originates from msg.sender.
+            if arg.get("nodeType") == "MemberAccess":
+                base_expr = arg.get("expression", {})
+                if arg.get("memberName") == "sender" and base_expr.get("name") == "msg":
+                    return False
+            # If the 'from' argument is a result of a function call,
+            # verify if it safely refers to 'this'.
+            elif arg.get("nodeType") == "FunctionCall":
+                expr = arg.get("expression", {})
+                if expr.get("typeName", {}).get("name") == "address" and \
+                   arg.get("arguments", [])[0].get("name") == "this":
+                    return False
+        # Consider the call valid if none of the above conditions are met.
+        return True
+    
+    # Iterate through each function call found in the AST.
+    for function_call in function_calls:
+        # Extract the name of the function being called.
+        function_name = function_call.get("expression", {}).get("memberName", "")
+        # If the function is 'transferFrom' or 'safeTransferFrom', and the 'from' argument is considered valid,
+        # add the function call to the results.
+        if function_name in ["transferFrom", "safeTransferFrom"] and check_argument_validity(function_call):
+            results.append(function_call)

@@ -1,0 +1,24 @@
+version: 1.0.6
+author: "@Seecoalba"
+name: "Unspecific Solidity Pragma Detector"
+severity: "Low"
+precision: "High"
+description: "Detects the usage of unspecific compiler pragmas that allow for a broader range of compiler versions than necessary, which can lead to unintended behavior or compiler warnings/errors with newer versions."
+impact: "Unpredictable behavior due to differences in compiler versions."
+action-items:
+    - "Specify a more precise range of compiler versions in the pragma statement to ensure consistent behavior across different environments."
+references:
+    - "https://docs.soliditylang.org/en/latest/layout-of-source-files.html#version-pragma"
+reports: 
+    - "https://github.com/Steemhunt/mint.club-v2-contract/issues/36"
+    - "https://solodit.xyz/issues/n-06-inconsistent-method-of-specifying-a-floating-pragma-code4rena-ens-ens-contest-git"
+vulnerable_contracts: 
+    - "../vulnerable_contracts/unspecific_pragma_detector.sol"
+python: |
+    results = []
+    pragma_directives = get_nodes_by_types(ast_data, "PragmaDirective")
+    for directive in pragma_directives:
+        literals = directive.get('literals', [])
+        pragma_string = ''.join(literals)
+        if '^' in pragma_string or '>' in pragma_string:
+            results.append(directive)

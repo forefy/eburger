@@ -1,4 +1,5 @@
 version: 1.0.5
+author: "@forefy"
 name: "Modifier Without Proper Enforcement"
 severity: "High"
 precision: "Low"

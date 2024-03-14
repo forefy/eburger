@@ -1,0 +1,41 @@
+version: 1.0.6
+author: "@Seecoalba"
+name: "Use of encodedPacked with Dynamic Data Types"
+severity: "Low"
+precision: "Medium"
+description: "It's recommended to avoid `abi.encodePacked()` for dynamic data types before hashing operations, like with `keccak256()`."
+impact: "Potential triggering of hash collisions."
+action-items:
+    - "Unless encodePacked is necessary, switch from `abi.encodePacked()` to `abi.encode()` in scenarios involving dynamic types ahead of hash function usage."
+    - "Consider `bytes.concat()` for concatenating strings or bytes, as a preferable method over `abi.encodePacked()`."
+references:
+    - "https://docs.soliditylang.org/en/v0.8.13/abi-spec.html#non-standard-packed-mode"
+    - "https://ethereum.stackexchange.com/questions/30912/how-to-compare-strings-in-solidity#answer-82739"
+reports: 
+    - "https://github.com/code-423n4/2023-11-shellprotocol/blob/8c6c6a33c817b588567a5b6a65bdda72d905941f/4naly3er-report.md?plain=1#L330"
+    - "https://solodit.xyz/issues/l-07-code4rena-backd-backd-contest-git"
+vulnerable_contracts: 
+    "../vulnerable_contracts/use_of_encodepacked.sol"
+python: |
+    results = []
+    nodes = get_nodes_by_types(ast_data, ["MemberAccess"])
+    for node in nodes:
+        if node.get("memberName") == "encodePacked":
+            uses_dynamic_data_types = False
+            problematic_type_string_patterns = ["bytes memory", "[] memory", "string memory"]
+            argument_types = node.get("argumentTypes", [])
+            for argument_type in argument_types:
+                type_string = argument_type.get("typeString", None)
+
+                pattern_match = False
+                for pattern in problematic_type_string_patterns:
+                    if pattern in type_string:
+                        pattern_match = True
+                        break
+
+                if pattern_match:
+                    uses_dynamic_data_types = True
+                    break
+                   
+            if uses_dynamic_data_types:
+                results.append(node)

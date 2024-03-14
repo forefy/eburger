@@ -1,0 +1,24 @@
+version: 1.0.6
+author: "@Seecoalba"
+name: "Use of SafeTransferLib"
+severity: "Low"
+precision: "High"
+description: "A notable distinction exists between Solmate's SafeTransferLib and OpenZeppelin's SafeERC20 library: the latter ensures the target is indeed a contract, a step omitted by Solmate's library. It is crucial to note from the documentation that the functions within this library do not verify the existence of code at the token's address, leaving it up to the user to ensure validity."
+impact: "Omitting checks for the token contract's presence could lead to tokens being sent to addresses that cannot interact with them properly, potentially resulting in the loss of assets or unsuccessful transactions."
+action-items:
+  - "Consider leveraging OpenZeppelin's SafeERC20 for ERC20 token interactions to incorporate contract presence verification."
+references:
+  - "https://github.com/transmissions11/solmate/blob/main/src/utils/SafeTransferLib.sol#L9"
+reports: 
+  - "https://github.com/code-423n4/2023-01-astaria-findings/blob/8059d5e7c4b3b7155259c7990226c91dc2f375fb/data/btk-Q.md?plain=1#L11"
+  - "https://solodit.xyz/issues/l-04-solmates-code4rena-caviar-caviar-contest-git"
+  - "https://solodit.xyz/issues/l-03-solmates-safetransferlib-doesnt-check-whether-the-erc20-contract-exists-code4rena-redacted-cartel-redacted-cartel-contest-git"
+vulnerable_contracts: 
+  - "../vulnerable_contracts/use_of_safetransferlib/"
+python: |
+  results = []
+  import_directives = get_nodes_by_types(ast_data, "ImportDirective")
+  for directive in import_directives:
+      absolute_path = directive.get("absolutePath", "")
+      if "solmate" in absolute_path and "SafeTransferLib" in absolute_path:
+          results.append(directive)
