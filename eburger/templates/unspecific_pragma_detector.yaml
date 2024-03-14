@@ -11,6 +11,7 @@ references:
     - "https://docs.soliditylang.org/en/latest/layout-of-source-files.html#version-pragma"
 reports: 
     - "https://github.com/Steemhunt/mint.club-v2-contract/issues/36"
+    - "https://solodit.xyz/issues/n-06-inconsistent-method-of-specifying-a-floating-pragma-code4rena-ens-ens-contest-git"
 vulnerable_contracts: 
     - "../vulnerable_contracts/unspecific_pragma_detector.sol"
 python: |

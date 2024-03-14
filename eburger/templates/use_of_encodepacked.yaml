@@ -13,6 +13,7 @@ references:
     - "https://ethereum.stackexchange.com/questions/30912/how-to-compare-strings-in-solidity#answer-82739"
 reports: 
     - "https://github.com/code-423n4/2023-11-shellprotocol/blob/8c6c6a33c817b588567a5b6a65bdda72d905941f/4naly3er-report.md?plain=1#L330"
+    - "https://solodit.xyz/issues/l-07-code4rena-backd-backd-contest-git"
 vulnerable_contracts: 
     "../vulnerable_contracts/use_of_encodepacked.sol"
 python: |

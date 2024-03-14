@@ -11,6 +11,8 @@ references:
   - "https://github.com/transmissions11/solmate/blob/main/src/utils/SafeTransferLib.sol#L9"
 reports: 
   - "https://github.com/code-423n4/2023-01-astaria-findings/blob/8059d5e7c4b3b7155259c7990226c91dc2f375fb/data/btk-Q.md?plain=1#L11"
+  - "https://solodit.xyz/issues/l-04-solmates-code4rena-caviar-caviar-contest-git"
+  - "https://solodit.xyz/issues/l-03-solmates-safetransferlib-doesnt-check-whether-the-erc20-contract-exists-code4rena-redacted-cartel-redacted-cartel-contest-git"
 vulnerable_contracts: 
   - "../vulnerable_contracts/use_of_safetransferlib/"
 python: |
