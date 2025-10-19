@@ -1,0 +1,128 @@
+name: "Missing Reentrancy Guard"
+severity: "High"
+precision: "Medium"
+description: "Function performs external calls transferring Ether without reentrancy protection."
+impact: "An attacker can exploit this to perform reentrancy attacks and drain funds or corrupt state."
+action-items:
+  - "Add reentrancy guard modifiers like OpenZeppelin's ReentrancyGuard."
+  - "Follow checks-effects-interactions pattern."
+  - "Move state changes before external calls."
+references:
+  - "https://consensys.github.io/smart-contract-best-practices/attacks/reentrancy/"
+reports: []
+vulnerable_contracts: []
+python: |
+  results = []
+  reports = []
+  debug_msgs = []
+
+  def get_line_number(file_path, offset):
+      try:
+          with open(file_path, 'r', encoding='utf-8') as f:
+              content = f.read()
+          return content[:int(offset)].count('\n') + 1
+      except:
+          return '?'
+
+  # --- Normalize ast_data to list ---
+  sources = list(ast_data.values()) if isinstance(ast_data, dict) else ast_data if isinstance(ast_data, list) else []
+
+  for source in sources:
+      nodes = source.get('nodes', [])
+      file_path = source.get('absolutePath','<unknown>')
+      for contract in [n for n in nodes if n.get('nodeType') == 'ContractDefinition']:
+          for func in [n for n in contract.get('nodes', []) if n.get('nodeType') == 'FunctionDefinition']:
+
+              body = func.get('body')
+              if not body:
+                  continue
+
+              # DFS stack to scan statements
+              stack = []
+              if isinstance(body, dict) and 'statements' in body:
+                  for stmt in body['statements']:
+                      if isinstance(stmt, dict):
+                          stack.append(stmt)
+
+              has_external_call = False
+
+              while stack and not has_external_call:
+                  stmt = stack.pop()
+                  stype = stmt.get('nodeType')
+
+                  expr = None
+                  if stype == 'ExpressionStatement':
+                      expr = stmt.get('expression', {})
+                  elif stype == 'VariableDeclarationStatement':
+                      expr = stmt.get('initialValue', {})
+
+                  if isinstance(expr, dict) and expr.get('nodeType') == 'FunctionCall':
+                      member_expr = expr.get('expression', {})
+
+                      # Case 1: MemberAccess (send/transfer/call)
+                      if member_expr.get('nodeType') == 'MemberAccess':
+                          member = member_expr.get('memberName', '')
+                          if member in ['send', 'transfer', 'call']:
+                              has_external_call = True
+                              break
+
+                      # Case 2: FunctionCallOptions or Identifier
+                      if member_expr.get('nodeType') in ['FunctionCallOptions', 'Identifier']:
+                          member_name = member_expr.get('memberName') or member_expr.get('name', '')
+                          if member_name.lower() in ['call', 'send', 'transfer'] or member_name == '':
+                              has_external_call = True
+                              break
+
+                  # Push nested blocks to stack
+                  for key in ['trueBody', 'falseBody', 'body']:
+                      if key in stmt and isinstance(stmt[key], dict):
+                          for s in stmt[key].get('statements', []):
+                              if isinstance(s, dict):
+                                  stack.append(s)
+                  if 'statements' in stmt and isinstance(stmt['statements'], list):
+                      for s in stmt['statements']:
+                          if isinstance(s, dict):
+                              stack.append(s)
+
+              if has_external_call:
+                  mods = func.get('modifiers', [])
+                  has_guard = False
+                  for mod in mods:
+                      mod_name = ''
+                      if isinstance(mod.get('modifierName'), dict):
+                          mod_name = mod['modifierName'].get('name', '').lower()
+                      elif isinstance(mod.get('modifierName'), str):
+                          mod_name = mod['modifierName'].lower()
+                      else:
+                          mod_name = str(mod.get('modifierName')).lower()
+                      if 'reentrancyguard' in mod_name or 'nonreentrant' in mod_name:
+                          has_guard = True
+                          break
+
+                  if not has_guard:
+                      results.append(func)
+
+                      func_name = func.get('name', '<anonymous>')
+                      contract_name = contract.get('name', '<anonymous>')
+                      src_info = func.get('src', '?:?:?').split(':')
+                      offset = src_info[0] if src_info else '0'
+                      line_number = get_line_number(file_path, offset)
+
+                      msg = f"[DEBUG] Potential reentrancy in {func_name} in contract {contract_name} (line {line_number})"
+                      print(msg)
+                      debug_msgs.append(msg)
+
+                      report = {
+                          "contract": contract_name,
+                          "function": func_name,
+                          "location": f"{file_path}:{line_number}",
+                          "description": f"Function '{func_name}' in contract '{contract_name}' performs an external call without a reentrancy guard."
+                      }
+                      reports.append(report)
+
+  # attach debug to reports for JSON output
+  result = {
+      "insights": reports,
+      "debug": debug_msgs
+  }
+  result
