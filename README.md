@@ -163,20 +163,6 @@ If you are using eburger as a python package (installed via pip install), the ex
 For template writing and documentation refer to the [Wiki](https://github.com/forefy/eburger/wiki/Templates).
 
 
-## Comparison table
-Comparison of actively maintained / popular solidity smart contract static analyzers
-
-| Static Analyzer                                        | Language        | 2 Minutes to write a [custom template with ChatGPT](https://chat.openai.com/g/g-gKaBfljnY-eburger-templates-generator) | GitHub Action | Many findings that are already found before the contest began | Would want to eat |
-|--------------------------------------------------------|-----------------|------------------------------------------------------------------------------------------------------------------------|---------------|---------------------------------------------------------------|-------------------|
-| [eBurger](https://github.com/forefy/eburger)           | Python          | ✅                                                                                                                     | ✅            |                                                               | ✅                |
-| [Slither](https://github.com/crytic/slither)           | Python          |                                                                                                                        | ✅            | ✅                                                            |                   |
-| [4naly3er](https://github.com/Picodes/4naly3er)        | TypeScript 🤮   |                                                                                                                        |               | ✅                                                            |                   |
-| [Mythril](https://github.com/Consensys/mythril)        | Python          |                                                                                                                        |               |                                                               |                   |
-| [Aderyn](https://github.com/Cyfrin/aderyn)             | Rust            |                                                                                                                        |               |                                                               |                   |
-
-
-Forgot one or made a mistake? open a pull request or an issue :)
-
 ## Features
 - YAML template support to query contract structure and raise insights for any matches
 - Fast learning curve for creating templates, ability to customize templates to the current ongoing audit project
